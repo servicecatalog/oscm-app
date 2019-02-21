@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.oscm</groupId>
+        <artifactId>new-oscm-app</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>oscm-app</artifactId>
+    <packaging>ejb</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.oscm</groupId>
+            <artifactId>oscm-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.oscm</groupId>
+            <artifactId>oscm-app-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <classifier>classes</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.oscm</groupId>
+            <artifactId>oscm-apiversioning-client-handler</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.oscm</groupId>
+            <artifactId>oscm-webservices-client</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.servicecatalog.oscm-interfaces</groupId>
+            <artifactId>oscm-app-extsvc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.servicecatalog.oscm-interfaces</groupId>
+            <artifactId>oscm-extsvc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.servicecatalog.oscm-interfaces</groupId>
+            <artifactId>oscm-extsvc-provisioning</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.servicecatalog.oscm-interfaces</groupId>
+            <artifactId>oscm-extsvc-operation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomee</groupId>
+            <artifactId>javaee-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.javamail</groupId>
+            <artifactId>geronimo-javamail_1.4_mail</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>wsdl4j</groupId>
+            <artifactId>wsdl4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+    </build>
+
+
+</project>
