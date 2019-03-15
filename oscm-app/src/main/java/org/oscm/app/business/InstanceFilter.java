@@ -8,15 +8,15 @@
 
 package org.oscm.app.business;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.oscm.app.business.exceptions.BadResultException;
 import org.oscm.app.domain.InstanceAttribute;
 import org.oscm.app.domain.InstanceParameter;
 import org.oscm.app.domain.ServiceInstance;
 import org.oscm.provisioning.data.ServiceAttribute;
 import org.oscm.provisioning.data.ServiceParameter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Class to filter the parameters that are only meant for proxy internal use and

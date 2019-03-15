@@ -9,8 +9,9 @@
 package org.oscm.app.setup;
 
 import org.apache.commons.validator.GenericValidator;
-import org.oscm.app.domain.PlatformConfigurationKey;
+
 import org.oscm.validator.ADMValidator;
+import org.oscm.app.domain.PlatformConfigurationKey;
 
 /**
  * Configuration setting validator

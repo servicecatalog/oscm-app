@@ -8,6 +8,20 @@
 
 package org.oscm.app.ui.serviceinstance;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.oscm.app.business.exceptions.ServiceInstanceException;
 import org.oscm.app.domain.InstanceOperation;
 import org.oscm.app.domain.InstanceParameter;
@@ -17,15 +31,6 @@ import org.oscm.app.ui.SessionConstants;
 import org.oscm.app.v2_0.data.ServiceUser;
 import org.oscm.app.v2_0.service.APPTimerServiceBean;
 import org.oscm.app.v2_0.service.ServiceInstanceServiceBean;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import javax.faces.model.SelectItem;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.util.*;
 
 /**
  * Controller of manage service instance page

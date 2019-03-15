@@ -4,10 +4,10 @@
 
 package org.oscm.converter;
 
+import java.io.IOException;
+
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
-
-import java.io.IOException;
 
 /**
  * This class is responsible to offer the functionality to encode and decode

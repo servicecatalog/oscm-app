@@ -60,9 +60,9 @@ import org.oscm.string.Strings;
  * members of this object are set when the provisionig call is done. Currently,
  * following members are provided by OSCM:<br />
  * <code>email, locale, first name, last name, user id</code>
- *
+ * 
  * @author kulle
- *
+ * 
  */
 @Stateless
 @WebService(serviceName = "ProvisioningService", targetNamespace = "http://oscm.org/xsd", portName = "ProvisioningServicePort", endpointInterface = "org.oscm.provisioning.intf.ProvisioningService")
@@ -94,7 +94,7 @@ public class AsynchronousProvisioningProxy implements ProvisioningService {
 
     @Override
     public BaseResult asyncCreateInstance(InstanceRequest request,
-                                          User requestingUser) {
+            User requestingUser) {
         logger.info("Create instance for organization {} for subscription {}.",
                 request.getOrganizationId(), request.getSubscriptionId());
         ServiceInstance instance = null;
@@ -126,7 +126,7 @@ public class AsynchronousProvisioningProxy implements ProvisioningService {
     }
 
     ServiceInstance createPersistentServiceInstance(InstanceRequest request,
-                                                    InstanceDescription descr) throws BadResultException {
+            InstanceDescription descr) throws BadResultException {
         final HashMap<String, Setting> parameters = createParameterMap(
                 request.getParameterValue());
         String controllerId = parameters.get(InstanceParameter.CONTROLLER_ID)
@@ -153,7 +153,7 @@ public class AsynchronousProvisioningProxy implements ProvisioningService {
     }
 
     InstanceDescription getInstanceDescription(InstanceRequest request,
-                                               User requestingUser)
+            User requestingUser)
             throws APPlatformException, BadResultException {
         final HashMap<String, Setting> parameters = createParameterMap(
                 request.getParameterValue());
@@ -214,7 +214,7 @@ public class AsynchronousProvisioningProxy implements ProvisioningService {
     }
 
     private List<InstanceParameter> createParameters(final ServiceInstance si,
-                                                     final Map<String, Setting> src) throws BadResultException {
+            final Map<String, Setting> src) throws BadResultException {
         final ArrayList<InstanceParameter> dest = new ArrayList<>();
         if (src != null) {
             for (final String key : src.keySet()) {
@@ -233,7 +233,7 @@ public class AsynchronousProvisioningProxy implements ProvisioningService {
     }
 
     private List<InstanceAttribute> createAttributes(final ServiceInstance si,
-                                                     final Map<String, Setting> src) throws BadResultException {
+            final Map<String, Setting> src) throws BadResultException {
         final ArrayList<InstanceAttribute> dest = new ArrayList<>();
         if (src != null) {
             for (final String key : src.keySet()) {
@@ -254,7 +254,7 @@ public class AsynchronousProvisioningProxy implements ProvisioningService {
 
     @Override
     public UserResult createUsers(String instanceId, List<User> users,
-                                  User requestingUser) {
+            User requestingUser) {
         logger.info("Create users for service instance with ID {}.",
                 instanceId);
 
@@ -322,7 +322,7 @@ public class AsynchronousProvisioningProxy implements ProvisioningService {
 
     @Override
     public BaseResult updateUsers(String instanceId, List<User> users,
-                                  User requestingUser) {
+            User requestingUser) {
         logger.info("Update users for service instance {}.", instanceId);
 
         ServiceInstance instance = null;
@@ -375,7 +375,7 @@ public class AsynchronousProvisioningProxy implements ProvisioningService {
 
     @Override
     public BaseResult deleteUsers(String instanceId, List<User> users,
-                                  User requestingUser) {
+            User requestingUser) {
         logger.info("Delete users for instance {}.", instanceId);
         ServiceInstance instance = null;
 
@@ -430,9 +430,9 @@ public class AsynchronousProvisioningProxy implements ProvisioningService {
 
     @Override
     public BaseResult asyncModifySubscription(String instanceId,
-                                              String subscriptionId, String referenceId,
-                                              List<ServiceParameter> parameterValues,
-                                              List<ServiceAttribute> attributeValues, User requestingUser) {
+            String subscriptionId, String referenceId,
+            List<ServiceParameter> parameterValues,
+            List<ServiceAttribute> attributeValues, User requestingUser) {
         final HashMap<String, Setting> parameterMap = createParameterMap(
                 parameterValues);
         final HashMap<String, Setting> attributeMap = createAttributeMap(
@@ -446,12 +446,12 @@ public class AsynchronousProvisioningProxy implements ProvisioningService {
     }
 
     private BaseResult modifySubscription(String instanceId,
-                                          String subscriptionId, String referenceId,
-                                          List<ServiceParameter> parameterValues,
-                                          List<ServiceAttribute> attributeValues,
-                                          final HashMap<String, Setting> parameterMap,
-                                          final HashMap<String, Setting> attributeMap,
-                                          ProvisioningStatus targetStatus, User requestingUser) {
+            String subscriptionId, String referenceId,
+            List<ServiceParameter> parameterValues,
+            List<ServiceAttribute> attributeValues,
+            final HashMap<String, Setting> parameterMap,
+            final HashMap<String, Setting> attributeMap,
+            ProvisioningStatus targetStatus, User requestingUser) {
 
         ServiceInstance instance = null;
 
@@ -525,7 +525,7 @@ public class AsynchronousProvisioningProxy implements ProvisioningService {
 
     @Override
     public BaseResult deleteInstance(String instanceId, String organizationId,
-                                     String subscriptionId, User requestingUser) {
+            String subscriptionId, User requestingUser) {
 
         logger.info("Delete instance {}.", instanceId);
         return appImpl.deleteInstance(instanceId, organizationId,
@@ -534,7 +534,7 @@ public class AsynchronousProvisioningProxy implements ProvisioningService {
 
     @Override
     public InstanceResult createInstance(InstanceRequest request,
-                                         User requestingUser) {
+            User requestingUser) {
         return provResult.getBaseResult(InstanceResult.class, 1, Messages.get(
                 getLocale(requestingUser), "error_synchronous_provisioning"));
     }
@@ -628,7 +628,7 @@ public class AsynchronousProvisioningProxy implements ProvisioningService {
 
     @Override
     public BaseResult deactivateInstance(String instanceId,
-                                         User requestingUser) {
+            User requestingUser) {
         logger.info("Deactivate instance {}.", instanceId);
         ServiceInstance instance = null;
 
@@ -681,18 +681,18 @@ public class AsynchronousProvisioningProxy implements ProvisioningService {
 
     @Override
     public BaseResult modifySubscription(String instanceId,
-                                         String subscriptionId, String referenceId,
-                                         List<ServiceParameter> parameterValues,
-                                         List<ServiceAttribute> attributeValues, User requestingUser) {
+            String subscriptionId, String referenceId,
+            List<ServiceParameter> parameterValues,
+            List<ServiceAttribute> attributeValues, User requestingUser) {
         return provResult.getBaseResult(BaseResult.class, 1, Messages.get(
                 getLocale(requestingUser), "error_synchronous_provisioning"));
     }
 
     @Override
     public BaseResult asyncUpgradeSubscription(String instanceId,
-                                               String subscriptionId, String referenceId,
-                                               List<ServiceParameter> parameterValues,
-                                               List<ServiceAttribute> attributeValues, User requestingUser) {
+            String subscriptionId, String referenceId,
+            List<ServiceParameter> parameterValues,
+            List<ServiceAttribute> attributeValues, User requestingUser) {
         final HashMap<String, Setting> parameterMap = createParameterMap(
                 parameterValues);
         final HashMap<String, Setting> attributesMap = createAttributeMap(
@@ -705,9 +705,9 @@ public class AsynchronousProvisioningProxy implements ProvisioningService {
 
     @Override
     public BaseResult upgradeSubscription(String instanceId,
-                                          String subscriptionId, String referenceId,
-                                          List<ServiceParameter> parameterValues,
-                                          List<ServiceAttribute> attributeValues, User requestingUser) {
+            String subscriptionId, String referenceId,
+            List<ServiceParameter> parameterValues,
+            List<ServiceAttribute> attributeValues, User requestingUser) {
         return provResult.getBaseResult(BaseResult.class, 1, Messages.get(
                 getLocale(requestingUser), "error_synchronous_provisioning"));
     }
@@ -727,7 +727,7 @@ public class AsynchronousProvisioningProxy implements ProvisioningService {
      * Merges updated application user ids to given list of users
      */
     private void mergeServiceUsers(List<User> users,
-                                   List<ServiceUser> updatedUsers) {
+            List<ServiceUser> updatedUsers) {
         for (ServiceUser updatedUser : updatedUsers) {
             for (User user : users) {
                 if (user.getUserId().equals(updatedUser.getUserId())) {
@@ -749,7 +749,7 @@ public class AsynchronousProvisioningProxy implements ProvisioningService {
 
     @Override
     public BaseResult saveAttributes(String organizationId,
-                                     List<ServiceAttribute> attributeValues, User requestingUser) {
+            List<ServiceAttribute> attributeValues, User requestingUser) {
         if (attributeValues == null) {
             return provResult.newOkBaseResult();
         }

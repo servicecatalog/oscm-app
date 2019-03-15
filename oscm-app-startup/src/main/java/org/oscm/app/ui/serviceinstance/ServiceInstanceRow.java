@@ -8,12 +8,13 @@
 
 package org.oscm.app.ui.serviceinstance;
 
-import org.oscm.app.domain.InstanceParameter;
-import org.oscm.app.domain.ServiceInstance;
+import java.util.List;
 
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
-import java.util.List;
+
+import org.oscm.app.domain.InstanceParameter;
+import org.oscm.app.domain.ServiceInstance;
 
 /**
  * Row of ServiceInstance table

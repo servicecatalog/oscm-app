@@ -8,12 +8,17 @@
 
 package org.oscm.app.domain;
 
-import org.oscm.app.business.exceptions.BadResultException;
-import org.oscm.encrypter.AESEncrypter;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.security.GeneralSecurityException;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+
+import org.oscm.app.business.exceptions.BadResultException;
+import org.oscm.encrypter.AESEncrypter;
 
 /**
  * A custom attribute for the asynchronous provisioning proxy.

@@ -12,10 +12,10 @@
 
 package org.oscm.types.enumtypes;
 
-import org.oscm.internal.types.enumtypes.OrganizationRoleType;
-
 import java.util.Collections;
 import java.util.Set;
+
+import org.oscm.internal.types.enumtypes.OrganizationRoleType;
 
 /**
  * The enumeration defining the possible target types for UDAs (entities where

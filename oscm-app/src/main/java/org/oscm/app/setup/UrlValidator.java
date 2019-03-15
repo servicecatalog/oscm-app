@@ -8,14 +8,14 @@
  *******************************************************************************/
 package org.oscm.app.setup;
 
-import org.apache.commons.validator.routines.RegexValidator;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.validator.routines.RegexValidator;
 
 /**
  * Overwrite Url validator

@@ -7,14 +7,7 @@
  *******************************************************************************/
 package org.oscm.app.dao;
 
-import org.oscm.app.business.exceptions.ServiceInstanceNotFoundException;
-import org.oscm.app.domain.InstanceParameter;
-import org.oscm.app.domain.ProvisioningStatus;
-import org.oscm.app.domain.ServiceInstance;
-import org.oscm.logging.Log4jLogger;
-import org.oscm.logging.LoggerFactory;
-import org.oscm.string.Strings;
-import org.oscm.types.enumtypes.LogMessageIdentifier;
+import java.util.List;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
@@ -24,7 +17,15 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.util.List;
+
+import org.oscm.logging.Log4jLogger;
+import org.oscm.logging.LoggerFactory;
+import org.oscm.string.Strings;
+import org.oscm.app.business.exceptions.ServiceInstanceNotFoundException;
+import org.oscm.app.domain.InstanceParameter;
+import org.oscm.app.domain.ProvisioningStatus;
+import org.oscm.app.domain.ServiceInstance;
+import org.oscm.types.enumtypes.LogMessageIdentifier;
 
 @Stateless
 @LocalBean

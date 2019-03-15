@@ -7,6 +7,18 @@
  *******************************************************************************/
 package org.oscm.app.v2_0.service;
 
+import java.util.EnumSet;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.ejb.LocalBean;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import org.oscm.app.business.AsynchronousProvisioningProxyImpl;
 import org.oscm.app.business.UserMapper;
 import org.oscm.app.business.exceptions.BESNotificationException;
@@ -16,7 +28,11 @@ import org.oscm.app.business.exceptions.ServiceInstanceNotFoundException;
 import org.oscm.app.dao.BesDAO;
 import org.oscm.app.dao.OperationDAO;
 import org.oscm.app.dao.ServiceInstanceDAO;
-import org.oscm.app.domain.*;
+import org.oscm.app.domain.InstanceOperation;
+import org.oscm.app.domain.InstanceParameter;
+import org.oscm.app.domain.Operation;
+import org.oscm.app.domain.ProvisioningStatus;
+import org.oscm.app.domain.ServiceInstance;
 import org.oscm.app.i18n.Messages;
 import org.oscm.app.v2_0.data.ServiceUser;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
@@ -26,13 +42,6 @@ import org.oscm.provisioning.data.User;
 import org.oscm.types.enumtypes.OperationStatus;
 import org.oscm.types.exceptions.ObjectNotFoundException;
 import org.slf4j.Logger;
-
-import javax.ejb.*;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import java.util.EnumSet;
-import java.util.List;
 
 /**
  * @author goebel

@@ -8,16 +8,12 @@
 
 package org.oscm.app.setup;
 
-import org.apache.commons.codec.binary.Base64;
-import org.oscm.app.business.exceptions.BadResultException;
-import org.oscm.app.domain.ConfigurationSetting;
-import org.oscm.app.domain.CustomAttribute;
-import org.oscm.app.domain.InstanceAttribute;
-import org.oscm.app.domain.InstanceParameter;
-import org.oscm.app.v2_0.exceptions.ConfigurationException;
-import org.oscm.app.v2_0.service.APPConfigurationServiceBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.Random;
 
 import javax.annotation.PostConstruct;
 import javax.crypto.BadPaddingException;
@@ -31,12 +27,17 @@ import javax.ejb.Startup;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import java.io.UnsupportedEncodingException;
-import java.security.GeneralSecurityException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import java.util.Random;
+
+import org.apache.commons.codec.binary.Base64;
+import org.oscm.app.business.exceptions.BadResultException;
+import org.oscm.app.domain.ConfigurationSetting;
+import org.oscm.app.domain.CustomAttribute;
+import org.oscm.app.domain.InstanceAttribute;
+import org.oscm.app.domain.InstanceParameter;
+import org.oscm.app.v2_0.exceptions.ConfigurationException;
+import org.oscm.app.v2_0.service.APPConfigurationServiceBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Migrates the old passwords to the new method.

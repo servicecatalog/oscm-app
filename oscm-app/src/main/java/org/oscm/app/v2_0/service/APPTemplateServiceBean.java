@@ -8,6 +8,13 @@
 
 package org.oscm.app.v2_0.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.ejb.Remote;
+import javax.ejb.Stateless;
+
 import org.oscm.app.dao.TemplateFileDAO;
 import org.oscm.app.domain.TemplateFile;
 import org.oscm.app.v2_0.data.PasswordAuthentication;
@@ -15,12 +22,6 @@ import org.oscm.app.v2_0.data.Template;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
 import org.oscm.app.v2_0.exceptions.AuthenticationException;
 import org.oscm.app.v2_0.intf.APPTemplateService;
-
-import javax.ejb.EJB;
-import javax.ejb.Remote;
-import javax.ejb.Stateless;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Implementation of the template service.

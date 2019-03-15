@@ -8,7 +8,25 @@
 
 package org.oscm.app.ui.filter;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+import javax.ejb.EJB;
+import javax.inject.Inject;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
 import org.oscm.app.ui.SessionConstants;
 import org.oscm.app.ui.i18n.Messages;
 import org.oscm.app.v2_0.data.PasswordAuthentication;
@@ -16,18 +34,7 @@ import org.oscm.app.v2_0.service.APPAuthenticationServiceBean;
 import org.oscm.app.v2_0.service.APPConfigurationServiceBean;
 import org.oscm.types.enumtypes.UserRoleType;
 import org.oscm.vo.VOUserDetails;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ejb.EJB;
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.StringTokenizer;
 
 /**
  * @author Dirk Bernsau

@@ -8,28 +8,41 @@
 
 package org.oscm.app.v2_0.service;
 
-import org.oscm.app.business.exceptions.BadResultException;
-import org.oscm.app.domain.*;
-import org.oscm.app.i18n.Messages;
-import org.oscm.app.v2_0.data.*;
-import org.oscm.app.v2_0.exceptions.ConfigurationException;
-import org.oscm.encrypter.AESEncrypter;
-import org.oscm.string.Strings;
-import org.oscm.vo.VOUserDetails;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.ejb.LocalBean;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.persistence.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.security.GeneralSecurityException;
 import java.util.*;
+
+import javax.ejb.LocalBean;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
+import org.oscm.app.business.exceptions.BadResultException;
+import org.oscm.app.domain.ConfigurationSetting;
+import org.oscm.app.domain.CustomAttribute;
+import org.oscm.app.domain.InstanceParameter;
+import org.oscm.app.domain.PlatformConfigurationKey;
+import org.oscm.app.domain.ServiceInstance;
+import org.oscm.app.i18n.Messages;
+import org.oscm.app.v2_0.data.ControllerConfigurationKey;
+import org.oscm.app.v2_0.data.PasswordAuthentication;
+import org.oscm.app.v2_0.data.ProvisioningSettings;
+import org.oscm.app.v2_0.data.ServiceUser;
+import org.oscm.app.v2_0.data.Setting;
+import org.oscm.app.v2_0.exceptions.ConfigurationException;
+import org.oscm.encrypter.AESEncrypter;
+import org.oscm.string.Strings;
+import org.oscm.vo.VOUserDetails;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of the configuration service.

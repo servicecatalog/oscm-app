@@ -8,20 +8,22 @@
 
 package org.oscm.app.v2_0.service;
 
-import org.apache.commons.codec.binary.Base64;
-import org.oscm.app.business.APPlatformControllerFactory;
-import org.oscm.app.business.exceptions.BadResultException;
-import org.oscm.app.business.exceptions.ServiceInstanceNotFoundException;
-import org.oscm.app.dao.ServiceInstanceDAO;
-import org.oscm.app.domain.PlatformConfigurationKey;
-import org.oscm.app.domain.ServiceInstance;
-import org.oscm.app.v2_0.data.*;
-import org.oscm.app.v2_0.exceptions.*;
-import org.oscm.app.v2_0.intf.APPlatformController;
-import org.oscm.app.v2_0.intf.APPlatformService;
-import org.oscm.vo.VOUserDetails;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -30,17 +32,29 @@ import javax.crypto.NoSuchPaddingException;
 import javax.ejb.EJB;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.security.*;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+
+import org.apache.commons.codec.binary.Base64;
+import org.oscm.app.business.APPlatformControllerFactory;
+import org.oscm.app.business.exceptions.BadResultException;
+import org.oscm.app.business.exceptions.ServiceInstanceNotFoundException;
+import org.oscm.app.dao.ServiceInstanceDAO;
+import org.oscm.app.domain.PlatformConfigurationKey;
+import org.oscm.app.domain.ServiceInstance;
+import org.oscm.app.v2_0.data.ControllerSettings;
+import org.oscm.app.v2_0.data.PasswordAuthentication;
+import org.oscm.app.v2_0.data.ProvisioningSettings;
+import org.oscm.app.v2_0.data.Setting;
+import org.oscm.app.v2_0.data.User;
+import org.oscm.app.v2_0.exceptions.APPlatformException;
+import org.oscm.app.v2_0.exceptions.ConfigurationException;
+import org.oscm.app.v2_0.exceptions.ControllerLookupException;
+import org.oscm.app.v2_0.exceptions.ObjectNotFoundException;
+import org.oscm.app.v2_0.exceptions.SuspendException;
+import org.oscm.app.v2_0.intf.APPlatformController;
+import org.oscm.app.v2_0.intf.APPlatformService;
+import org.oscm.vo.VOUserDetails;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Dirk Bernsau

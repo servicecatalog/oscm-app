@@ -4,6 +4,9 @@
 
 package org.oscm.app.business;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
 import org.oscm.app.adapter.APPlatformControllerAdapter;
 import org.oscm.app.i18n.Messages;
 import org.oscm.app.v2_0.exceptions.ControllerLookupException;
@@ -11,8 +14,6 @@ import org.oscm.app.v2_0.intf.APPlatformController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import java.util.Properties;
 
 public class APPlatformControllerFactory {

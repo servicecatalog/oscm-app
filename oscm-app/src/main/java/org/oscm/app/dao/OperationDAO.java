@@ -4,15 +4,16 @@
 
 package org.oscm.app.dao;
 
-import org.oscm.app.domain.Operation;
-import org.oscm.app.domain.ServiceInstance;
+import java.util.Properties;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.util.Properties;
+
+import org.oscm.app.domain.Operation;
+import org.oscm.app.domain.ServiceInstance;
 
 @Stateless
 public class OperationDAO {

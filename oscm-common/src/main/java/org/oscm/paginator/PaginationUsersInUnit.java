@@ -7,10 +7,10 @@
  *******************************************************************************/
 package org.oscm.paginator;
 
-import org.oscm.internal.types.enumtypes.UnitRoleType;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.oscm.internal.types.enumtypes.UnitRoleType;
 
 public class PaginationUsersInUnit extends Pagination {
 

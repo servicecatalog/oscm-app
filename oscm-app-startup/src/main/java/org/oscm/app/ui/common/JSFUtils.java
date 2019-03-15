@@ -8,13 +8,14 @@
 
 package org.oscm.app.ui.common;
 
-import org.oscm.app.ui.SessionConstants;
+import java.util.Iterator;
+import java.util.Locale;
 
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.Iterator;
-import java.util.Locale;
+
+import org.oscm.app.ui.SessionConstants;
 
 /**
  * Utility class which provides helper methods around the JSF classes.

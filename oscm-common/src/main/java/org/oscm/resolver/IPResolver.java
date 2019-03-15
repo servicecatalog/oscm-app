@@ -12,10 +12,11 @@
 
 package org.oscm.resolver;
 
+import java.util.Enumeration;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
-import java.util.Enumeration;
 
 /**
  * @author tokoda

@@ -8,6 +8,12 @@
 
 package org.oscm.app.business;
 
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.slf4j.Logger;
+
 import org.oscm.app.business.exceptions.BadResultException;
 import org.oscm.app.business.exceptions.ServiceInstanceNotFoundException;
 import org.oscm.app.dao.ServiceInstanceDAO;
@@ -22,11 +28,6 @@ import org.oscm.app.v2_0.service.APPTimerServiceBean;
 import org.oscm.provisioning.data.BaseResult;
 import org.oscm.provisioning.data.User;
 import org.oscm.provisioning.intf.ProvisioningService;
-import org.slf4j.Logger;
-
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 /**
  * @author kulle

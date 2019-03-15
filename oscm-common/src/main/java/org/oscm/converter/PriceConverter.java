@@ -12,8 +12,6 @@
 
 package org.oscm.converter;
 
-import org.apache.commons.validator.routines.CurrencyValidator;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -21,6 +19,8 @@ import java.text.DecimalFormatSymbols;
 import java.text.Format;
 import java.text.ParseException;
 import java.util.Locale;
+
+import org.apache.commons.validator.routines.CurrencyValidator;
 
 /**
  * @author pravi

@@ -4,14 +4,14 @@
 
 package org.oscm.converter;
 
-import org.oscm.internal.types.exception.SaaSSystemException;
-import org.oscm.logging.Log4jLogger;
-import org.oscm.logging.LoggerFactory;
-import org.oscm.types.enumtypes.LogMessageIdentifier;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+
+import org.oscm.logging.Log4jLogger;
+import org.oscm.logging.LoggerFactory;
+import org.oscm.types.enumtypes.LogMessageIdentifier;
+import org.oscm.internal.types.exception.SaaSSystemException;
 
 public class ResourceLoader {
 

@@ -8,11 +8,12 @@
 
 package org.oscm.app.ui.serviceinstance;
 
-import org.oscm.app.ui.BaseModel;
+import java.util.List;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.util.List;
+
+import org.oscm.app.ui.BaseModel;
 
 /**
  * Model of manage service instance page

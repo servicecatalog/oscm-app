@@ -12,14 +12,15 @@
 
 package org.oscm.logging;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.oscm.types.enumtypes.LogMessageIdentifier;
-
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
+import org.oscm.types.enumtypes.LogMessageIdentifier;
 
 /**
  * This utility class provides the logging functionality to be used by the

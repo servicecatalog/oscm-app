@@ -8,12 +8,12 @@
 
 package org.oscm.validator;
 
-import org.oscm.converter.TimeStampUtil;
-import org.oscm.internal.types.enumtypes.ServiceStatus;
-import org.oscm.internal.types.exception.ServiceStateException;
 import org.oscm.logging.Log4jLogger;
 import org.oscm.logging.LoggerFactory;
+import org.oscm.converter.TimeStampUtil;
 import org.oscm.types.enumtypes.LogMessageIdentifier;
+import org.oscm.internal.types.enumtypes.ServiceStatus;
+import org.oscm.internal.types.exception.ServiceStateException;
 
 /**
  * Contains utility methods for validating Product domain model objects.

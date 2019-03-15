@@ -8,6 +8,11 @@
 
 package org.oscm.validator;
 
+import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Locale;
+
 import org.apache.commons.validator.GenericValidator;
 import org.oscm.converter.PriceConverter;
 import org.oscm.internal.types.exception.ValidationException;
@@ -15,11 +20,6 @@ import org.oscm.internal.types.exception.ValidationException.ReasonEnum;
 import org.oscm.logging.Log4jLogger;
 import org.oscm.logging.LoggerFactory;
 import org.oscm.types.enumtypes.LogMessageIdentifier;
-
-import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * Helper class which provides convenient methods to perform the validation in

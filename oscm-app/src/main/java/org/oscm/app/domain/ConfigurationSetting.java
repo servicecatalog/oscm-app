@@ -8,12 +8,18 @@
 
 package org.oscm.app.domain;
 
-import org.oscm.app.v2_0.exceptions.ConfigurationException;
-import org.oscm.encrypter.AESEncrypter;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.security.GeneralSecurityException;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+
+import org.oscm.app.v2_0.exceptions.ConfigurationException;
+import org.oscm.encrypter.AESEncrypter;
 
 /**
  * A configuration setting for the asynchronous provisioning proxy.

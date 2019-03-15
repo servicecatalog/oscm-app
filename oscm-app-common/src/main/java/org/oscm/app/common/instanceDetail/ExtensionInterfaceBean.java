@@ -10,6 +10,17 @@
  *******************************************************************************/
 package org.oscm.app.common.instanceDetail;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.inject.Inject;
+
 import org.apache.commons.codec.binary.Base64;
 import org.oscm.app.v2_0.data.ControllerConfigurationKey;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
@@ -17,16 +28,6 @@ import org.oscm.app.v2_0.intf.InstanceAccess;
 import org.oscm.app.v2_0.intf.ServerInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import javax.inject.Inject;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Bean for showing server information.

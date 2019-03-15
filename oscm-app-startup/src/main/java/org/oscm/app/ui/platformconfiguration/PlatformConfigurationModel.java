@@ -5,12 +5,12 @@
  *******************************************************************************/
 package org.oscm.app.ui.platformconfiguration;
 
-import org.oscm.app.ui.BaseModel;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
 import java.util.List;
 import java.util.TreeMap;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+
+import org.oscm.app.ui.BaseModel;
 
 /**
  * Created by PLGrubskiM on 2017-04-24.

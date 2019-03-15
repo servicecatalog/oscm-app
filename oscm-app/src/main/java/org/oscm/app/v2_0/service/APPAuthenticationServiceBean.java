@@ -4,6 +4,17 @@
 
 package org.oscm.app.v2_0.service;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.ejb.EJB;
+import javax.ejb.LocalBean;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+
 import org.oscm.app.business.exceptions.ServiceInstanceNotFoundException;
 import org.oscm.app.dao.BesDAO;
 import org.oscm.app.dao.ServiceInstanceDAO;
@@ -21,12 +32,6 @@ import org.oscm.vo.VOUser;
 import org.oscm.vo.VOUserDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ejb.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 @Stateless
 @LocalBean

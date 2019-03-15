@@ -8,6 +8,36 @@
 
 package org.oscm.app.v2_0.service;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Properties;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.ejb.ConcurrencyManagement;
+import javax.ejb.ConcurrencyManagementType;
+import javax.ejb.EJB;
+import javax.ejb.EJBException;
+import javax.ejb.LocalBean;
+import javax.ejb.Singleton;
+import javax.ejb.Timeout;
+import javax.ejb.Timer;
+import javax.ejb.TimerService;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.inject.Inject;
+import javax.naming.NamingException;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.PersistenceContext;
+
 import org.oscm.app.business.APPlatformControllerFactory;
 import org.oscm.app.business.InstanceFilter;
 import org.oscm.app.business.ProductProvisioningServiceFactoryBean;
@@ -17,13 +47,23 @@ import org.oscm.app.business.exceptions.ServiceInstanceNotFoundException;
 import org.oscm.app.dao.BesDAO;
 import org.oscm.app.dao.OperationDAO;
 import org.oscm.app.dao.ServiceInstanceDAO;
-import org.oscm.app.domain.*;
+import org.oscm.app.domain.InstanceParameter;
+import org.oscm.app.domain.Operation;
+import org.oscm.app.domain.PlatformConfigurationKey;
+import org.oscm.app.domain.ProvisioningStatus;
+import org.oscm.app.domain.ServiceInstance;
 import org.oscm.app.i18n.Messages;
 import org.oscm.app.v2_0.data.InstanceStatus;
 import org.oscm.app.v2_0.data.LocalizedText;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
 import org.oscm.app.v2_0.data.Setting;
-import org.oscm.app.v2_0.exceptions.*;
+import org.oscm.app.v2_0.exceptions.APPlatformException;
+import org.oscm.app.v2_0.exceptions.AbortException;
+import org.oscm.app.v2_0.exceptions.ConfigurationException;
+import org.oscm.app.v2_0.exceptions.ControllerLookupException;
+import org.oscm.app.v2_0.exceptions.InstanceExistsException;
+import org.oscm.app.v2_0.exceptions.InstanceNotAliveException;
+import org.oscm.app.v2_0.exceptions.SuspendException;
 import org.oscm.app.v2_0.intf.APPlatformController;
 import org.oscm.operation.data.OperationResult;
 import org.oscm.provisioning.data.BaseResult;
@@ -36,20 +76,6 @@ import org.oscm.types.enumtypes.OperationStatus;
 import org.oscm.types.exceptions.ObjectNotFoundException;
 import org.oscm.vo.VOUserDetails;
 import org.slf4j.Logger;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import javax.ejb.*;
-import javax.ejb.Timer;
-import javax.inject.Inject;
-import javax.naming.NamingException;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.PersistenceContext;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * The timer service implementation
@@ -517,7 +543,7 @@ public class APPTimerServiceBean implements Cloneable {
     }
 
     void handleException(ServiceInstance currentSI,
-                         final ProvisioningStatus instanceProvStatus, Exception e) {
+            final ProvisioningStatus instanceProvStatus, Exception e) {
         APPlatformException cause = getPlatformException(e);
         logger.warn(
                 "Failure during processing for service instance '{}' with message '{}'",
@@ -615,7 +641,7 @@ public class APPTimerServiceBean implements Cloneable {
     }
 
     void handleSuspendException(ServiceInstance currentSI,
-                                ProvisioningStatus instanceProvStatus, SuspendException se) {
+            ProvisioningStatus instanceProvStatus, SuspendException se) {
         // TODO check no params set in SuspendException
         // write the parameters back
         updateParameterMapSafe(currentSI, se.getChangedParameters());

@@ -8,15 +8,16 @@
 
 package org.oscm.app.domain;
 
+import java.io.*;
+import java.util.Properties;
+
+import javax.persistence.*;
+
 import org.oscm.app.v2_0.intf.APPlatformController;
 import org.oscm.logging.Log4jLogger;
 import org.oscm.logging.LoggerFactory;
 import org.oscm.string.Strings;
 import org.oscm.types.enumtypes.LogMessageIdentifier;
-
-import javax.persistence.*;
-import java.io.*;
-import java.util.Properties;
 
 /**
  * Represents an operation for a service instance.

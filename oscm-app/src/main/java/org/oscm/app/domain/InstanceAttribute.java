@@ -8,11 +8,12 @@
 
 package org.oscm.app.domain;
 
-import org.oscm.app.business.exceptions.BadResultException;
-import org.oscm.encrypter.AESEncrypter;
+import java.security.GeneralSecurityException;
 
 import javax.persistence.*;
-import java.security.GeneralSecurityException;
+
+import org.oscm.app.business.exceptions.BadResultException;
+import org.oscm.encrypter.AESEncrypter;
 
 /**
  * Represents a attributes setting for a service instance.

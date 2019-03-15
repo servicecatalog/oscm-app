@@ -8,9 +8,9 @@
 
 package org.oscm.types.enumtypes;
 
-import org.oscm.converter.DateConverter;
-
 import java.util.Calendar;
+
+import org.oscm.converter.DateConverter;
 
 /**
  * Represents periods that can be used by the services to indicate time spans,

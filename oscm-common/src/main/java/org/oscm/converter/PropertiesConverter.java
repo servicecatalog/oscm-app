@@ -8,15 +8,15 @@
 
 package org.oscm.converter;
 
-import org.oscm.internal.types.exception.SaaSSystemException;
-import org.oscm.logging.Log4jLogger;
-import org.oscm.logging.LoggerFactory;
-import org.oscm.types.enumtypes.LogMessageIdentifier;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Properties;
+
+import org.oscm.logging.Log4jLogger;
+import org.oscm.logging.LoggerFactory;
+import org.oscm.types.enumtypes.LogMessageIdentifier;
+import org.oscm.internal.types.exception.SaaSSystemException;
 
 /**
  * Converter of properties

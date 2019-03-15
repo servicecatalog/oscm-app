@@ -8,13 +8,13 @@
 
 package org.oscm.validator;
 
-import org.apache.commons.validator.GenericValidator;
-import org.apache.commons.validator.routines.DomainValidator;
-import org.apache.oro.text.perl.Perl5Util;
-
 import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.validator.GenericValidator;
+import org.apache.commons.validator.routines.DomainValidator;
+import org.apache.oro.text.perl.Perl5Util;
 
 /**
  * Class which provides base validation methods and constants.

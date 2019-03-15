@@ -7,6 +7,29 @@
  *******************************************************************************/
 package org.oscm.app.v2_0.service;
 
+import static java.lang.Long.parseLong;
+import static java.time.Instant.ofEpochMilli;
+import static java.time.ZoneId.of;
+import static java.time.ZonedDateTime.now;
+import static java.time.ZonedDateTime.ofInstant;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.ejb.EJB;
+import javax.ejb.Singleton;
+import javax.ejb.Startup;
+import javax.ejb.Timeout;
+import javax.ejb.Timer;
+import javax.ejb.TimerService;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import org.oscm.app.business.APPlatformControllerFactory;
 import org.oscm.app.business.exceptions.BadResultException;
 import org.oscm.app.domain.PlatformConfigurationKey;
@@ -18,23 +41,6 @@ import org.oscm.app.v2_0.intf.APPlatformController;
 import org.oscm.app.v2_0.intf.APPlatformService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import javax.ejb.*;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.List;
-
-import static java.lang.Long.parseLong;
-import static java.time.Instant.ofEpochMilli;
-import static java.time.ZoneId.of;
-import static java.time.ZonedDateTime.now;
-import static java.time.ZonedDateTime.ofInstant;
-import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 /**
  * This class is a timer implementation which polls the controller to gather

@@ -4,9 +4,10 @@
 
 package org.oscm.validation;
 
-import org.oscm.converter.WhiteSpaceConverter;
-
 import java.util.Collection;
+
+import org.oscm.converter.WhiteSpaceConverter;
+import org.oscm.internal.types.exception.IllegalArgumentException;
 
 /**
  * Utility class to validate arguments in API methods.

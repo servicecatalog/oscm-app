@@ -8,7 +8,9 @@
 
 package org.oscm.app.dao;
 
-import org.oscm.app.domain.TemplateFile;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
@@ -16,9 +18,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+
+import org.oscm.app.domain.TemplateFile;
 
 /**
  * Data access object for template files.

@@ -8,11 +8,12 @@
 
 package org.oscm.app.ui.common;
 
-import org.oscm.app.ui.SessionConstants;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.oscm.app.ui.SessionConstants;
 
 /**
  * Exception helper class.

@@ -8,8 +8,7 @@
 
 package org.oscm.app.ui;
 
-import org.oscm.app.ui.i18n.Messages;
-import org.oscm.app.v2_0.data.ServiceUser;
+import java.util.regex.Pattern;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -17,7 +16,9 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.regex.Pattern;
+
+import org.oscm.app.ui.i18n.Messages;
+import org.oscm.app.v2_0.data.ServiceUser;
 
 /**
  * Base class for backing beans implementing UI controllers.
