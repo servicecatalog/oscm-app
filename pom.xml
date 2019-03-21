@@ -14,6 +14,7 @@
         <module>oscm-app</module>
         <module>oscm-app-startup</module>
         <module>oscm-app-common</module>
+        <module>oscm-app-openstack-ear</module>
         <module>oscm-app-openstack</module>
         <module>oscm-apiversioning-client-handler</module>
         <module>oscm-common</module>
@@ -86,6 +87,11 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.5</version>
             </dependency>
             <dependency>
                 <groupId>log4j</groupId>

@@ -10,8 +10,8 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.oscm</groupId>
     <artifactId>oscm-app-openstack</artifactId>
+    <packaging>ejb</packaging>
 
     <dependencies>
         <dependency>
@@ -44,5 +44,8 @@
         </dependency>
     </dependencies>
 
-    
+    <build>
+        <finalName>${project.artifactId}</finalName>
+    </build>
+
 </project>
