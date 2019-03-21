@@ -8,21 +8,28 @@
 
 package org.oscm.app.openstack;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.Authenticator;
+import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
+import java.net.Proxy;
+import java.net.URL;
+import java.net.URLStreamHandler;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+
 import org.oscm.app.openstack.exceptions.OpenStackConnectionException;
 import org.oscm.app.openstack.proxy.ProxyAuthenticator;
 import org.oscm.app.openstack.proxy.ProxySettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.*;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * A connection to the OpenStack Heat API.
@@ -156,23 +163,19 @@ public class OpenStackConnection {
             case 400:
                 throw new OpenStackConnectionException(
                         "either input parameter format error or security key is not correct"
-                                + code,
-                        responseCode);
+                                + code, responseCode);
             case 401:
-                throw new OpenStackConnectionException("unauthorized" + code,
-                        responseCode);
-
+                throw new OpenStackConnectionException(
+                        "unauthorized" + code, responseCode);
             case 404:
                 throw new OpenStackConnectionException(
                         "resource not found" + code, responseCode);
-
             case 504:
                 throw new OpenStackConnectionException(
                         " Gateway/proxy timeout." + code, responseCode);
-
             default:
-                throw new OpenStackConnectionException("send failed" + code,
-                        responseCode);
+                throw new OpenStackConnectionException(
+                        "send failed" + code, responseCode);
             }
         } finally {
             if (out != null) {

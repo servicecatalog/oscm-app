@@ -8,10 +8,10 @@
 
 package org.oscm.app.openstack.data;
 
-import org.oscm.app.v2_0.intf.ServerInformation;
-
 import java.util.Iterator;
 import java.util.List;
+
+import org.oscm.app.v2_0.intf.ServerInformation;
 
 /**
  * @author tateiwamext

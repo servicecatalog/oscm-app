@@ -8,6 +8,25 @@
 
 package org.oscm.app.openstack;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Authenticator;
+import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
+import java.net.Proxy;
+import java.net.URL;
+import java.net.URLStreamHandler;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+
 import org.oscm.app.openstack.controller.OpenStackController;
 import org.oscm.app.openstack.controller.PropertyHandler;
 import org.oscm.app.openstack.controller.StackStatus;
@@ -26,18 +45,6 @@ import org.oscm.app.v2_0.exceptions.InstanceNotAliveException;
 import org.oscm.app.v2_0.intf.APPTemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.*;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Make Heat API calls to create, update and delete stacks.

@@ -8,6 +8,11 @@
 
 package org.oscm.app.openstack.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+
 import org.oscm.app.openstack.NovaProcessor;
 import org.oscm.app.openstack.data.Server;
 import org.oscm.app.v2_0.APPlatformServiceFactory;
@@ -21,10 +26,6 @@ import org.oscm.app.v2_0.intf.InstanceAccess;
 import org.oscm.app.v2_0.intf.ServerInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author tateiwamext

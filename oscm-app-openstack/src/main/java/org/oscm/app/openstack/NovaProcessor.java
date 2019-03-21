@@ -8,6 +8,10 @@
 
 package org.oscm.app.openstack;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import org.oscm.app.openstack.controller.PropertyHandler;
 import org.oscm.app.openstack.controller.ServerStatus;
 import org.oscm.app.openstack.data.Server;
@@ -19,10 +23,6 @@ import org.oscm.app.v2_0.exceptions.APPlatformException;
 import org.oscm.app.v2_0.exceptions.InstanceNotAliveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * @author tateiwamext

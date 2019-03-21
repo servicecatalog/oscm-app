@@ -7,6 +7,13 @@
  *******************************************************************************/
 package org.oscm.app.openstack.usage;
 
+import static java.time.LocalDateTime.parse;
+import static java.time.ZoneOffset.UTC;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+
+import java.math.BigDecimal;
+import java.net.MalformedURLException;
+
 import org.openstack4j.model.compute.SimpleTenantUsage;
 import org.oscm.app.openstack.OpenstackClient;
 import org.oscm.app.openstack.controller.PropertyHandler;
@@ -19,13 +26,6 @@ import org.oscm.types.exceptions.ValidationException;
 import org.oscm.vo.VOGatheredEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.math.BigDecimal;
-import java.net.MalformedURLException;
-
-import static java.time.LocalDateTime.parse;
-import static java.time.ZoneOffset.UTC;
-import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 /**
  * Handle usage data and register events.

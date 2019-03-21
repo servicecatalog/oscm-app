@@ -8,6 +8,12 @@
 
 package org.oscm.app.openstack.controller;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import org.oscm.app.openstack.data.FlowState;
 import org.oscm.app.openstack.i18n.Messages;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
@@ -16,12 +22,6 @@ import org.oscm.app.v2_0.exceptions.ConfigurationException;
 import org.oscm.app.v2_0.intf.APPlatformService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 public abstract class ProvisioningValidator {
 

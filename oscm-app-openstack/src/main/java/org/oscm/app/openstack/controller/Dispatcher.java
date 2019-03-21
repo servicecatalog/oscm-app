@@ -10,6 +10,15 @@
  *******************************************************************************/
 package org.oscm.app.openstack.controller;
 
+import static org.oscm.app.openstack.controller.PropertyHandler.RESOURCETYPE_PROJ;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
 import org.oscm.app.openstack.HeatProcessor;
 import org.oscm.app.openstack.NovaProcessor;
 import org.oscm.app.openstack.OpenstackClient;
@@ -21,19 +30,14 @@ import org.oscm.app.openstack.i18n.Messages;
 import org.oscm.app.v2_0.data.InstanceStatus;
 import org.oscm.app.v2_0.data.LocalizedText;
 import org.oscm.app.v2_0.data.User;
-import org.oscm.app.v2_0.exceptions.*;
+import org.oscm.app.v2_0.exceptions.APPlatformException;
+import org.oscm.app.v2_0.exceptions.AbortException;
+import org.oscm.app.v2_0.exceptions.AuthenticationException;
+import org.oscm.app.v2_0.exceptions.InstanceNotAliveException;
+import org.oscm.app.v2_0.exceptions.SuspendException;
 import org.oscm.app.v2_0.intf.APPlatformService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
-import static org.oscm.app.openstack.controller.PropertyHandler.RESOURCETYPE_PROJ;
 
 /**
  * Dispatcher for triggering the next step in a provisioning operation depending

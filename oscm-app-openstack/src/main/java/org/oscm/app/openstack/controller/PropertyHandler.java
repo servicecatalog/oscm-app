@@ -10,6 +10,11 @@
  *******************************************************************************/
 package org.oscm.app.openstack.controller;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.sling.commons.json.JSONArray;
 import org.apache.sling.commons.json.JSONException;
 import org.apache.sling.commons.json.JSONObject;
@@ -22,11 +27,6 @@ import org.oscm.app.v2_0.data.Setting;
 import org.oscm.app.v2_0.exceptions.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Helper class to handle service parameters and controller configuration
