@@ -15,6 +15,14 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.github.servicecatalog.oscm-interfaces</groupId>
+            <artifactId>oscm-app-extsvc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.oscm</groupId>
+            <artifactId>oscm-common</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.faces</artifactId>
         </dependency>
@@ -55,12 +63,12 @@
             <artifactId>richfaces-a4j</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.oscm</groupId>
-            <artifactId>oscm-common</artifactId>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.servicecatalog.oscm-interfaces</groupId>
-            <artifactId>oscm-app-extsvc</artifactId>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
         </dependency>
     </dependencies>
 
