@@ -1,141 +1,126 @@
 /*******************************************************************************
- *                                                                              
+ *
  *  Copyright FUJITSU LIMITED 2018
- *                                                                              
- *  Creation Date: 10.04.2017                                                      
- *                                                                              
+ *
+ *  Creation Date: 10.04.2017
+ *
  *******************************************************************************/
 package org.oscm.app.common.ui;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import java.io.OutputStream;
-import java.util.Locale;
-
-import javax.faces.application.Application;
-import javax.faces.component.UIViewRoot;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.naming.InitialContext;
-import javax.servlet.http.HttpSession;
-
 import org.apache.myfaces.custom.fileupload.UploadedFile;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.oscm.app.common.APPTemplateServiceMockup;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.oscm.app.v2_0.data.PasswordAuthentication;
+import org.oscm.app.v2_0.data.Template;
 import org.oscm.app.v2_0.intf.APPTemplateService;
 import org.oscm.app.v2_0.intf.ControllerAccess;
-//TODO: check it
-/*import org.oscm.test.EJBTestBase;
-import org.oscm.test.ejb.TestContainer;*/
 
-/**
- * Unit test of template bean
- */
-//TODO: check it
-@Ignore
-public class TemplateBeanTest /*extends EJBTestBase*/ {
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import java.io.OutputStream;
+import java.util.Date;
 
-    // Local mockups
-    private APPTemplateServiceMockup templateService;
-    private FacesContext facesContext;
-    private ExternalContext externalContext;
-    private Application application;
-    private HttpSession httpSession;
-    private UIViewRoot viewRoot;
-    private ControllerAccess controllerAccess;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
-    //TODO: check it
-    /*@Override
-    protected void setup(TestContainer container) throws Exception {
-    }*/
+/** Unit test of template bean */
+@RunWith(MockitoJUnitRunner.class)
+public class TemplateBeanTest {
 
-    /**
-     * Init and return testing bean
-     */
-    private TemplateBean getTestBean() throws Exception {
-        InitialContext context = new InitialContext();
-        context.bind(APPTemplateService.JNDI_NAME, templateService);
+  @Spy @InjectMocks private TemplateBean templateBean = new TemplateBean();
 
-        templateService = new APPTemplateServiceMockup();
-        facesContext = Mockito.mock(FacesContext.class);
-        externalContext = Mockito.mock(ExternalContext.class);
-        httpSession = Mockito.mock(HttpSession.class);
-        application = Mockito.mock(Application.class);
-        controllerAccess = Mockito.mock(ControllerAccess.class);
-        viewRoot = Mockito.mock(UIViewRoot.class);
+  @Mock private APPTemplateService templateService;
 
-        Mockito.when(facesContext.getExternalContext())
-                .thenReturn(externalContext);
-        Mockito.when(facesContext.getApplication()).thenReturn(application);
-        Mockito.when(externalContext.getSession(Matchers.anyBoolean()))
-                .thenReturn(httpSession);
-        Mockito.when(httpSession.getAttribute(Matchers.anyString()))
-                .thenReturn("aValue");
-        Mockito.when(facesContext.getViewRoot()).thenReturn(viewRoot);
-        Mockito.when(viewRoot.getLocale()).thenReturn(new Locale("en"));
-        Mockito.when(controllerAccess.getControllerId())
-                .thenReturn("ess.common");
+  @Mock private ControllerAccess controllerAccess;
 
-        // Init testing bean
-        TemplateBean bean = new TemplateBean() {
+  @Mock private UploadedFile uploadedFile;
 
-            @Override
-            protected FacesContext getContext() {
-                return facesContext;
-            }
-        };
-        bean.setTemplateService(templateService);
-        bean.setControllerAccess(controllerAccess);
-        return bean;
-    }
+  @Before
+  public void setup() {
 
-    @Test
-    public void testLoad() throws Exception {
-        TemplateBean bean = getTestBean();
+    PasswordAuthentication sampleAuthentication = new PasswordAuthentication("test", "test");
+    doReturn(sampleAuthentication).when(templateBean).getAuthentication();
+  }
 
-        assertNull(bean.getModel());
-        bean.load();
-        assertNotNull(bean.getModel());
-    }
+  @Test
+  public void testLoad() {
 
-    @Test
-    public void testSave() throws Exception {
-        TemplateBean bean = getTestBean();
+    // given
+    assertNull(templateBean.getModel());
 
-        UploadedFile uf = Mockito.mock(UploadedFile.class);
-        Mockito.when(uf.getName()).thenReturn("test.txt");
+    // when
+    templateBean.load();
 
-        bean.setUploadedFile(uf);
+    // then
+    assertNotNull(templateBean.getModel());
+  }
 
-        assertNull(bean.getStatus());
-        bean.save();
+  @Test
+  public void testSave() {
 
-        assertNotNull(bean.getStatus());
-    }
+    // given
+    when(uploadedFile.getName()).thenReturn("test.txt");
+    assertNull(templateBean.getStatus());
 
-    @Test
-    public void testDelete() throws Exception {
-        TemplateBean bean = getTestBean();
+    // when
+    templateBean.save();
 
-        assertNull(bean.getModel());
-        bean.delete("file");
-        assertNotNull(bean.getModel());
-    }
+    // then
+    assertNotNull(templateBean.getStatus());
+  }
 
-    @Test
-    public void testExport() throws Exception {
-        TemplateBean bean = getTestBean();
+  @Test
+  public void testDelete() {
 
-        OutputStream os = Mockito.mock(OutputStream.class);
-        Mockito.when(externalContext.getResponseOutputStream()).thenReturn(os);
+    // given
+    assertNull(templateBean.getModel());
 
-        bean.export("file");
-        Mockito.verify(facesContext).responseComplete();
+    // when
+    templateBean.delete("file");
 
-    }
+    // then
+    assertNotNull(templateBean.getModel());
+  }
 
+  @Test
+  public void testExport() throws Exception {
+
+    // given
+    Template template = givenTemplate();
+
+    FacesContext facesContext = mock(FacesContext.class);
+    ExternalContext externalContext = mock(ExternalContext.class);
+    OutputStream os = mock(OutputStream.class);
+
+    doReturn(facesContext).when(templateBean).getContext();
+    when(templateService.getTemplate(anyString(), anyString(), any(PasswordAuthentication.class)))
+        .thenReturn(template);
+    when(facesContext.getExternalContext()).thenReturn(externalContext);
+    when(externalContext.getResponseOutputStream()).thenReturn(os);
+
+    // when
+    templateBean.export("file");
+
+    // then
+    Mockito.verify(facesContext).responseComplete();
+  }
+
+  private Template givenTemplate() {
+
+    Template template = new Template();
+    template.setFileName("file");
+    template.setContent("test".getBytes());
+    template.setLastChange(new Date());
+
+    return template;
+  }
 }
