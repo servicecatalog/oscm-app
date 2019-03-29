@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.oscm</groupId>
+        <artifactId>new-oscm-app</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>oscm-app-openstack-ear</artifactId>
+    <packaging>ear</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.oscm</groupId>
+            <artifactId>oscm-app-openstack</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <type>ejb</type>
+        </dependency>
+        <dependency>
+            <groupId>org.oscm</groupId>
+            <artifactId>oscm-app-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <configuration>
+                    <version>7</version>
+                    <displayName>Catalog Manager OpenStack Heat Provisioning</displayName>
+                    <defaultLibBundleDir>lib</defaultLibBundleDir>
+                    <modules>
+                        <ejbModule>
+                            <groupId>org.oscm</groupId>
+                            <artifactId>oscm-app-openstack</artifactId>
+                            <bundleFileName>oscm-app-openstack.jar</bundleFileName>
+                        </ejbModule>
+                        <webModule>
+                            <groupId>org.oscm</groupId>
+                            <artifactId>oscm-app-common</artifactId>
+                            <contextRoot>oscm-app-openstack</contextRoot>
+                            <bundleFileName>oscm-app-common.war</bundleFileName>
+                        </webModule>
+                    </modules>
+                    <archive>
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                        <manifest>
+                            <addClasspath>false</addClasspath>
+                        </manifest>
+                    </archive>
+                    <packagingExcludes>
+                        lib/activation-*.jar,
+                        lib/btf-*.jar,
+                        lib/commons-beanutils*.jar,
+                        lib/commons-digester*.jar,
+                        lib/commons-validator*.jar,
+                        lib/jackson-coreutils*.jar,
+                        lib/jackson-dataformat*.jar,
+                        lib/jackson-jaxrs*.jar,
+                        lib/jackson-module*.jar,
+                        lib/jboss-*.jar,
+                        lib/jcip-*.jar,
+                        lib/json-*.jar,
+                        lib/jsr*.jar,
+                        lib/msg-*.jar,
+                        lib/oro-*.jar,
+                        lib/oscm-app-*.jar,
+                        lib/resteasy-*.jar,
+                        lib/snake*.jar
+                    </packagingExcludes>
+                </configuration>
+            </plugin>
+        </plugins>
+        <finalName>oscm-app-openstack</finalName>
+    </build>
+
+
+</project>
