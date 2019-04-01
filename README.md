@@ -9,3 +9,4 @@ Simply run
 `mvn clean install`
 to get following artifacts:
 - oscm-app.ear
+- oscm-app-openstack.ear
