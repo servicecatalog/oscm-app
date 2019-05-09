@@ -10,3 +10,4 @@ Simply run
 to get following artifacts:
 - oscm-app.ear
 - oscm-app-openstack.ear
+- oscm-app-aws.ear
