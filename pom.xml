@@ -18,6 +18,8 @@
         <module>oscm-app-openstack</module>
         <module>oscm-app-aws-ear</module>
         <module>oscm-app-aws</module>
+        <module>oscm-app-azure-ear</module>
+        <module>oscm-app-azure</module>
         <module>oscm-apiversioning-client-handler</module>
         <module>oscm-common</module>
         <module>oscm-extsvc-internal</module>

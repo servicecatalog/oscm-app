@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.oscm</groupId>
+        <artifactId>new-oscm-app</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>oscm-app-azure-ear</artifactId>
+    <packaging>ear</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.oscm</groupId>
+            <artifactId>oscm-app-azure</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <type>ejb</type>
+        </dependency>
+        <dependency>
+            <groupId>org.oscm</groupId>
+            <artifactId>oscm-app-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <type>war</type>
+        </dependency>
+        <!--check if necessary-->
+        <dependency>
+            <groupId>com.github.servicecatalog.oscm-interfaces</groupId>
+            <artifactId>oscm-extsvc</artifactId>
+        </dependency>
+        <!--check if necessary-->
+        <dependency>
+            <groupId>org.oscm</groupId>
+            <artifactId>oscm-common</artifactId>
+        </dependency>
+        <!--check if necessary-->
+        <dependency>
+            <groupId>org.oscm</groupId>
+            <artifactId>oscm-extsvc-internal</artifactId>
+        </dependency>
+        <!--check if necessary-->
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>asm</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+        <!--check if necessary-->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>fluent-hc</artifactId>
+            <version>4.3.1</version>
+        </dependency>
+        <!--check if necessary-->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient-cache</artifactId>
+            <version>4.3.1</version>
+        </dependency>
+        <!--check if necessary-->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>4.3.1</version>
+        </dependency>
+        <!--check if necessary-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.9.4</version>
+        </dependency>
+        <!--check if necessary-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.4</version>
+        </dependency>
+        <!--check if necessary-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+        <!--check if necessary-->
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-bundle</artifactId>
+            <version>1.18.1</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <configuration>
+                    <version>7</version>
+                    <displayName>OSCM AZURE ARM CONTROLLER</displayName>
+                    <defaultLibBundleDir>lib</defaultLibBundleDir>
+                    <modules>
+                        <ejbModule>
+                            <groupId>org.oscm</groupId>
+                            <artifactId>oscm-app-azure</artifactId>
+                            <bundleFileName>oscm-app-azure.jar</bundleFileName>
+                        </ejbModule>
+                        <webModule>
+                            <groupId>org.oscm</groupId>
+                            <artifactId>oscm-app-common</artifactId>
+                            <contextRoot>oscm-app-azure</contextRoot>
+                            <bundleFileName>oscm-app-common.war</bundleFileName>
+                        </webModule>
+                    </modules>
+                    <archive>
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                        <manifest>
+                            <addClasspath>false</addClasspath>
+                        </manifest>
+                    </archive>
+                    <packagingExcludes>
+                        lib/asm-3*.jar,
+                        lib/activation-*.jar,
+                        lib/azure-keyvault*.jar,
+                        lib/bcprov-*.jar,
+                        lib/commons-beanutils*.jar,
+                        lib/commons-digester*.jar,
+                        lib/commons-validator*.jar,
+                        lib/jackson-jaxrs*.jar,
+                        lib/jackson-xc*.jar,
+                        lib/javax*.jar,
+                        lib/jaxb-*.jar,
+                        lib/jcip-*.jar,
+                        lib/jersey-client*.jar,
+                        lib/jersey-core*.jar,
+                        lib/jersey-json*.jar,
+                        lib/jettison-*.jar,
+                        lib/jsr*.jar,
+                        lib/lang-*.jar,
+                        lib/mail-*.jar,
+                        lib/oro-*.jar,
+                        lib/stax-*.jar
+                    </packagingExcludes>
+                </configuration>
+            </plugin>
+        </plugins>
+        <finalName>oscm-app-azure</finalName>
+    </build>
+
+    
+</project>
