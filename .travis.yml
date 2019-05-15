@@ -8,7 +8,7 @@ jdk:
 env:
 - MVN_GOAL=test
 
-before_script: mvn clean
+before_install: mvn clean
 
 script:
 - MAVEN_OPTS=-Dorg.slf4j.simpleLogger.defaultLogLevel=info mvn org.jacoco:jacoco-maven-plugin:prepare-agent $MVN_GOAL -q -fae -Dmaven.javadoc.skip=true -DfailIfNoTests=false -B -P travis
