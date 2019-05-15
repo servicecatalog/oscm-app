@@ -9,7 +9,7 @@ env:
 - MVN_GOAL=test
 
 script:
-- "mvn clean install"
+- "mvn clean install -X"
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)
