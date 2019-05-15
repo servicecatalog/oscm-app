@@ -49,31 +49,7 @@
     </dependencies>
 
     <build>
-        <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-install-plugin</artifactId>
-            <executions>
-                <execution>
-                    <id>install-vim25-jar</id>
-                    <phase>clean</phase>
-                    <configuration>
-                        <repositoryLayout>default</repositoryLayout>
-                        <groupId>com.vmware</groupId>
-                        <artifactId>wsvim25</artifactId>
-                        <version>1.0.0</version>
-                        <file>${project.basedir}/resources/vim25.jar</file>
-                        <packaging>jar</packaging>
-                        <generatePom>true</generatePom>
-                    </configuration>
-                    <goals>
-                        <goal>install-file</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
-        </plugins>
         <finalName>${project.artifactId}</finalName>
     </build>
-    
+
 </project>
