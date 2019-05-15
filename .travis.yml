@@ -5,8 +5,8 @@ sudo: false
 jdk:
 - oraclejdk8
 
-script:
-- mvn clean install
+before_install:
+- mvn clean install -X
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)
