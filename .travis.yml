@@ -6,11 +6,11 @@ jdk:
 - oraclejdk8
 
 env:
-- MVN_GOAL=clean install
+- MVN_GOAL=test
 
 script:
 - MAVEN_OPTS=-Dorg.slf4j.simpleLogger.defaultLogLevel=info mvn org.jacoco:jacoco-maven-plugin:prepare-agent $MVN_GOAL -q -fae -Dmaven.javadoc.skip=true -DfailIfNoTests=false -B -P travis
-- "mvn cobertura:cobertura"
+- "mvn clean cobertura:cobertura"
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)
