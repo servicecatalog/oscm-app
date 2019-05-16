@@ -12,3 +12,4 @@ to get following artifacts:
 - oscm-app-openstack.ear
 - oscm-app-aws.ear
 - oscm-app-azure.ear
+- oscm-app-vmware.ear
