@@ -80,6 +80,7 @@
                         lib/jsr*.jar,
                         lib/msg-*.jar,
                         lib/oro-*.jar,
+                        lib/openstack4j-resteasy-*.jar,
                         lib/oscm-app-*.jar,
                         lib/resteasy-*.jar,
                         lib/snake*.jar
