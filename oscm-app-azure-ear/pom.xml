@@ -33,13 +33,13 @@
         </dependency>
         <!--check if necessary-->
         <dependency>
-            <groupId>org.oscm</groupId>
-            <artifactId>oscm-common</artifactId>
+            <groupId>com.github.servicecatalog.oscm-interfaces</groupId>
+            <artifactId>oscm-extsvc-internal</artifactId>
         </dependency>
         <!--check if necessary-->
         <dependency>
             <groupId>org.oscm</groupId>
-            <artifactId>oscm-extsvc-internal</artifactId>
+            <artifactId>oscm-common</artifactId>
         </dependency>
         <!--check if necessary-->
         <dependency>

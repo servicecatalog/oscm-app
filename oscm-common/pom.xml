@@ -14,7 +14,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.oscm</groupId>
+            <groupId>com.github.servicecatalog.oscm-interfaces</groupId>
             <artifactId>oscm-extsvc-internal</artifactId>
         </dependency>
         <dependency>
