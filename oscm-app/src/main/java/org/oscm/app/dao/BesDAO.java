@@ -7,9 +7,7 @@
  *******************************************************************************/
 package org.oscm.app.dao;
 
-import org.oscm.apiversioning.handler.ClientVersionHandler;
 import org.oscm.app.business.exceptions.BESNotificationException;
-import org.oscm.app.contants.CTMGApiVersion;
 import org.oscm.app.domain.Operation;
 import org.oscm.app.domain.PlatformConfigurationKey;
 import org.oscm.app.domain.ServiceInstance;
@@ -211,22 +209,8 @@ public class BesDAO {
 
         Service service = createWebService(getWsdlUrl(serviceClass, settings),
                 serviceQName);
-        addVersionInformation(service);
-        return service.getPort(serviceClass);
-    }
 
-    /**
-     * Helper method to add a version information into the header of the
-     * outbound SOAP message. The version information is read from a property
-     * file.
-     * 
-     * @param service
-     * @return
-     */
-    private Service addVersionInformation(Service service) {
-        ClientVersionHandler versionHandler = new ClientVersionHandler(
-                CTMGApiVersion.version);
-        return versionHandler.addVersionInformationToClient(service);
+        return service.getPort(serviceClass);
     }
 
     <T> URL getWsdlUrl(Class<T> serviceClass, Map<String, Setting> settings)
