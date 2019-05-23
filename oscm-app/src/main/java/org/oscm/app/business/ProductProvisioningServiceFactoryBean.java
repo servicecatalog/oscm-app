@@ -8,22 +8,22 @@
 
 package org.oscm.app.business;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.xml.ws.WebServiceException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.oscm.ws.WSPortConnector;
 import org.oscm.app.business.exceptions.BadResultException;
 import org.oscm.app.domain.InstanceParameter;
 import org.oscm.app.domain.ServiceInstance;
 import org.oscm.provisioning.intf.ProvisioningService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.jws.WebService;
+import javax.xml.namespace.QName;
+import javax.xml.ws.Service;
+import javax.xml.ws.WebServiceException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Implementation for the product provisioning service factory.
@@ -59,15 +59,23 @@ public class ProductProvisioningServiceFactoryBean {
                     .getParameterForKey(InstanceParameter.SERVICE_USER);
             InstanceParameter serviceUserPwdParam = instance
                     .getParameterForKey(InstanceParameter.SERVICE_USER_PWD);
+
+            //TODO: add additional check for user
             String username = (serviceUserParam == null) ? null
                     : serviceUserParam.getDecryptedValue();
             String password = (serviceUserPwdParam == null) ? null
                     : serviceUserPwdParam.getDecryptedValue();
 
-            WSPortConnector connector = new WSPortConnector(wsdlUrl.toString(),
-                    username, password, ip);
             try {
-                result = connector.getPort(wsdlUrl, ProvisioningService.class);
+                // TODO: think of common WS client (BesDAO is also using webservice connection)
+                String targetNamespace =
+                    ProvisioningService.class.getAnnotation(WebService.class).targetNamespace();
+                QName serviceQName =
+                        new QName(targetNamespace, ProvisioningService.class.getSimpleName());
+
+                Service service = Service.create(wsdlUrl, serviceQName);
+                result = service.getPort(ProvisioningService.class);
+
             } catch (WebServiceException e) {
                 result = null;
                 BadResultException bre = new BadResultException(
