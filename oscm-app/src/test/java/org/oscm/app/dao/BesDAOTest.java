@@ -117,7 +117,6 @@ public class BesDAOTest {
                 anyMap());
         doReturn(subServ).when(besDAO)
                 .getServicePort(eq(SubscriptionService.class), anyMap());
-        doNothing().when(besDAO).validateVersion(anyString());
         Binding mockBinding = mock(Binding.class);
         when(idServ.getBinding()).thenReturn(mockBinding);
     }

@@ -29,9 +29,7 @@
         <module>oscm-app-sample</module>
         <module>oscm-app-sample-ear</module>
         <module>oscm-app-sample-ui</module>
-        <module>oscm-apiversioning-client-handler</module>
         <module>oscm-common</module>
-        <module>oscm-webservices-client</module>
     </modules>
 
     <properties>

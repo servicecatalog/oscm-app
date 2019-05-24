@@ -5,3 +5,12 @@
 # Maven
 target/
 
+# Eclipse
+.project
+.settings
+.classpath
+
+# Temporarily
+//TODO: remove when oscm-common is handled
+oscm-common/logs
+

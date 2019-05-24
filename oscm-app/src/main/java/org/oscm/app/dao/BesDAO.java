@@ -7,34 +7,7 @@
  *******************************************************************************/
 package org.oscm.app.dao;
 
-import java.net.ConnectException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.ejb.EJB;
-import javax.ejb.EJBException;
-import javax.ejb.Stateless;
-import javax.jws.WebService;
-import javax.wsdl.Definition;
-import javax.wsdl.WSDLException;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLLocator;
-import javax.wsdl.xml.WSDLReader;
-import javax.xml.namespace.QName;
-import javax.xml.ws.Binding;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
-import javax.xml.ws.handler.Handler;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
-
-import org.oscm.apiversioning.handler.ClientVersionHandler;
 import org.oscm.app.business.exceptions.BESNotificationException;
-import org.oscm.app.contants.CTMGApiVersion;
 import org.oscm.app.domain.Operation;
 import org.oscm.app.domain.PlatformConfigurationKey;
 import org.oscm.app.domain.ServiceInstance;
@@ -57,13 +30,27 @@ import org.oscm.types.enumtypes.UserRoleType;
 import org.oscm.types.exceptions.ObjectNotFoundException;
 import org.oscm.types.exceptions.SaaSApplicationException;
 import org.oscm.types.exceptions.SubscriptionStateException;
-import org.oscm.vo.VOInstanceInfo;
-import org.oscm.vo.VOLocalizedText;
-import org.oscm.vo.VOSubscription;
-import org.oscm.vo.VOUser;
-import org.oscm.vo.VOUserDetails;
-import org.oscm.ws.BasicAuthWSDLLocator;
-import org.oscm.ws.WSVersionExtensionRegistry;
+import org.oscm.vo.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.ejb.EJB;
+import javax.ejb.EJBException;
+import javax.ejb.Stateless;
+import javax.jws.WebService;
+import javax.xml.namespace.QName;
+import javax.xml.ws.Binding;
+import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Service;
+import javax.xml.ws.handler.Handler;
+import java.net.ConnectException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Stateless
 public class BesDAO {
@@ -222,22 +209,8 @@ public class BesDAO {
 
         Service service = createWebService(getWsdlUrl(serviceClass, settings),
                 serviceQName);
-        addVersionInformation(service);
-        return service.getPort(serviceClass);
-    }
 
-    /**
-     * Helper method to add a version information into the header of the
-     * outbound SOAP message. The version information is read from a property
-     * file.
-     * 
-     * @param service
-     * @return
-     */
-    private Service addVersionInformation(Service service) {
-        ClientVersionHandler versionHandler = new ClientVersionHandler(
-                CTMGApiVersion.version);
-        return versionHandler.addVersionInformationToClient(service);
+        return service.getPort(serviceClass);
     }
 
     <T> URL getWsdlUrl(Class<T> serviceClass, Map<String, Setting> settings)
@@ -255,36 +228,8 @@ public class BesDAO {
         }
 
         wsdlUrl = wsdlUrl.replace("{SERVICE}", serviceClass.getSimpleName());
-        // validateVersion(wsdlUrl);
+
         return new URL(wsdlUrl);
-
-    }
-
-    void validateVersion(String wsdlUrl) {
-        WSDLLocator locator = new BasicAuthWSDLLocator(wsdlUrl, null, null);
-        WSDLFactory wsdlFactory;
-        Definition serviceDefinition;
-        try {
-            wsdlFactory = WSDLFactory.newInstance();
-            WSDLReader wsdlReader = wsdlFactory.newWSDLReader();
-            // avoid importing external documents
-            wsdlReader.setExtensionRegistry(new WSVersionExtensionRegistry());
-            serviceDefinition = wsdlReader.readWSDL(locator);
-            Element versionElement = serviceDefinition
-                    .getDocumentationElement();
-            if (!CTMGApiVersion.version
-                    .equals(versionElement.getTextContent())) {
-                LOGGER.warn(
-                        "Web service mismatches and the version value, expected: "
-                                + CTMGApiVersion.version
-                                + " and the one got from wsdl: "
-                                + versionElement.getTextContent());
-            }
-        } catch (WSDLException e) {
-            LOGGER.warn("Remote wsdl cannot be retrieved from CT_MG. [Cause: "
-                    + e.getMessage() + "]", e);
-        }
-
     }
 
     String getPortSuffix(Map<String, Setting> settings) {

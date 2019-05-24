@@ -34,6 +34,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -70,6 +75,7 @@
                         lib/commons-beanutils*.jar,
                         lib/commons-digester*.jar,
                         lib/commons-validator*.jar,
+                        lib/guava-20*.jar,
                         lib/jackson-coreutils*.jar,
                         lib/jackson-dataformat*.jar,
                         lib/jackson-jaxrs*.jar,
