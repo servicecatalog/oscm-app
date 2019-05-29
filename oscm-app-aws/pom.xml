@@ -27,7 +27,7 @@
 
         <!--check if necessary-->
         <dependency>
-            <groupId>org.oscm</groupId>
+            <groupId>com.github.servicecatalog.oscm-commons</groupId>
             <artifactId>oscm-common</artifactId>
         </dependency>
 
