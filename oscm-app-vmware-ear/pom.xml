@@ -79,10 +79,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-ear-plugin</artifactId>
                 <configuration>
-                    <version>7</version>
                     <displayName>VMware Provisioning</displayName>
                     <defaultLibBundleDir>lib</defaultLibBundleDir>
                     <modules>
@@ -98,12 +96,6 @@
                             <bundleFileName>oscm-app-vmware-ui.war</bundleFileName>
                         </webModule>
                     </modules>
-                    <archive>
-                        <addMavenDescriptor>false</addMavenDescriptor>
-                        <manifest>
-                            <addClasspath>false</addClasspath>
-                        </manifest>
-                    </archive>
                     <packagingExcludes>
                         lib/batik-*.jar,
                         lib/commons-beanutils*.jar,
@@ -113,24 +105,6 @@
                         lib/oro-*.jar,
                         lib/oscm-app-extsvc-*.jar,
                         lib/xmlParser*.jar
-                        <!--lib/activation-*.jar,
-                        lib/btf-*.jar,
-                        lib/commons-beanutils*.jar,
-                        lib/commons-digester*.jar,
-                        lib/commons-validator*.jar,
-                        lib/jackson-coreutils*.jar,
-                        lib/jackson-dataformat*.jar,
-                        lib/jackson-jaxrs*.jar,
-                        lib/jackson-module*.jar,
-                        lib/jboss-*.jar,
-                        lib/jcip-*.jar,
-                        lib/json-*.jar,
-                        lib/jsr*.jar,
-                        lib/msg-*.jar,
-                        lib/oro-*.jar,
-                        lib/oscm-app-*.jar,
-                        lib/resteasy-*.jar,
-                        lib/snake*.jar-->
                     </packagingExcludes>
                 </configuration>
             </plugin>

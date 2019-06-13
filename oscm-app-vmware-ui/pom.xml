@@ -54,7 +54,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.2.2</version>
                 <configuration>
                     <packagingExcludes>
                         index.xhtml,
@@ -74,12 +73,6 @@
                         WEB-INF/lib/tomahawk*.jar,
                         WEB-INF/lib/wsvim25-*.jar,
                     </packagingExcludes>
-                    <archive>
-                        <addMavenDescriptor>false</addMavenDescriptor>
-                        <manifest>
-                            <addClasspath>false</addClasspath>
-                        </manifest>
-                    </archive>
                 </configuration>
             </plugin>
         </plugins>
