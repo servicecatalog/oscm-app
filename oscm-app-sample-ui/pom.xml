@@ -46,24 +46,10 @@
         <plugins>
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.2.2</version>
                 <configuration>
                     <packagingExcludes>
                         WEB-INF/classes
-                        <!--WEB-INF/lib/jstl-*.jar,
-                        WEB-INF/lib/log4j-*.jar,
-                        WEB-INF/lib/slf4j-*.jar,
-                        WEB-INF/lib/oro-*.jar,
-                        WEB-INF/lib/oscm-*.jar,
-                        WEB-INF/lib/xml*.jar,
-                        %regex[WEB-INF/lib/commons-(?!fileupload).*.jar]-->
                     </packagingExcludes>
-                    <archive>
-                        <addMavenDescriptor>false</addMavenDescriptor>
-                        <manifest>
-                            <addClasspath>false</addClasspath>
-                        </manifest>
-                    </archive>
                 </configuration>
             </plugin>
         </plugins>

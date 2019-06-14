@@ -85,7 +85,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.2.2</version>
                 <configuration>
                     <packagingExcludes>
                         WEB-INF/lib/batik-*.jar,
@@ -107,12 +106,6 @@
                         WEB-INF/lib/xml*.jar,
                         WEB-INF/lib/slf4j-*.jar
                     </packagingExcludes>
-                    <archive>
-                        <addMavenDescriptor>false</addMavenDescriptor>
-                        <manifest>
-                            <addClasspath>false</addClasspath>
-                        </manifest>
-                    </archive>
                 </configuration>
             </plugin>
         </plugins>

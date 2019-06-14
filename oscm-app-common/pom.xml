@@ -76,7 +76,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.2.2</version>
                 <configuration>
                     <packagingExcludes>
                         WEB-INF/lib/batik-*.jar,
@@ -88,12 +87,6 @@
                         WEB-INF/lib/xml*.jar,
                         %regex[WEB-INF/lib/commons-(?!fileupload).*.jar]
                     </packagingExcludes>
-                    <archive>
-                        <addMavenDescriptor>false</addMavenDescriptor>
-                        <manifest>
-                            <addClasspath>false</addClasspath>
-                        </manifest>
-                    </archive>
                     <attachClasses>true</attachClasses>
                 </configuration>
             </plugin>
