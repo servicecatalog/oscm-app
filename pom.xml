@@ -352,35 +352,38 @@
                         <generatePom>true</generatePom>
                     </configuration>
                 </plugin>
-
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <providerSelection>2.0</providerSelection>
+                            <properties>
+                                <script>hostname</script>
+                            </properties>
+                            <source>
+                                def command = project.properties.script
+                                def process = command.execute()
+                                process.waitFor()
+                                def hostname = process.in.text.trim()
+                                project.properties.setProperty('build.hostname',hostname)
+                            </source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <id>unix</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                </os>
-            </activation>
-            <properties>
-                <build.hostname>${env.HOSTNAME}</build.hostname>
-            </properties>
-        </profile>
-        <profile>
-            <id>windows</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-            </activation>
-            <properties>
-                <build.hostname>${env.COMPUTERNAME}</build.hostname>
-            </properties>
-        </profile>
-    </profiles>
     <repositories>
         <repository>
             <id>jitpack.io</id>
