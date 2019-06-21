@@ -1,10 +1,8 @@
 package org.oscm.app.vmware.usage;
 
 import java.net.MalformedURLException;
-import java.util.List;
 
 import org.oscm.app.v2_0.exceptions.APPlatformException;
-import org.oscm.app.v2_0.exceptions.ConfigurationException;
 import org.oscm.app.vmware.business.VM;
 import org.oscm.app.vmware.business.VMPropertyHandler;
 import org.oscm.app.vmware.remote.vmware.VMClientPool;
@@ -16,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vmware.vim25.ManagedObjectReference;
-import com.vmware.vim25.NetworkSummary;
+import com.vmware.vim25.PerfCounterInfo;
 import com.vmware.vim25.PerfInterval;
 
 public class VMUsageConverter {
@@ -39,9 +37,9 @@ public class VMUsageConverter {
     }
 
     public void registerUsageEvents(String startTime, String endTime)
-            throws MalformedURLException,
-            ObjectNotFoundException, OrganizationAuthoritiesException,
-            ValidationException, APPlatformException {
+            throws MalformedURLException, ObjectNotFoundException,
+            OrganizationAuthoritiesException, ValidationException,
+            APPlatformException {
 
         VM vm = getVM(ph.getInstanceName());
     }
@@ -53,26 +51,42 @@ public class VMUsageConverter {
         try {
             VMwareClient vmw = VMClientPool.getInstance().getPool()
                     .borrowObject(vcenter);
-            ManagedObjectReference vmInstance = vmw.getServiceUtil().getDecendentMoRef(null, "VirtualMachine", instanceName);
-            ManagedObjectReference performanceManager =
-                    (ManagedObjectReference)
-                        vmw.getServiceUtil().getDynamicProperty(vmInstance, "performanceManager");
-            
-            
-            PerfInterval[] perfIntervals =
-                    (PerfInterval[])
-                        vmw.getServiceUtil().getDynamicProperty(performanceManager, "historicalInterval");
+            ManagedObjectReference vmInstance = vmw.getServiceUtil()
+                    .getDecendentMoRef(null, "VirtualMachine", instanceName);
+            ManagedObjectReference performanceManager = (ManagedObjectReference) vmw
+                    .getServiceUtil()
+                    .getDynamicProperty(vmInstance, "performanceManager");
+
+            PerfInterval[] perfIntervals = (PerfInterval[]) vmw.getServiceUtil()
+                    .getDynamicProperty(performanceManager,
+                            "historicalInterval");
+
+            PerfCounterInfo[] perfCounters = (PerfCounterInfo[]) vmw
+                    .getServiceUtil()
+                    .getDynamicProperty(performanceManager, "perfCounter");
+
+            for (int i = 0; i < perfCounters.length; i++) {
+                PerfCounterInfo perfCounterInfo = perfCounters[i];
+                String perfCounterString = perfCounterInfo.getNameInfo()
+                        .getLabel() + " ("
+                        + perfCounterInfo.getGroupInfo().getKey() + ") in "
+                        + perfCounterInfo.getUnitInfo().getLabel() + " ("
+                        + perfCounterInfo.getStatsType().toString() + ")";
+                System.out.println(
+                        perfCounterInfo.getKey() + " : " + perfCounterString);
+            }
             
             for (PerfInterval perfInterval : perfIntervals) {
                 System.out.println("key = " + perfInterval.getKey());
                 System.out.println("length = " + perfInterval.getLength());
-                System.out.println("samplingPeriod = " + perfInterval.getSamplingPeriod());
+                System.out.println(
+                        "samplingPeriod = " + perfInterval.getSamplingPeriod());
                 System.out.println("level = " + perfInterval.getLevel());
                 System.out.println("name = " + perfInterval.getName());
-                System.out.println();
-        }
-            
-            
+                System.out.println(
+                        "periode = " + perfInterval.getSamplingPeriod());
+            }
+
             vm = new VM(vmw, ph.getInstanceName());
         } catch (Exception e) {
             LOGGER.error("Can´t gather usage data for instance "
