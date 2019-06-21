@@ -351,6 +351,17 @@ public class VMPropertyHandler {
   public static final String TS_VSPHERE_CONSOLE_PORT = "VSPHERE_CONSOLE_PORT";
 
   public static final String TS_IPPOOL_FOR_PORTGROUP = "IPPOOL_FOR_PORTGROUP";
+  
+  public static final String INSTANCE_ID = "INSTANCE_ID";
+  
+  /**
+   * Boolean service parameter.
+   * <ul>
+   * <li>True: Billing events will be generated for this tenant subscription
+   * <li>False: Service is free of charge. No billing events will be generated
+   * <ul>
+   */
+  public static final String IS_CHARGING = "IS_CHARGING";
 
   public VMPropertyHandler(ProvisioningSettings settings) {
     this.settings = settings;
@@ -1606,6 +1617,20 @@ public class VMPropertyHandler {
     } else {
       return new DataAccessService(getLocale());
     }
+  }
+  
+  public String getInstanceId() {
+      return getValue(INSTANCE_ID, settings.getParameters());
+  }
+
+  public void setInstanceId(String value) {
+      setValue(INSTANCE_ID, value, settings.getParameters());
+  }
+  
+  public boolean isCharging() {
+      Setting setting = settings.getParameters().get(IS_CHARGING);
+      return setting == null ? false
+              : Boolean.parseBoolean(setting.getValue());
   }
 
   private String getValue(String key, Map<String, Setting> source) {

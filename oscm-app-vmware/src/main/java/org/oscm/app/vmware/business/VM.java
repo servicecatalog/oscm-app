@@ -9,10 +9,12 @@
  */
 package org.oscm.app.vmware.business;
 
+import com.vmware.vim25.ComputeResourceSummary;
 import com.vmware.vim25.GuestInfo;
 import com.vmware.vim25.GuestNicInfo;
 import com.vmware.vim25.InvalidStateFaultMsg;
 import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.ResourcePoolRuntimeInfo;
 import com.vmware.vim25.RuntimeFaultFaultMsg;
 import com.vmware.vim25.TaskInfo;
 import com.vmware.vim25.VimPortType;
@@ -66,6 +68,13 @@ public class VM extends Template {
     virtualMachineSnapshotInfo =
         (VirtualMachineSnapshotInfo)
             vmw.getServiceUtil().getDynamicProperty(vmInstance, "snapshot");
+    
+    ComputeResourceSummary c = (ComputeResourceSummary) vmw.getServiceUtil().getDynamicProperty(vmInstance, "computeResourceSummary");
+    ResourcePoolRuntimeInfo r = (ResourcePoolRuntimeInfo) vmw.getServiceUtil().getDynamicProperty(vmInstance, "resourcePoolRuntimeInfo");
+    
+    List<ManagedObjectReference> performanceManager =
+            (List<ManagedObjectReference>)
+                vmw.getServiceUtil().getDynamicProperty(vmInstance, "performanceManager");
 
     if (vmInstance == null || configSpec == null || folder == null || guestInfo == null) {
       LOG.warn("failed to retrieve VM");

@@ -20,6 +20,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
+
 import org.oscm.app.v2_0.APPlatformServiceFactory;
 import org.oscm.app.v2_0.data.*;
 import org.oscm.app.v2_0.exceptions.*;
@@ -648,6 +649,24 @@ public class VMController implements APPlatformController {
 			ProvisioningSettings arg3) throws APPlatformException {
 		return null;
 	}
+	
+       @Override
+        public boolean gatherUsageData(String controllerId, String instanceId, String startTime, String endTime,
+                        ProvisioningSettings settings) throws APPlatformException {
+           VMPropertyHandler propertyHandler = new VMPropertyHandler(settings);
+           propertyHandler.setInstanceId(instanceId);
+               if (propertyHandler.isCharging()) {
+                       try {
+                         //      new UsageConverter(propertyHandler).registerUsageEvents(startTime, endTime);
+                       } catch (Exception e) {
+                               throw new APPlatformException("Failed to gather usage data", e);
+                       }
+                       return true;
+       }
+           
+           
+           return false;
+       }
 
 	@Override
 	public void setControllerSettings(ControllerSettings settings) {
