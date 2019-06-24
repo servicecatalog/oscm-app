@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="oscm-app-sample">
+        <wb-resource deploy-path="/" source-path="/target/m2e-wtp/ear-resources"/>
+        <wb-resource deploy-path="/" source-path="/src/main/application" tag="defaultRootSource"/>
+        <dependent-module archiveName="oscm-app-sample.jar" deploy-path="/" handle="module:/resource/oscm-app-sample/oscm-app-sample">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="oscm-app-common.war" deploy-path="/" handle="module:/resource/oscm-app-common/oscm-app-common">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="oscm-app-extsvc-master-ef5fda73d2-1.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-app-extsvc/master-ef5fda73d2-1/oscm-app-extsvc-master-ef5fda73d2-1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="oscm-extsvc-master-ef5fda73d2-1.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-extsvc/master-ef5fda73d2-1/oscm-extsvc-master-ef5fda73d2-1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="oscm-extsvc-internal-master-ef5fda73d2-1.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-extsvc-internal/master-ef5fda73d2-1/oscm-extsvc-internal-master-ef5fda73d2-1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="oscm-common-master-20d96da1f0-1.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/github/servicecatalog/oscm-commons/oscm-common/master-20d96da1f0-1/oscm-common-master-20d96da1f0-1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-codec-1.10.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/commons-codec/commons-codec/1.10/commons-codec-1.10.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="log4j-1.2.16.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="slf4j-log4j12-1.7.7.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/slf4j/slf4j-log4j12/1.7.7/slf4j-log4j12-1.7.7.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="slf4j-api-1.7.21.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/slf4j/slf4j-api/1.7.21/slf4j-api-1.7.21.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="component.exclusion.patterns" value="lib/commons-beanutils*.jar,lib/commons-digester*.jar,lib/commons-validator*.jar,lib/commons-logging*.jar,lib/oro-*.jar"/>
+    </wb-module>
+</project-modules>

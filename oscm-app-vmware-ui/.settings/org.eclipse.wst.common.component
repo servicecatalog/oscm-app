@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="oscm-app-vmware-ui">
+        <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
+        <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
+        <dependent-module deploy-path="/" handle="module:/overlay/prj/oscm-app-common?includes=**/**&amp;excludes=META-INF/MANIFEST.MF">
+            <dependency-type>consumes</dependency-type>
+        </dependent-module>
+        <dependent-module deploy-path="/" handle="module:/overlay/slf/?includes=**/**&amp;excludes=META-INF/MANIFEST.MF">
+            <dependency-type>consumes</dependency-type>
+        </dependent-module>
+        <property name="context-root" value="oscm-app-vmware-ui"/>
+        <property name="java-output-path" value="/oscm-app-vmware-ui/target/classes"/>
+        <property name="component.exclusion.patterns" value="index.xhtml,WEB-INF/beans.xml,WEB-INF/lib/commons-codec-*.jar,WEB-INF/lib/commons-fileupload-*.jar,WEB-INF/lib/commons-io-*.jar,WEB-INF/lib/commons-lang3-*.jar,WEB-INF/lib/commons-pool2-*.jar,WEB-INF/lib/commons-logging-*.jar,WEB-INF/lib/commons-validator-*.jar,WEB-INF/lib/log4j-*.jar,WEB-INF/lib/oro-*.jar,WEB-INF/lib/opencsv-*.jar,WEB-INF/lib/oscm-*.jar,WEB-INF/lib/slf4j-*.jar,WEB-INF/lib/tomahawk*.jar,WEB-INF/lib/wsvim25-*.jar"/>
+    </wb-module>
+</project-modules>
