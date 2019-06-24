@@ -76,10 +76,6 @@ public class VM extends Template {
         (VirtualMachineSnapshotInfo)
             vmw.getServiceUtil().getDynamicProperty(vmInstance, "snapshot");
     
-    ComputeResourceSummary c = (ComputeResourceSummary) vmw.getServiceUtil().getDynamicProperty(vmInstance, "computeResourceSummary");
-    ResourcePoolRuntimeInfo r = (ResourcePoolRuntimeInfo) vmw.getServiceUtil().getDynamicProperty(vmInstance, "resourcePoolRuntimeInfo");
-    
-    
 
     if (vmInstance == null || configSpec == null || folder == null || guestInfo == null) {
       LOG.warn("failed to retrieve VM");
