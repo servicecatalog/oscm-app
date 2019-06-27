@@ -12,6 +12,8 @@ package org.oscm.app.vmware.business;
 import com.vmware.vim25.LocalizableMessage;
 import com.vmware.vim25.TaskInfo;
 import com.vmware.vim25.TaskInfoState;
+
+import java.net.MalformedURLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,11 +21,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import javax.xml.datatype.XMLGregorianCalendar;
+
+import org.oscm.app.v2_0.BSSWebServiceFactory;
 import org.oscm.app.v2_0.data.PasswordAuthentication;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
 import org.oscm.app.v2_0.data.ServiceUser;
 import org.oscm.app.v2_0.data.Setting;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
+import org.oscm.app.v2_0.exceptions.ConfigurationException;
 import org.oscm.app.vmware.business.VMwareValue.Unit;
 import org.oscm.app.vmware.business.model.Cluster;
 import org.oscm.app.vmware.business.model.DistributedVirtualSwitch;
@@ -362,6 +367,12 @@ public class VMPropertyHandler {
    * <ul>
    */
   public static final String IS_CHARGING = "IS_CHARGING";
+  
+  /**
+   * To create a billing event the technical service id is required and will
+   * be stored as service parameter.
+   */
+  public static final String TECHNICAL_SERVICE_ID = "TECHNICAL_SERVICE_ID";
 
   public VMPropertyHandler(ProvisioningSettings settings) {
     this.settings = settings;
@@ -1640,5 +1651,22 @@ public class VMPropertyHandler {
 
   private void setValue(String key, String value, Map<String, Setting> target) {
     target.put(key, new Setting(key, value));
+  }
+  
+  public String getTechnicalServiceId() {
+      return getValue(TECHNICAL_SERVICE_ID, settings.getParameters());
+  }
+
+  public void setTechnicalServiceId(String value) {
+      setValue(TECHNICAL_SERVICE_ID, value, settings.getParameters());
+  }
+  
+  /**
+   * Returns service interfaces for BSS web service calls.
+   */
+  public <T> T getWebService(Class<T> serviceClass)
+          throws ConfigurationException, MalformedURLException {
+      return BSSWebServiceFactory.getBSSWebService(serviceClass,
+              settings.getAuthentication());
   }
 }
