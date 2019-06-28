@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import com.vmware.vim25.RuntimeFaultFaultMsg;
 
-
 public class VMUsageConverter {
 
     static final String EVENT_DISK = "EVENT_DISK_GIGABYTE_HOURS";
@@ -47,8 +46,8 @@ public class VMUsageConverter {
 
         VMUsageCalculator usage = new VMUsageCalculator(ph);
 
-            submit(EVENT_RAM, usage.calculateMemUsage(), endTime);
-            submit(EVENT_CPU, usage.calculateCpuUsage(), endTime);
+            submit(EVENT_RAM, usage.calculateMemUsageMB(), endTime);
+            submit(EVENT_CPU, usage.calculateCpuUsageMhz(), endTime);
             submit(EVENT_DISK, usage.calculateDiskUsageGB(), endTime);
 
     }

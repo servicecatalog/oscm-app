@@ -188,25 +188,30 @@ public class VMMetricCollector {
         return lastDayValue;
     }
 
-    public String getDiskUsageTotal()
+    public long getDiskUsageTotalKB()
             throws APPlatformException, RuntimeFaultFaultMsg {
         ArrayList<String> result = new ArrayList<String>();
         result = createMetricResult(DISK_USAGE_TOTAL);
-        return getLastDayValue(resultListToString(result));
+        String lastDayValue = getLastDayValue(resultListToString(result));
+        long memUsageBK = Integer.parseInt(lastDayValue);
+        return memUsageBK;
     }
     
-    public String getMemUsagePercent()
+    public long getMemUsagePercent()
             throws APPlatformException, RuntimeFaultFaultMsg {
         ArrayList<String> result = new ArrayList<String>();
         result = createMetricResult(MEM_USAGE_PERCENT);
-        return getLastDayValue(resultListToString(result));
+        String lastDayValue = getLastDayValue(resultListToString(result));
+        long memUsage = Integer.parseInt(lastDayValue);
+        long memUsagePercent = memUsage / 100; //number is given with 2 decimal places without separating point
+        return memUsagePercent;
     }
 
-    public String getCpuUsage()
+    public int getCpuUsageMhz()
             throws APPlatformException, RuntimeFaultFaultMsg {
         ArrayList<String> result = new ArrayList<String>();
         result = createMetricResult(CPU_USAGE_PERCENT);
-        return getLastDayValue(resultListToString(result));
+        return Integer.parseInt(getLastDayValue(resultListToString(result)));
     }
 
 }
