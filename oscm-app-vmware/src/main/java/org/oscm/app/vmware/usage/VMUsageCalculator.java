@@ -16,13 +16,13 @@ public class VMUsageCalculator {
     public VMUsageCalculator(VMPropertyHandler ph) {
         this.ph = ph;
         collector = new VMMetricCollector(ph);
-        collector.createMetricforInstance();
+        collector.initialize();
     }
     
     public VMUsageCalculator(VMPropertyHandler ph, VMMetricCollector collector) {
         this.ph = ph;
         this.collector = collector;
-        collector.createMetricforInstance();
+        collector.initialize();
     }
 
 

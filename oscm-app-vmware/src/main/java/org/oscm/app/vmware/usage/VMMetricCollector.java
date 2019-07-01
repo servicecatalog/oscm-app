@@ -50,7 +50,7 @@ public class VMMetricCollector {
         this.ph = ph;
     }
 
-    public void createMetricforInstance() {
+    public void initialize() {
 
         String vcenter = ph
                 .getServiceSetting(VMPropertyHandler.TS_TARGET_VCENTER_SERVER);
@@ -86,7 +86,7 @@ public class VMMetricCollector {
         return createResultFromStats(retrievedStats);
     }
 
-    private List<PerfQuerySpec> createPerfQuerySpec(
+    protected List<PerfQuerySpec> createPerfQuerySpec(
             ManagedObjectReference vmInstance,
             List<PerfMetricId> perfMetricIds) {
         List<PerfQuerySpec> pqsList = new ArrayList<PerfQuerySpec>();
@@ -99,7 +99,7 @@ public class VMMetricCollector {
         return pqsList;
     }
 
-    private List<PerfMetricId> createMetrics(String counterName) {
+    protected List<PerfMetricId> createMetrics(String counterName) {
         List<PerfMetricId> perfMetricIds = new ArrayList<PerfMetricId>();
         PerfMetricId metricId = new PerfMetricId();
         metricId.setCounterId(countersIdMap.get(counterName));
@@ -110,7 +110,7 @@ public class VMMetricCollector {
         return perfMetricIds;
     }
 
-    private ArrayList<String> createResultFromStats(
+    protected ArrayList<String> createResultFromStats(
             List<PerfEntityMetricBase> retrievedStats)
             throws APPlatformException {
         ArrayList<String> result = new ArrayList<String>();
@@ -125,26 +125,16 @@ public class VMMetricCollector {
                 throw new APPlatformException("No stats retrieved. "
                         + "Check whether the virtual machine is powered on.");
             }
-            String csvTimeInfoAboutStats = entityStatsCsv.getSampleInfoCSV();
-            LOGGER.info(
-                    "Collection: interval (seconds),time (yyyy-mm-ddThh:mm:ssZ)");
-            LOGGER.info(csvTimeInfoAboutStats);
             result = getResults(metricsValues);
         }
         return result;
     }
 
-    private ArrayList<String> getResults(
+    protected ArrayList<String> getResults(
             List<PerfMetricSeriesCSV> metricsValues) {
         ArrayList<String> result = new ArrayList<String>();
         for (PerfMetricSeriesCSV csv : metricsValues) {
-            PerfCounterInfo pci = countersInfoMap
-                    .get(csv.getId().getCounterId());
             if (csv.getId().getInstance().isEmpty()) {
-            LOGGER.info("----------------------------------------");
-            LOGGER.info(pci.getGroupInfo().getKey() + "."
-                    + pci.getNameInfo().getKey() + "." + pci.getRollupType()
-                    + " - " + pci.getUnitInfo().getKey());
             LOGGER.info("Instance: " + csv.getId().getInstance());
             LOGGER.info("Values: " + csv.getValue());
                 result.add(csv.getValue());
@@ -155,7 +145,7 @@ public class VMMetricCollector {
 
     // counter Id's can be different in every vSphere environment, therefore
     // it,s necessary to map the id's to names
-    private void createCounterToNameMapping(
+    protected void createCounterToNameMapping(
             List<PerfCounterInfo> perfCounters) {
         for (PerfCounterInfo perfCounter : perfCounters) {
             Integer counterId = new Integer(perfCounter.getKey());
@@ -171,7 +161,7 @@ public class VMMetricCollector {
         }
     }
     
-    public String resultListToString(List resultList) {
+    protected String resultListToString(List resultList) {
         String result ="";
         for(int i = 0; i<resultList.size(); i++) {
             result = result + resultList.get(i);
@@ -179,7 +169,7 @@ public class VMMetricCollector {
         return result;
     }
     
-    public String getLastDayValue(String values) {
+    protected String getLastDayValue(String values) {
         String[] value = values.split(",");
         String lastDayValue ="";
         if(value.length > 0) {
