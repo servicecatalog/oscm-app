@@ -25,10 +25,7 @@
 	</classpathentry>
 	<classpathentry kind="src" path="/oscm-app"/>
 	<classpathentry kind="src" path="/oscm-app-common"/>
-	<classpathentry kind="var" path="M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-app-extsvc/master-ef5fda73d2-1/oscm-app-extsvc-master-ef5fda73d2-1.jar" sourcepath="M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-app-extsvc/master-ef5fda73d2-1/oscm-app-extsvc-master-ef5fda73d2-1-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.7.21/slf4j-api-1.7.21.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/github/servicecatalog/oscm-commons/oscm-common/master-20d96da1f0-1/oscm-common-master-20d96da1f0-1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-extsvc-internal/master-ef5fda73d2-1/oscm-extsvc-internal-master-ef5fda73d2-1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomee/javaee-api/7.0-1/javaee-api-7.0-1.jar" sourcepath="M2_REPO/org/apache/tomee/javaee-api/7.0-1/javaee-api-7.0-1-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-validator/commons-validator/1.4.0/commons-validator-1.4.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-beanutils/commons-beanutils/1.8.3/commons-beanutils-1.8.3.jar"/>
@@ -53,9 +50,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/w3c/css/sac/1.3/sac-1.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/com/google/guava/guava/18.0/guava-18.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/richfaces/richfaces-a4j/4.5.0.Final/richfaces-a4j-4.5.0.Final.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-extsvc/master-ef5fda73d2-1/oscm-extsvc-master-ef5fda73d2-1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-extsvc-provisioning/master-ef5fda73d2-1/oscm-extsvc-provisioning-master-ef5fda73d2-1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-extsvc-operation/master-ef5fda73d2-1/oscm-extsvc-operation-master-ef5fda73d2-1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/geronimo/javamail/geronimo-javamail_1.4_mail/1.9.0-alpha-2/geronimo-javamail_1.4_mail-1.9.0-alpha-2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/wsdl4j/wsdl4j/1.6.3/wsdl4j-1.6.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/glassfish/javax.faces/2.2.12/javax.faces-2.2.12.jar"/>
@@ -67,5 +61,12 @@
 			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/oscm-interfaces/oscm-app-extsvc/target/oscm-app-extsvc.jar"/>
+	<classpathentry kind="lib" path="/oscm-interfaces/oscm-extsvc-provisioning/target/oscm-extsvc-provisioning.jar"/>
+	<classpathentry kind="lib" path="/oscm-interfaces/oscm-extsvc-operation/target/oscm-extsvc-operation.jar"/>
+	<classpathentry kind="lib" path="/oscm-interfaces/oscm-extsvc/target/oscm-extsvc-sources.jar"/>
+	<classpathentry kind="lib" path="/oscm-interfaces/oscm-extsvc/target/oscm-extsvc.jar"/>
+	<classpathentry kind="lib" path="/oscm-interfaces/oscm-extsvc-internal/target/oscm-extsvc-internal.jar"/>
+	<classpathentry kind="lib" path="/oscm-commons/oscm-common/target/oscm-common.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

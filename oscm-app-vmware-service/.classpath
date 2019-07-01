@@ -22,10 +22,8 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-app-extsvc/master-ef5fda73d2-1/oscm-app-extsvc-master-ef5fda73d2-1.jar" sourcepath="M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-app-extsvc/master-ef5fda73d2-1/oscm-app-extsvc-master-ef5fda73d2-1-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.7.21/slf4j-api-1.7.21.jar"/>
 	<classpathentry kind="src" path="/oscm-app-vmware"/>
-	<classpathentry kind="var" path="M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-extsvc/master-ef5fda73d2-1/oscm-extsvc-master-ef5fda73d2-1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/com/vmware/wsvim25/1.0.0/wsvim25-1.0.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-io/commons-io/1.4/commons-io-1.4.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.10/commons-codec-1.10.jar"/>
@@ -42,5 +40,7 @@
 			<attribute name="org.eclipse.jst.component.nondependency" value=""/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/oscm-interfaces/oscm-extsvc/target/oscm-extsvc.jar"/>
+	<classpathentry kind="lib" path="/oscm-interfaces/oscm-app-extsvc/target/oscm-app-extsvc.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -5,19 +5,22 @@
         <dependent-module archiveName="oscm-app-sample.jar" deploy-path="/" handle="module:/resource/oscm-app-sample/oscm-app-sample">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="oscm-app-sample.war" deploy-path="/" handle="module:/resource/oscm-app-sample-ui/oscm-app-sample-ui">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <dependent-module archiveName="oscm-app-common.war" deploy-path="/" handle="module:/resource/oscm-app-common/oscm-app-common">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="oscm-app-extsvc-master-ef5fda73d2-1.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-app-extsvc/master-ef5fda73d2-1/oscm-app-extsvc-master-ef5fda73d2-1.jar">
+        <dependent-module archiveName="oscm-app-extsvc-master-SNAPSHOT.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-app-extsvc/master-SNAPSHOT/oscm-app-extsvc-master-SNAPSHOT.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="oscm-extsvc-master-ef5fda73d2-1.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-extsvc/master-ef5fda73d2-1/oscm-extsvc-master-ef5fda73d2-1.jar">
+        <dependent-module archiveName="oscm-extsvc-master-SNAPSHOT.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-extsvc/master-SNAPSHOT/oscm-extsvc-master-SNAPSHOT.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="oscm-extsvc-internal-master-ef5fda73d2-1.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-extsvc-internal/master-ef5fda73d2-1/oscm-extsvc-internal-master-ef5fda73d2-1.jar">
+        <dependent-module archiveName="oscm-extsvc-internal-master-SNAPSHOT.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-extsvc-internal/master-SNAPSHOT/oscm-extsvc-internal-master-SNAPSHOT.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="oscm-common-master-20d96da1f0-1.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/github/servicecatalog/oscm-commons/oscm-common/master-20d96da1f0-1/oscm-common-master-20d96da1f0-1.jar">
+        <dependent-module archiveName="oscm-common-master-SNAPSHOT.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/github/servicecatalog/oscm-commons/oscm-common/master-SNAPSHOT/oscm-common-master-SNAPSHOT.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="commons-codec-1.10.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/commons-codec/commons-codec/1.10/commons-codec-1.10.jar">
