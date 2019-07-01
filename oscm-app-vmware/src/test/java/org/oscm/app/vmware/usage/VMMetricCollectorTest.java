@@ -24,6 +24,7 @@ import com.vmware.vim25.PerfMetricId;
 import com.vmware.vim25.PerfMetricSeriesCSV;
 import com.vmware.vim25.PerfQuerySpec;
 import com.vmware.vim25.PerfSummaryType;
+import com.vmware.vim25.RuntimeFaultFaultMsg;
 
 public class VMMetricCollectorTest {
     
@@ -179,11 +180,9 @@ public class VMMetricCollectorTest {
         
         //then
         assertEquals(expected.get(0).getMetricId(), result.get(0).getMetricId());
-        
-        
     }
     
-    
+
 
 
 }
