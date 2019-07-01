@@ -6,11 +6,11 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
 import org.oscm.app.vmware.business.VMPropertyHandler;
 import org.oscm.app.vmware.remote.vmware.VMwareClient;
@@ -25,6 +25,7 @@ import com.vmware.vim25.PerfMetricSeriesCSV;
 import com.vmware.vim25.PerfQuerySpec;
 import com.vmware.vim25.PerfSummaryType;
 import com.vmware.vim25.RuntimeFaultFaultMsg;
+import com.vmware.vim25.VimPortType;
 
 public class VMMetricCollectorTest {
     
@@ -147,10 +148,7 @@ public class VMMetricCollectorTest {
         expected.add(metricId);
         String counterName = "name";
         
-//        HashMap<String, Integer> counterIdMap = new HashMap<String, Integer>();
-//        counterIdMap.put(counterName, 1);
         collector.countersIdMap.put(counterName, 1); 
-//        = counterIdMap;
         
         //when
         List<PerfMetricId> result = collector.createMetrics(counterName);
@@ -182,7 +180,39 @@ public class VMMetricCollectorTest {
         assertEquals(expected.get(0).getMetricId(), result.get(0).getMetricId());
     }
     
-
-
-
+    @Test(expected = APPlatformException.class)
+    public void testCreateMetricResult() throws RuntimeFaultFaultMsg, APPlatformException{
+        //given
+        String name = "name";
+        List<PerfEntityMetricBase> retrievedStats = new ArrayList<PerfEntityMetricBase>();
+        PerfEntityMetricCSV metric = mock(PerfEntityMetricCSV.class);
+        retrievedStats.add(metric);
+        
+        collector.countersIdMap.put(name, 1); 
+        collector.vmInstance  = mock(ManagedObjectReference.class);
+        collector.vmw = vmw = mock(VMwareClient.class);
+        
+        VimPortType port = mock(VimPortType.class);
+        
+        when(metric.getValue()).thenReturn(new ArrayList<PerfMetricSeriesCSV>());
+        when(vmw.getService()).thenReturn(port);
+        when(port.queryPerf(Mockito.anyObject(), Mockito.<PerfQuerySpec>anyList())).thenReturn(retrievedStats);
+        
+        
+        //when
+        ArrayList<String> result = collector.createMetricResult(name);
+        result.get(0); 
+    }
+    
+    @Test
+    public void TestInitialize(){
+        
+        //given
+        
+        //when
+        collector.initialize();
+        //then
+        Mockito.verify(collector, Mockito.times(1)).initialize();
+    }
+    
 }

@@ -47,7 +47,7 @@ public class VMUsageConverterTest {
         converter.submit(eventId, multiplier, occurence);
 
         // then
-        verifyZeroInteractions(svc);
+        verifyZeroInteractions(svc); 
     }
 
     /**

@@ -21,10 +21,6 @@ import com.vmware.vim25.PerfQuerySpec;
 import com.vmware.vim25.RuntimeFaultFaultMsg;
 
 public class VMMetricCollector {
-    static final String EVENT_DISK = "EVENT_DISK_GIGABYTE_HOURS";
-    static final String EVENT_CPU = "EVENT_CPU_HOURS";
-    static final String EVENT_RAM = "EVENT_RAM_MEGABYTE_HOURS";
-    static final String EVENT_TOTAL = "EVENT_TOTAL_HOURS";
 
     static final String CPU_USAGE_PERCENT = "cpu.usagemhz.AVERAGE";
     static final String MEM_USAGE_PERCENT = "mem.usage.AVERAGE";
@@ -72,7 +68,7 @@ public class VMMetricCollector {
             LOGGER.error("Can´t gather usage data for instance "
                     + ph.getInstanceId() + "\n" + e.getMessage());
         }
-    }
+    } 
 
     public ArrayList<String> createMetricResult(String name)
             throws APPlatformException, RuntimeFaultFaultMsg {
@@ -80,8 +76,7 @@ public class VMMetricCollector {
         List<PerfQuerySpec> pqsList = createPerfQuerySpec(vmInstance,
                 perfMetricIds);
 
-        List<PerfEntityMetricBase> retrievedStats = vmw.getConnection()
-                .getService().queryPerf(performanceManager, pqsList);
+        List<PerfEntityMetricBase> retrievedStats = vmw.getService().queryPerf(performanceManager, pqsList);
 
         return createResultFromStats(retrievedStats);
     }

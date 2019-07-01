@@ -50,7 +50,7 @@ public class VMUsageConverter {
             submit(EVENT_CPU, usage.calculateCpuUsageMhz(), endTime);
             submit(EVENT_DISK, usage.calculateDiskUsageGB(), endTime);
 
-    }
+    } 
 
     void submit(String eventId, long multiplier, String occurence)
             throws ConfigurationException, MalformedURLException,
