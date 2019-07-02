@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="oscm-app-startup">
+        <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
+        <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+        <property name="context-root" value="oscm-app-startup"/>
+        <property name="java-output-path" value="/oscm-app-startup/target/classes"/>
+        <property name="component.exclusion.patterns" value="WEB-INF/lib/batik-*.jar,WEB-INF/lib/commons-codec*.jar,WEB-INF/lib/commons-collections*.jar,WEB-INF/lib/commons-fileupload*.jar,WEB-INF/lib/commons-httpclient*.jar,WEB-INF/lib/commons-io*.jar,WEB-INF/lib/commons-lang*.jar,WEB-INF/lib/commons-validator*.jar,WEB-INF/lib/geronimo-*.jar,WEB-INF/lib/jstl-*.jar,WEB-INF/lib/junit-*.jar,WEB-INF/lib/log4j-*.jar,WEB-INF/lib/oro-*.jar,WEB-INF/lib/oscm-*.jar,WEB-INF/lib/tomahawk*.jar,WEB-INF/lib/wsdl4j-*.jar,WEB-INF/lib/xml*.jar,WEB-INF/lib/slf4j-*.jar"/>
+    </wb-module>
+</project-modules>

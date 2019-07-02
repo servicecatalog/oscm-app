@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="oscm-app-vmware">
+        <wb-resource deploy-path="/" source-path="/target/m2e-wtp/ear-resources"/>
+        <wb-resource deploy-path="/" source-path="/src/main/application" tag="defaultRootSource"/>
+        <dependent-module archiveName="oscm-app-vmware-service.jar" deploy-path="/" handle="module:/resource/oscm-app-vmware-service/oscm-app-vmware-service">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="oscm-app-vmware-ui.war" deploy-path="/" handle="module:/resource/oscm-app-vmware-ui/oscm-app-vmware-ui">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="oscm-app-vmware-1.0-SNAPSHOT.jar" deploy-path="/lib" handle="module:/resource/oscm-app-vmware/oscm-app-vmware">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="oscm-extsvc-master-SNAPSHOT.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-extsvc/master-SNAPSHOT/oscm-extsvc-master-SNAPSHOT.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-pool2-2.4.2.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/apache/commons/commons-pool2/2.4.2/commons-pool2-2.4.2.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="opencsv-3.7.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/opencsv/opencsv/3.7/opencsv-3.7.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-lang3-3.5.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/apache/commons/commons-lang3/3.5/commons-lang3-3.5.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="wsvim25-1.0.0.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/vmware/wsvim25/1.0.0/wsvim25-1.0.0.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="oscm-extsvc-internal-master-SNAPSHOT.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-extsvc-internal/master-SNAPSHOT/oscm-extsvc-internal-master-SNAPSHOT.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="oscm-common-master-SNAPSHOT.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/github/servicecatalog/oscm-commons/oscm-common/master-SNAPSHOT/oscm-common-master-SNAPSHOT.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-validator-1.4.0.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/commons-validator/commons-validator/1.4.0/commons-validator-1.4.0.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-codec-1.10.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/commons-codec/commons-codec/1.10/commons-codec-1.10.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="log4j-1.2.16.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-fileupload-1.3.3.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/commons-fileupload/commons-fileupload/1.3.3/commons-fileupload-1.3.3.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-io-1.4.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/commons-io/commons-io/1.4/commons-io-1.4.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="httpclient-4.5.2.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/apache/httpcomponents/httpclient/4.5.2/httpclient-4.5.2.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="httpcore-4.4.4.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/apache/httpcomponents/httpcore/4.4.4/httpcore-4.4.4.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-logging-1.1.3.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/commons-logging/commons-logging/1.1.3/commons-logging-1.1.3.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="wsdl4j-1.6.3.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/wsdl4j/wsdl4j/1.6.3/wsdl4j-1.6.3.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="slf4j-log4j12-1.7.7.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/slf4j/slf4j-log4j12/1.7.7/slf4j-log4j12-1.7.7.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="slf4j-api-1.7.21.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/slf4j/slf4j-api/1.7.21/slf4j-api-1.7.21.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-collections-3.2.2.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/commons-collections/commons-collections/3.2.2/commons-collections-3.2.2.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="oscm-app-vmware-statemachines-1.0-SNAPSHOT.jar" deploy-path="/lib" handle="module:/resource/oscm-app-vmware-statemachines/oscm-app-vmware-statemachines">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="tomahawk20-1.1.14.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/apache/myfaces/tomahawk/tomahawk20/1.1.14/tomahawk20-1.1.14.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="component.exclusion.patterns" value="lib/batik-*.jar,lib/commons-beanutils*.jar,lib/commons-digester*.jar,lib/commons-lang-*.jar,lib/jstl-*.jar,lib/oro-*.jar,lib/oscm-app-extsvc-*.jar,lib/xmlParser*.jar"/>
+    </wb-module>
+</project-modules>

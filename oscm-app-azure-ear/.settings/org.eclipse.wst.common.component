@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="oscm-app-azure">
+        <wb-resource deploy-path="/" source-path="/target/m2e-wtp/ear-resources"/>
+        <wb-resource deploy-path="/" source-path="/src/main/application" tag="defaultRootSource"/>
+        <dependent-module archiveName="oscm-app-azure.jar" deploy-path="/" handle="module:/resource/oscm-app-azure/oscm-app-azure">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="oscm-app-common.war" deploy-path="/" handle="module:/resource/oscm-app-common/oscm-app-common">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="oscm-app-extsvc-master-SNAPSHOT.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-app-extsvc/master-SNAPSHOT/oscm-app-extsvc-master-SNAPSHOT.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="azure-core-0.9.7.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/microsoft/azure/azure-core/0.9.7/azure-core-0.9.7.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-lang-2.6.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/commons-lang/commons-lang/2.6/commons-lang-2.6.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jackson-core-asl-1.9.2.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/codehaus/jackson/jackson-core-asl/1.9.2/jackson-core-asl-1.9.2.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jackson-mapper-asl-1.9.2.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/codehaus/jackson/jackson-mapper-asl/1.9.2/jackson-mapper-asl-1.9.2.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="azure-mgmt-resources-0.9.7.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/microsoft/azure/azure-mgmt-resources/0.9.7/azure-mgmt-resources-0.9.7.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-io-1.4.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/commons-io/commons-io/1.4/commons-io-1.4.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="azure-mgmt-network-0.9.7.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/microsoft/azure/azure-mgmt-network/0.9.7/azure-mgmt-network-0.9.7.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="azure-mgmt-storage-0.9.7.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/microsoft/azure/azure-mgmt-storage/0.9.7/azure-mgmt-storage-0.9.7.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="azure-mgmt-compute-0.9.7.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/microsoft/azure/azure-mgmt-compute/0.9.7/azure-mgmt-compute-0.9.7.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="azure-storage-4.4.0.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/microsoft/azure/azure-storage/4.4.0/azure-storage-4.4.0.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-lang3-3.5.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/apache/commons/commons-lang3/3.5/commons-lang3-3.5.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="adal4j-1.1.3.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/microsoft/azure/adal4j/1.1.3/adal4j-1.1.3.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="oauth2-oidc-sdk-4.5.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/nimbusds/oauth2-oidc-sdk/4.5/oauth2-oidc-sdk-4.5.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="json-smart-1.1.1.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/net/minidev/json-smart/1.1.1/json-smart-1.1.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="nimbus-jose-jwt-3.1.2.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/nimbusds/nimbus-jose-jwt/3.1.2/nimbus-jose-jwt-3.1.2.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="gson-2.2.4.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/google/code/gson/gson/2.2.4/gson-2.2.4.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="oscm-extsvc-master-SNAPSHOT.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-extsvc/master-SNAPSHOT/oscm-extsvc-master-SNAPSHOT.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="oscm-extsvc-internal-master-SNAPSHOT.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/github/servicecatalog/oscm-interfaces/oscm-extsvc-internal/master-SNAPSHOT/oscm-extsvc-internal-master-SNAPSHOT.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="oscm-common-master-SNAPSHOT.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/github/servicecatalog/oscm-commons/oscm-common/master-SNAPSHOT/oscm-common-master-SNAPSHOT.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-codec-1.10.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/commons-codec/commons-codec/1.10/commons-codec-1.10.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="log4j-1.2.16.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="asm-1.0.2.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/net/minidev/asm/1.0.2/asm-1.0.2.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="fluent-hc-4.3.1.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/apache/httpcomponents/fluent-hc/4.3.1/fluent-hc-4.3.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="httpclient-4.3.1.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/apache/httpcomponents/httpclient/4.3.1/httpclient-4.3.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="httpcore-4.3.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/apache/httpcomponents/httpcore/4.3/httpcore-4.3.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-logging-1.1.3.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/commons-logging/commons-logging/1.1.3/commons-logging-1.1.3.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="httpclient-cache-4.3.1.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/apache/httpcomponents/httpclient-cache/4.3.1/httpclient-cache-4.3.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="httpmime-4.3.1.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/apache/httpcomponents/httpmime/4.3.1/httpmime-4.3.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jackson-annotations-2.9.4.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/fasterxml/jackson/core/jackson-annotations/2.9.4/jackson-annotations-2.9.4.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jackson-databind-2.9.9.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/fasterxml/jackson/core/jackson-databind/2.9.9/jackson-databind-2.9.9.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jackson-core-2.9.9.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/fasterxml/jackson/core/jackson-core/2.9.9/jackson-core-2.9.9.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="slf4j-log4j12-1.7.7.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/slf4j/slf4j-log4j12/1.7.7/slf4j-log4j12-1.7.7.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="slf4j-api-1.7.21.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/org/slf4j/slf4j-api/1.7.21/slf4j-api-1.7.21.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jersey-bundle-1.18.1.jar" deploy-path="/lib" handle="module:/classpath/var/M2_REPO/com/sun/jersey/jersey-bundle/1.18.1/jersey-bundle-1.18.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="component.exclusion.patterns" value="lib/asm-3*.jar,lib/activation-*.jar,lib/azure-keyvault*.jar,lib/bcprov-*.jar,lib/commons-beanutils*.jar,lib/commons-digester*.jar,lib/commons-validator*.jar,lib/jackson-jaxrs*.jar,lib/jackson-xc*.jar,lib/javax*.jar,lib/jaxb-*.jar,lib/jcip-*.jar,lib/jersey-client*.jar,lib/jersey-core*.jar,lib/jersey-json*.jar,lib/jettison-*.jar,lib/jsr*.jar,lib/lang-*.jar,lib/mail-*.jar,lib/oro-*.jar,lib/stax-*.jar"/>
+    </wb-module>
+</project-modules>
