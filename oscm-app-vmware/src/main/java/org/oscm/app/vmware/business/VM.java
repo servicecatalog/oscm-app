@@ -9,7 +9,6 @@
  */
 package org.oscm.app.vmware.business;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,19 +19,13 @@ import org.oscm.app.v2_0.exceptions.APPlatformException;
 import org.oscm.app.vmware.business.Script.OS;
 import org.oscm.app.vmware.i18n.Messages;
 import org.oscm.app.vmware.remote.vmware.VMwareClient;
-import org.oscm.app.vmware.usage.VMUsageConverter;
-import org.oscm.types.exceptions.ObjectNotFoundException;
-import org.oscm.types.exceptions.OrganizationAuthoritiesException;
-import org.oscm.types.exceptions.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vmware.vim25.ComputeResourceSummary;
 import com.vmware.vim25.GuestInfo;
 import com.vmware.vim25.GuestNicInfo;
 import com.vmware.vim25.InvalidStateFaultMsg;
 import com.vmware.vim25.ManagedObjectReference;
-import com.vmware.vim25.ResourcePoolRuntimeInfo;
 import com.vmware.vim25.RuntimeFaultFaultMsg;
 import com.vmware.vim25.TaskInfo;
 import com.vmware.vim25.VimPortType;
