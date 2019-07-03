@@ -87,30 +87,6 @@ public class VM extends Template {
   public String createVmUrl(VMPropertyHandler ph)
       throws InvalidStateFaultMsg, RuntimeFaultFaultMsg {
       
-      
-    VMUsageConverter us;
-    try {
-        us = new VMUsageConverter(ph);
-        us.registerUsageEvents("0", "0");
-    } catch (MalformedURLException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-    } catch (ObjectNotFoundException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-    } catch (OrganizationAuthoritiesException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-    } catch (ValidationException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-    } catch (APPlatformException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-    }
-      
-      
-      
     StringBuilder url = new StringBuilder();
     url.append("https://");
     url.append(ph.getTargetVCenterServer());

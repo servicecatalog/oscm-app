@@ -36,6 +36,7 @@ import org.oscm.app.vmware.i18n.Messages;
 import org.oscm.app.vmware.persistence.VMwareCredentials;
 import org.oscm.app.vmware.remote.bes.Credentials;
 import org.oscm.app.vmware.remote.vmware.VMwareClient;
+import org.oscm.app.vmware.usage.VMUsageConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -657,14 +658,12 @@ public class VMController implements APPlatformController {
            propertyHandler.setInstanceId(instanceId);
                if (propertyHandler.isCharging()) {
                        try {
-                         //      new UsageConverter(propertyHandler).registerUsageEvents(startTime, endTime);
+                              new VMUsageConverter(propertyHandler).registerUsageEvents(startTime, endTime);
                        } catch (Exception e) {
                                throw new APPlatformException("Failed to gather usage data", e);
                        }
                        return true;
        }
-           
-           
            return false;
        }
 

@@ -36,7 +36,7 @@ public class VMUsageConverter {
     }
 
     public VMUsageConverter(VMPropertyHandler ph) throws MalformedURLException {
-        this.ph = ph;
+        this.ph = ph; 
     }
     
 
