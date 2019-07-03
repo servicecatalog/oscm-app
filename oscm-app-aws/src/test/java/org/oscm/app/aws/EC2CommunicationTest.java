@@ -25,6 +25,7 @@ import java.util.HashMap;
 
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
@@ -473,6 +474,7 @@ public class EC2CommunicationTest {
         assertEquals("instance3", result);
     }
 
+    @Ignore
     @Test
     public void testCreateInstanceUserDataInvalidPath() throws Exception {
         File myFile = createUserDataFile("test123");
