@@ -87,7 +87,7 @@ public class NetworkManager {
       ManagedObjectReference vmwInstance)
       throws Exception {
     logger.debug("");
-
+ 
     VirtualMachineConfigInfo configInfo =
         (VirtualMachineConfigInfo) vmw.getServiceUtil().getDynamicProperty(vmwInstance, "config");
     List<VirtualEthernetCard> vmNics = getNetworkAdapter(configInfo);
@@ -108,16 +108,20 @@ public class NetworkManager {
     }
 
     for (int i = 1; i <= numberOfNICs; i++) {
+      
+      VirtualEthernetCard vmNic = vmNics.get(i - 1);
+      boolean connectNic = true;
+      
       String newNetworkName = paramHandler.getNetworkAdapter(i);
       PortgroupIpSettings pis = new PortgroupIpSettings(paramHandler, i);
+      
+      if(pis.getPortgroup() != null && pis.getDvs() != null) {
       String newGroup = pis.getPortgroup().getUuid();
       String switchUIID = pis.getDvs().getUuid();
 
       logger.info(String.format("NIC%s_SWITCH_UUID: %s", String.valueOf(i), switchUIID));
       logger.info(String.format("NIC%s_PORTGROUP: %s", String.valueOf(i), newGroup));
-
-      VirtualEthernetCard vmNic = vmNics.get(i - 1);
-      boolean connectNic = true;
+      
       if (switchUIID != null && switchUIID.length() > 0) {
         if (newGroup == null || newGroup.length() == 0)
           throw new Exception(
@@ -129,7 +133,7 @@ public class NetworkManager {
 
         replaceNetworkAdapter(vmConfigSpec, vmNic, group, newGroup);
         connectNic = false;
-      } else {
+      }} else {
 
         String vmNetworkName = getNetworkName(vmw, vmwInstance, i);
         if (newNetworkName != null
