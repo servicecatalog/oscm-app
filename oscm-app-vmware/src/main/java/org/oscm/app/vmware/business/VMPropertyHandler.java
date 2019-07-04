@@ -1669,4 +1669,12 @@ public class VMPropertyHandler {
       return BSSWebServiceFactory.getBSSWebService(serviceClass,
               settings.getAuthentication());
   }
+  
+  /**
+   * Returns the instance or controller specific technology manager
+   * authentication.
+   */
+  public PasswordAuthentication getTPAuthentication() {
+      return settings.getAuthentication();
+  }
 }

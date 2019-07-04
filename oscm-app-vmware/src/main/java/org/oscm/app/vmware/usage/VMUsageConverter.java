@@ -44,7 +44,7 @@ public class VMUsageConverter {
             throws NumberFormatException, APPlatformException,
             RuntimeFaultFaultMsg, ObjectNotFoundException, MalformedURLException, OrganizationAuthoritiesException, ValidationException {
 
-        VMUsageCalculator usage = new VMUsageCalculator(ph);
+            VMUsageCalculator usage = new VMUsageCalculator(ph);
 
             submit(EVENT_RAM, usage.calculateMemUsageMB(), endTime);
             submit(EVENT_CPU, usage.calculateCpuUsageMhz(), endTime);
@@ -62,7 +62,7 @@ public class VMUsageConverter {
         }
 
         VOGatheredEvent event = new VOGatheredEvent();
-        event.setActor(ph.getSettings().getRequestingUser().getUserId());
+        event.setActor(ph.getTPAuthentication().getUserName());
         event.setEventId(eventId);
         event.setMultiplier(multiplier);
         event.setOccurrenceTime(parse(occurence, ISO_LOCAL_DATE_TIME)

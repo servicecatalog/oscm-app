@@ -13,8 +13,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.oscm.app.v2_0.data.ProvisioningSettings;
-import org.oscm.app.v2_0.data.ServiceUser;
+import org.oscm.app.v2_0.data.PasswordAuthentication;
 import org.oscm.app.vmware.business.VMPropertyHandler;
 import org.oscm.intf.EventService;
 import org.oscm.vo.VOGatheredEvent;
@@ -77,16 +76,10 @@ public class VMUsageConverterTest {
         String occurence = "1970-01-01T00:00:01";
 
         EventService svc = mock(EventService.class);
-        
+        PasswordAuthentication pwAuth = mock(PasswordAuthentication.class);
+        when(ph.getTPAuthentication()).thenReturn(pwAuth);
+        when(pwAuth.getUserName()).thenReturn("user");
         doReturn(svc).when(ph).getWebService(EventService.class);
-
-        ServiceUser serviceUser = mock(ServiceUser.class);
-        ProvisioningSettings ps = mock(ProvisioningSettings.class);
-        
-        when(ph.getSettings()).thenReturn(ps);
-        when(serviceUser.getUserId()).thenReturn("user");
-        when(ps.getRequestingUser()).thenReturn(serviceUser);
-        
         
         ArgumentCaptor<VOGatheredEvent> event = forClass(VOGatheredEvent.class);
 

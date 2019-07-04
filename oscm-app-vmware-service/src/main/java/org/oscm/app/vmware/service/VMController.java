@@ -659,10 +659,11 @@ public class VMController implements APPlatformController {
                if (propertyHandler.isCharging()) {
                        try {
                               new VMUsageConverter(propertyHandler).registerUsageEvents(startTime, endTime);
+                              return true;
                        } catch (Exception e) {
                                throw new APPlatformException("Failed to gather usage data", e);
                        }
-                       return true;
+                       
        }
            return false;
        }
