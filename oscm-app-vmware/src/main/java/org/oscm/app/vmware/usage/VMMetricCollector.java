@@ -150,8 +150,6 @@ public class VMMetricCollector {
             String counterRollupType = perfCounter.getRollupType().toString();
             String fullCounterName = counterGroup + "." + counterName + "."
                     + counterRollupType;
-            LOGGER.info(
-                    counterGroup + "." + counterName + "." + counterRollupType);
             countersIdMap.put(fullCounterName, counterId);
         }
     }
