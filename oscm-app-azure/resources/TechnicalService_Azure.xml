@@ -71,7 +71,7 @@
       <LocalizedDescription locale="de"/>
       <LocalizedDescription locale="ja"/>
     </ParameterDefinition>
-    <ParameterDefinition configurable="true" default="https://raw.githubusercontent.com/servicecatalog/oscm/master/oscm-app-azure/resources/" id="TEMPLATE_BASE_URL" mandatory="true" valueType="STRING">
+    <ParameterDefinition configurable="true" default="https://raw.githubusercontent.com/servicecatalog/oscm-app/master/oscm-app-azure/resources/" id="TEMPLATE_BASE_URL" mandatory="true" valueType="STRING">
       <LocalizedDescription locale="en">Template Base URL</LocalizedDescription>
       <LocalizedDescription locale="ja"/>
       <LocalizedDescription locale="de"/>
