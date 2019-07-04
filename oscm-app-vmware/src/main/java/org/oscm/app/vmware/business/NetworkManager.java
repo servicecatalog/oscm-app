@@ -111,11 +111,12 @@ public class NetworkManager {
       
       VirtualEthernetCard vmNic = vmNics.get(i - 1);
       boolean connectNic = true;
-      
       String newNetworkName = paramHandler.getNetworkAdapter(i);
+      
+      if(paramHandler.getPortGroup(i) != null && !paramHandler.getPortGroup(i).isEmpty()
+         && paramHandler.getSwitchUUID(i) != null && !paramHandler.getSwitchUUID(i).isEmpty()) {
       PortgroupIpSettings pis = new PortgroupIpSettings(paramHandler, i);
       
-      if(pis.getPortgroup() != null && pis.getDvs() != null) {
       String newGroup = pis.getPortgroup().getUuid();
       String switchUIID = pis.getDvs().getUuid();
 
