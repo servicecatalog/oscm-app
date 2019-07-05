@@ -112,4 +112,4 @@ Third step:
 
 For more information on installing a sample controller, please click the link below:
 
-https://github.com/servicecatalog/oscm/tree/master/oscm-app-sample/
+https://github.com/servicecatalog/oscm-app/tree/master/oscm-app-sample/
