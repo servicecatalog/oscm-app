@@ -83,7 +83,7 @@ public class VMController implements APPlatformController {
 		try {
 			VMPropertyHandler ph = new VMPropertyHandler(settings);
 			ph.setRequestingUser(settings.getRequestingUser());
-
+			ph.setLastUsageFetch("");
 			InstanceDescription id = new InstanceDescription();
 			id.setInstanceId(Long.toString(System.currentTimeMillis()));
 			id.setChangedParameters(settings.getParameters());

@@ -1,11 +1,22 @@
 package org.oscm.app.vmware.usage;
 
+import static java.time.LocalDateTime.parse;
+import static java.time.ZoneOffset.UTC;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+
+import java.time.format.DateTimeParseException;
+
 import org.oscm.app.v2_0.exceptions.APPlatformException;
 import org.oscm.app.vmware.business.VMPropertyHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vmware.vim25.RuntimeFaultFaultMsg;
 
 public class VMUsageCalculator {
 
+    private static final Logger logger = LoggerFactory.getLogger(VMUsageCalculator.class);
+    
     VMPropertyHandler ph;
     VMMetricCollector collector;
 
@@ -44,6 +55,24 @@ public class VMUsageCalculator {
     public long calculateCpuUsageMhz() throws NumberFormatException,
             APPlatformException, RuntimeFaultFaultMsg {
         return collector.getCpuUsageMhz();
+    }
+
+    public long calculateTimeframe(String startTime, String endTime){
+        long hoursBetweenTwoDates;
+        try {
+        final long start = parse(startTime, ISO_LOCAL_DATE_TIME).toInstant(UTC)
+                .toEpochMilli();
+        final long end = parse(endTime, ISO_LOCAL_DATE_TIME).toInstant(UTC)
+                .toEpochMilli();
+        hoursBetweenTwoDates = (end - start)/ (60 * 60 * 1000) ;
+        if(hoursBetweenTwoDates < 1) {
+            hoursBetweenTwoDates = 1;
+        }
+        } catch(DateTimeParseException e) {
+            logger.error("failed to read start time " + startTime + " or end time " + endTime + ". Use 24 hours as default timeframe"); 
+        hoursBetweenTwoDates = 24;    
+        }
+        return hoursBetweenTwoDates;
     }
 
 }

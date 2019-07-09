@@ -1,9 +1,14 @@
 package org.oscm.app.vmware.usage;
 
+import static java.time.LocalDateTime.parse;
+import static java.time.ZoneOffset.UTC;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+
+import java.time.format.DateTimeParseException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +50,7 @@ public class VMUsageCalculatorTest {
     }
     
     @Test
-    public void calculateDiskUsageGB() throws APPlatformException, RuntimeFaultFaultMsg {
+    public void testCalculateDiskUsageGB() throws APPlatformException, RuntimeFaultFaultMsg {
         //given
         
         when(collector.getDiskUsageTotalKB()).thenReturn(9549836L); //number is given with 2 decimal places without separating point
@@ -58,5 +63,48 @@ public class VMUsageCalculatorTest {
         //then
         assertEquals(expected, result);
     }
+
+    @Test
+    public void testCalculateTimeframeCorrect() {
+        //given
+        String startTime = "2019-07-05T12:43:45.088";
+        String endTime = "2019-07-08T10:45:58.77";
+        long expected = 70;
+        
+        //when
+        long result = calculator.calculateTimeframe(startTime, endTime);
+        
+        //then 
+        assertEquals(expected, result);
+    }
+    
+    @Test
+    public void testCalculateTimeframeIncorrectFormat() {
+        //given
+        String startTime = "2019-07-05Z12:43:45.088";
+        String endTime = "2019-07-08T´10:45:58.77";
+        long expected = 24;
+        
+        //when
+        long result = calculator.calculateTimeframe(startTime, endTime);
+        
+        //then 
+        assertEquals(expected, result);
+    }
+    
+    @Test
+    public void testCalculateShortTimeframe() {
+        //given
+        String startTime = "2019-07-05T12:43:45.088";
+        String endTime = "2019-07-05T12:45:58.77";
+        long expected = 1;
+        
+        //when
+        long result = calculator.calculateTimeframe(startTime, endTime);
+        
+        //then 
+        assertEquals(expected, result);
+    }
+
 
 }

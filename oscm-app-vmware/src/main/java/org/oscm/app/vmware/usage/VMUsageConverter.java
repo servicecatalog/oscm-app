@@ -5,6 +5,7 @@ import static java.time.ZoneOffset.UTC;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 import java.net.MalformedURLException;
+import java.text.ParseException;
 
 import org.oscm.app.v2_0.exceptions.APPlatformException;
 import org.oscm.app.v2_0.exceptions.ConfigurationException;
@@ -22,9 +23,9 @@ import com.vmware.vim25.RuntimeFaultFaultMsg;
 
 public class VMUsageConverter {
 
-    static final String EVENT_DISK = "EVENT_DISK_GIGABYTE_HOURS";
-    static final String EVENT_CPU = "EVENT_CPU_HOURS";
-    static final String EVENT_RAM = "EVENT_RAM_MEGABYTE_HOURS";
+    static final String EVENT_DISK = "EVENT_DISK_GIGABYTE_USAGE";
+    static final String EVENT_CPU = "EVENT_CPU_MHZ_USAGE_AVERAGE";
+    static final String EVENT_RAM = "EVENT_RAM_MEGABYTE_USAGE_AVERAGE";
     
     private static final Logger LOGGER = LoggerFactory
             .getLogger(VMUsageConverter.class);
@@ -45,11 +46,10 @@ public class VMUsageConverter {
             RuntimeFaultFaultMsg, ObjectNotFoundException, MalformedURLException, OrganizationAuthoritiesException, ValidationException {
 
             VMUsageCalculator usage = new VMUsageCalculator(ph);
-
-            submit(EVENT_RAM, usage.calculateMemUsageMB(), endTime);
-            submit(EVENT_CPU, usage.calculateCpuUsageMhz(), endTime);
-            submit(EVENT_DISK, usage.calculateDiskUsageGB(), endTime);
-
+            long hours = usage.calculateTimeframe(startTime, endTime);
+            submit(EVENT_RAM, usage.calculateMemUsageMB() * hours, endTime);
+            submit(EVENT_CPU, usage.calculateCpuUsageMhz() * hours, endTime);
+            submit(EVENT_DISK, usage.calculateDiskUsageGB() * hours, endTime);
     } 
 
     void submit(String eventId, long multiplier, String occurence)

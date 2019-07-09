@@ -368,6 +368,8 @@ public class VMPropertyHandler {
    */
   public static final String IS_CHARGING = "IS_CHARGING";
   
+  public static final String LAST_USAGE_FETCH = "LAST_USAGE_FETCH";
+  
   /**
    * To create a billing event the technical service id is required and will
    * be stored as service parameter.
@@ -1676,5 +1678,13 @@ public class VMPropertyHandler {
    */
   public PasswordAuthentication getTPAuthentication() {
       return settings.getAuthentication();
+  }
+  
+  public String getLastUsageFetch() {
+      return getValue(LAST_USAGE_FETCH, settings.getParameters());
+  }
+
+  public void setLastUsageFetch(String value) {
+      setValue(LAST_USAGE_FETCH, value, settings.getParameters());
   }
 }

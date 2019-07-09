@@ -71,23 +71,50 @@ public class VMMetricCollector {
     } 
 
     public ArrayList<String> createMetricResult(String name)
-            throws APPlatformException, RuntimeFaultFaultMsg {
+            throws RuntimeFaultFaultMsg, APPlatformException {
         List<PerfMetricId> perfMetricIds = createMetrics(name);
-        List<PerfQuerySpec> pqsList = createPerfQuerySpec(vmInstance,
-                perfMetricIds);
+        ArrayList<String> result = null;
+        try {
+            result = getResultData(perfMetricIds, INTERVALL_ONE_YEAR);
+        } catch (APPlatformException e) {
+            result = getResultData(perfMetricIds, INTERVALL_ONE_DAY);
+            result = createAvaerage(result);
+        }
+        
+        return result;
+    }
 
+    ArrayList<String> createAvaerage(ArrayList<String> values) {
+        int sum = 0;
+        int factor = 0;
+        for(int i = 0; i < values.size(); i ++) {
+            String[] value = values.get(i).split(",");
+            for(int j = 0; value.length > j; j++) {
+                sum = sum + Integer.parseInt(value[j]);
+                factor++;
+            }
+        }
+        int avg  = sum/factor;
+        ArrayList<String> result = new ArrayList<String>();
+        result.add(String.valueOf(avg));
+        return result;
+    }
+
+    private ArrayList<String> getResultData(List<PerfMetricId> perfMetricIds, int intervall)
+            throws RuntimeFaultFaultMsg, APPlatformException {
+        List<PerfQuerySpec> pqsList =createPerfQuerySpec(vmInstance,
+                perfMetricIds, intervall);
         List<PerfEntityMetricBase> retrievedStats = vmw.getService().queryPerf(performanceManager, pqsList);
-
         return createResultFromStats(retrievedStats);
     }
 
     protected List<PerfQuerySpec> createPerfQuerySpec(
             ManagedObjectReference vmInstance,
-            List<PerfMetricId> perfMetricIds) {
+            List<PerfMetricId> perfMetricIds, int intervall) {
         List<PerfQuerySpec> pqsList = new ArrayList<PerfQuerySpec>();
         PerfQuerySpec querySpecification = new PerfQuerySpec();
         querySpecification.setEntity(vmInstance);
-        querySpecification.setIntervalId(INTERVALL_ONE_YEAR);
+        querySpecification.setIntervalId(intervall);
         querySpecification.setFormat("csv");
         querySpecification.getMetricId().addAll(perfMetricIds);
         pqsList.add(querySpecification);
@@ -117,7 +144,7 @@ public class VMMetricCollector {
             if (metricsValues.isEmpty()) {
                 LOGGER.error("No stats retrieved. "
                         + "Check whether the virtual machine is powered on.");
-                throw new APPlatformException("No stats retrieved. "
+                throw new APPlatformException("No stats retrieved. Maybe not enough data available"
                         + "Check whether the virtual machine is powered on.");
             }
             result = getResults(metricsValues);

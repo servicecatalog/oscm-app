@@ -174,7 +174,7 @@ public class VMMetricCollectorTest {
         expected.add(querySpecification);
         
         //when
-        List<PerfQuerySpec> result =  collector.createPerfQuerySpec(vmInstance, perfMetricIds);
+        List<PerfQuerySpec> result =  collector.createPerfQuerySpec(vmInstance, perfMetricIds, 86400);
         
         //then
         assertEquals(expected.get(0).getMetricId(), result.get(0).getMetricId());
@@ -205,7 +205,7 @@ public class VMMetricCollectorTest {
     }
     
     @Test
-    public void TestInitialize(){
+    public void testInitialize(){
         
         //given
         
@@ -213,6 +213,23 @@ public class VMMetricCollectorTest {
         collector.initialize();
         //then
         Mockito.verify(collector, Mockito.times(1)).initialize();
+    }
+    
+    @Test
+    public void testCreateAvaerage() {
+        //given
+        ArrayList<String> values = new ArrayList<String>();
+        ArrayList<String> expected = new ArrayList<String>();
+        String value = "1,2,3,4,5,6,7,8,9";
+        String expectedValue = "5";
+        values.add(value);
+        expected.add(expectedValue);
+        
+        //when
+        ArrayList<String> result = collector.createAvaerage(values);
+        
+        //then
+        assertEquals(expected, result);
     }
     
 }
