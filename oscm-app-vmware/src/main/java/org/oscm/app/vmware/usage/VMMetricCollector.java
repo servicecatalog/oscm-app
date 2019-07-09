@@ -142,8 +142,6 @@ public class VMMetricCollector {
             List<PerfMetricSeriesCSV> metricsValues = entityStatsCsv.getValue();
 
             if (metricsValues.isEmpty()) {
-                LOGGER.error("No stats retrieved. "
-                        + "Check whether the virtual machine is powered on.");
                 throw new APPlatformException("No stats retrieved. Maybe not enough data available"
                         + "Check whether the virtual machine is powered on.");
             }
