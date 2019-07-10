@@ -1,3 +1,14 @@
+/**
+ * *****************************************************************************
+ *
+ * <p>Copyright FUJITSU LIMITED 2018
+ *
+ * <p>Creation Date: 2019-07-09
+ *
+ * <p>*****************************************************************************
+ */
+
+
 package org.oscm.app.vmware.usage;
 
 import static org.junit.Assert.*;
@@ -27,6 +38,10 @@ import com.vmware.vim25.PerfSummaryType;
 import com.vmware.vim25.RuntimeFaultFaultMsg;
 import com.vmware.vim25.VimPortType;
 
+/**
+ * 
+ * @author worf
+ */
 public class VMMetricCollectorTest {
     
     private VMMetricCollector collector;
@@ -205,14 +220,14 @@ public class VMMetricCollectorTest {
     }
     
     @Test
-    public void testInitialize(){
+    public void testInitialize() {
         
         //given
         
         //when
-        collector.initialize();
+            collector.initialize();
         //then
-        Mockito.verify(collector, Mockito.times(1)).initialize();
+            Mockito.verify(collector, Mockito.times(1)).initialize();
     }
     
     @Test

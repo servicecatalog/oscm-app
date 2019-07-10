@@ -1,3 +1,13 @@
+/**
+ * *****************************************************************************
+ *
+ * <p>Copyright FUJITSU LIMITED 2018
+ *
+ * <p>Creation Date: 2019-07-09
+ *
+ * <p>*****************************************************************************
+ */
+
 package org.oscm.app.vmware.usage;
 
 import java.util.ArrayList;
@@ -20,6 +30,11 @@ import com.vmware.vim25.PerfMetricSeriesCSV;
 import com.vmware.vim25.PerfQuerySpec;
 import com.vmware.vim25.RuntimeFaultFaultMsg;
 
+/**
+ * 
+ * @author worf
+ * collects the metrics for cpu, mem and disc usage for the vm
+ */
 public class VMMetricCollector {
 
     static final String CPU_USAGE_PERCENT = "cpu.usagemhz.AVERAGE";
@@ -56,7 +71,7 @@ public class VMMetricCollector {
                     "VirtualMachine", ph.getInstanceName());
 
             performanceManager = vmw.getConnection().getServiceContent()
-                    .getPerfManager();
+                    .getPerfManager(); 
 
             List<PerfCounterInfo> perfCounters = (List<PerfCounterInfo>) vmw
                     .getServiceUtil()
@@ -65,8 +80,8 @@ public class VMMetricCollector {
             createCounterToNameMapping(perfCounters);
 
         } catch (Exception e) {
-            LOGGER.error("Can´t gather usage data for instance "
-                    + ph.getInstanceId() + "\n" + e.getMessage());
+            LOGGER.error("FATAL ERREOR: Can´t gather usage data for instance. Maybe your vSphere is not available."
+                    + ph.getInstanceId() + "\n" + e.getStackTrace());
         }
     } 
 
@@ -163,8 +178,10 @@ public class VMMetricCollector {
         return result;
     }
 
-    // counter Id's can be different in every vSphere environment, therefore
-    // it,s necessary to map the id's to names
+    /**
+     * counter Id's can be different in every vSphere environment, therefore
+     * it,s necessary to map the id's to names
+     */
     protected void createCounterToNameMapping(
             List<PerfCounterInfo> perfCounters) {
         for (PerfCounterInfo perfCounter : perfCounters) {

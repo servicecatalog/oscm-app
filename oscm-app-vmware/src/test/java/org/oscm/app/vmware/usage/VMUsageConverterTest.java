@@ -1,3 +1,14 @@
+/**
+ * *****************************************************************************
+ *
+ * <p>Copyright FUJITSU LIMITED 2018
+ *
+ * <p>Creation Date: 2019-07-09
+ *
+ * <p>*****************************************************************************
+ */
+
+
 package org.oscm.app.vmware.usage;
 
 import static org.junit.Assert.assertEquals;
@@ -7,6 +18,9 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+
+import java.net.MalformedURLException;
+
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
@@ -17,7 +31,10 @@ import org.oscm.app.v2_0.data.PasswordAuthentication;
 import org.oscm.app.vmware.business.VMPropertyHandler;
 import org.oscm.intf.EventService;
 import org.oscm.vo.VOGatheredEvent;
-
+/**
+ * 
+ * @author worf
+ */
 public class VMUsageConverterTest {
     
     private VMUsageConverter converter;
@@ -25,8 +42,9 @@ public class VMUsageConverterTest {
     
     @Before
     public void before() {
-        converter = spy(new VMUsageConverter());
-        converter.ph = ph = mock(VMPropertyHandler.class);
+        ph = mock(VMPropertyHandler.class);
+        converter = spy(new VMUsageConverter(ph));
+        converter.ph = ph;
 
     }
 

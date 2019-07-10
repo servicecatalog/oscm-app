@@ -1,3 +1,14 @@
+/**
+ * *****************************************************************************
+ *
+ * <p>Copyright FUJITSU LIMITED 2018
+ *
+ * <p>Creation Date: 2019-07-09
+ *
+ * <p>*****************************************************************************
+ */
+
+
 package org.oscm.app.vmware.usage;
 
 import static java.time.LocalDateTime.parse;
@@ -12,25 +23,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vmware.vim25.RuntimeFaultFaultMsg;
-
+/**
+ * 
+ * @author worf
+ * calculates the actual usage of mem, cpu and disc usage for the vm
+ */
 public class VMUsageCalculator {
 
     private static final Logger logger = LoggerFactory.getLogger(VMUsageCalculator.class);
     
-    VMPropertyHandler ph;
-    VMMetricCollector collector;
+    protected VMPropertyHandler ph;
+    protected VMMetricCollector collector;
 
     
     public VMUsageCalculator() {
     }
 
-    public VMUsageCalculator(VMPropertyHandler ph) {
+    public VMUsageCalculator(VMPropertyHandler ph){
         this.ph = ph;
         collector = new VMMetricCollector(ph);
         collector.initialize();
     }
     
-    public VMUsageCalculator(VMPropertyHandler ph, VMMetricCollector collector) {
+    public VMUsageCalculator(VMPropertyHandler ph, VMMetricCollector collector) throws APPlatformException {
         this.ph = ph;
         this.collector = collector;
         collector.initialize();

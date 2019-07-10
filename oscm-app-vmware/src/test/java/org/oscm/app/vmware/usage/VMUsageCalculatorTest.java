@@ -1,3 +1,14 @@
+/**
+ * *****************************************************************************
+ *
+ * <p>Copyright FUJITSU LIMITED 2018
+ *
+ * <p>Creation Date: 2019-07-09
+ *
+ * <p>*****************************************************************************
+ */
+
+
 package org.oscm.app.vmware.usage;
 
 import static java.time.LocalDateTime.parse;
@@ -16,7 +27,10 @@ import org.oscm.app.v2_0.exceptions.APPlatformException;
 import org.oscm.app.vmware.business.VMPropertyHandler;
 
 import com.vmware.vim25.RuntimeFaultFaultMsg;
-
+/**
+ * 
+ * @author worf
+ */
 public class VMUsageCalculatorTest {
     
     

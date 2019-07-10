@@ -1,3 +1,14 @@
+/**
+ * *****************************************************************************
+ *
+ * <p>Copyright FUJITSU LIMITED 2018
+ *
+ * <p>Creation Date: 2019-07-09
+ *
+ * <p>*****************************************************************************
+ */
+
+
 package org.oscm.app.vmware.usage;
 
 import static java.time.LocalDateTime.parse;
@@ -20,7 +31,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vmware.vim25.RuntimeFaultFaultMsg;
-
+/**
+ * 
+ * @author worf
+ * create events for billing the cpu, mem and disc usage of a vm 
+ */
 public class VMUsageConverter {
 
     static final String EVENT_DISK = "EVENT_DISK_GIGABYTE_USAGE";
@@ -30,13 +45,10 @@ public class VMUsageConverter {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(VMUsageConverter.class);
 
-    VMPropertyHandler ph;
+    protected VMPropertyHandler ph;
     
-    public VMUsageConverter() {
-        
-    }
 
-    public VMUsageConverter(VMPropertyHandler ph) throws MalformedURLException {
+    public VMUsageConverter(VMPropertyHandler ph){
         this.ph = ph; 
     }
     

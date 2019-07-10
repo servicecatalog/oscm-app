@@ -2,7 +2,7 @@
 <!-- Copyright FUJITSU LIMITED 2018-->
 
 <tns:TechnicalServices xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="oscm.serviceprovisioning/1.9/TechnicalService.xsd ../../oscm-serviceprovisioning/javares/TechnicalServices.xsd" xmlns:tns="oscm.serviceprovisioning/1.9/TechnicalService.xsd">
-  <tns:TechnicalService accessType="DIRECT" allowingOnBehalfActing="false" baseUrl="" billingIdentifier="NATIVE_BILLING" build="2017-09-07" id="VMwareTest" loginPath="/" onlyOneSubscriptionPerUser="false" provisioningPassword="" provisioningType="ASYNCHRONOUS" provisioningUrl="http://oscm-app:8880/oscm-app/webservices/oscm-app/oscm-app/org.oscm.app.v2_0.service.AsynchronousProvisioningProxy?wsdl" provisioningUsername="" provisioningVersion="1.0">
+  <tns:TechnicalService accessType="DIRECT" allowingOnBehalfActing="false" baseUrl="" billingIdentifier="NATIVE_BILLING" build="2017-09-07" id="WMwareSampleWithEvents" loginPath="/" onlyOneSubscriptionPerUser="false" provisioningPassword="" provisioningType="ASYNCHRONOUS" provisioningUrl="http://oscm-app:8880/oscm-app/webservices/oscm-app/oscm-app/org.oscm.app.v2_0.service.AsynchronousProvisioningProxy?wsdl" provisioningUsername="" provisioningVersion="1.0">
     <AccessInfo locale="en">VMware Access Info</AccessInfo>
     <LocalizedDescription locale="de">VMware Virtual Machine Provisioning</LocalizedDescription>
     <LocalizedDescription locale="en">VMware Virtual Machine Provisioning</LocalizedDescription>
@@ -419,7 +419,7 @@
       <LocalizedDescription locale="de"/>
       <LocalizedDescription locale="ja"/>
     </ParameterDefinition>
-    <ParameterDefinition configurable="false" default="VMwareTest" id="TECHNICAL_SERVICE_ID"
+    <ParameterDefinition configurable="false" default="WMwareSampleWithEvents" id="TECHNICAL_SERVICE_ID"
       mandatory="true" valueType="STRING">
       <LocalizedDescription locale="en">Technical Service Identifier, used to generate events. Must be the same as the id of this tns:TechnicalService element.</LocalizedDescription>
       <LocalizedDescription locale="de" />
@@ -482,7 +482,7 @@
       <LocalizedDescription locale="en">Restores a snapshot of the VM</LocalizedDescription>
     </Operation>
   </tns:TechnicalService>
-  <tns:TechnicalService accessType="DIRECT" allowingOnBehalfActing="false" baseUrl="" billingIdentifier="NATIVE_BILLING" build="2017-09-07" id="VMware ESS 6.5 17.4 test" loginPath="/" onlyOneSubscriptionPerUser="false" provisioningPassword="" provisioningType="ASYNCHRONOUS" provisioningUrl="https://eststbesint.intern.est.fujitsu.com:8881/ProvisioningService/AsynchronousProvisioningProxy?wsdl" provisioningUsername="" provisioningVersion="1.0">
+  <tns:TechnicalService accessType="DIRECT" allowingOnBehalfActing="false" baseUrl="" billingIdentifier="NATIVE_BILLING" build="2017-09-07" id="VMware ESS 6.5 test" loginPath="/" onlyOneSubscriptionPerUser="false" provisioningPassword="" provisioningType="ASYNCHRONOUS" provisioningUrl="https://eststbesint.intern.est.fujitsu.com:8881/ProvisioningService/AsynchronousProvisioningProxy?wsdl" provisioningUsername="" provisioningVersion="1.0">
     <AccessInfo locale="en">VMware Access Info</AccessInfo>
     <LocalizedDescription locale="de">VMware Virtual Machine Provisioning</LocalizedDescription>
     <LocalizedDescription locale="en">VMware Virtual Machine Provisioning</LocalizedDescription>
@@ -913,7 +913,7 @@
       <LocalizedDescription locale="en">Restores a snapshot of the VM</LocalizedDescription>
     </Operation>
   </tns:TechnicalService>
-  <tns:TechnicalService accessType="DIRECT" allowingOnBehalfActing="false" baseUrl="" billingIdentifier="NATIVE_BILLING" build="2017-09-07" id="VMware ESS 6.5 17.4 test1" loginPath="/" onlyOneSubscriptionPerUser="false" provisioningPassword="" provisioningType="ASYNCHRONOUS" provisioningUrl="https://eststbesint.intern.est.fujitsu.com:8881/ProvisioningService/AsynchronousProvisioningProxy?wsdl" provisioningUsername="" provisioningVersion="1.0">
+  <tns:TechnicalService accessType="DIRECT" allowingOnBehalfActing="false" baseUrl="" billingIdentifier="NATIVE_BILLING" build="2017-09-07" id="VMware ESS 6.5 test1" loginPath="/" onlyOneSubscriptionPerUser="false" provisioningPassword="" provisioningType="ASYNCHRONOUS" provisioningUrl="https://eststbesint.intern.est.fujitsu.com:8881/ProvisioningService/AsynchronousProvisioningProxy?wsdl" provisioningUsername="" provisioningVersion="1.0">
     <AccessInfo locale="en">VMware Access Info</AccessInfo>
     <LocalizedDescription locale="de">VMware Virtual Machine Provisioning</LocalizedDescription>
     <LocalizedDescription locale="en">VMware Virtual Machine Provisioning</LocalizedDescription>
