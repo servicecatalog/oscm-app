@@ -9,6 +9,19 @@
  */
 package org.oscm.app.vmware.business;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.oscm.app.v2_0.exceptions.APPlatformException;
+import org.oscm.app.vmware.business.Script.OS;
+import org.oscm.app.vmware.i18n.Messages;
+import org.oscm.app.vmware.remote.vmware.VMwareClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vmware.vim25.GuestInfo;
 import com.vmware.vim25.GuestNicInfo;
 import com.vmware.vim25.InvalidStateFaultMsg;
@@ -25,17 +38,6 @@ import com.vmware.vim25.VirtualMachineRuntimeInfo;
 import com.vmware.vim25.VirtualMachineSnapshotInfo;
 import com.vmware.vim25.VirtualMachineSnapshotTree;
 import com.vmware.vim25.VirtualMachineSummary;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.oscm.app.v2_0.exceptions.APPlatformException;
-import org.oscm.app.vmware.business.Script.OS;
-import org.oscm.app.vmware.i18n.Messages;
-import org.oscm.app.vmware.remote.vmware.VMwareClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class VM extends Template {
 
@@ -66,6 +68,7 @@ public class VM extends Template {
     virtualMachineSnapshotInfo =
         (VirtualMachineSnapshotInfo)
             vmw.getServiceUtil().getDynamicProperty(vmInstance, "snapshot");
+    
 
     if (vmInstance == null || configSpec == null || folder == null || guestInfo == null) {
       LOG.warn("failed to retrieve VM");
@@ -76,7 +79,7 @@ public class VM extends Template {
 
   public String createVmUrl(VMPropertyHandler ph)
       throws InvalidStateFaultMsg, RuntimeFaultFaultMsg {
-
+      
     StringBuilder url = new StringBuilder();
     url.append("https://");
     url.append(ph.getTargetVCenterServer());

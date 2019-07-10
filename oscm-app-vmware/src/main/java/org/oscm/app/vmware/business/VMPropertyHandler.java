@@ -12,6 +12,8 @@ package org.oscm.app.vmware.business;
 import com.vmware.vim25.LocalizableMessage;
 import com.vmware.vim25.TaskInfo;
 import com.vmware.vim25.TaskInfoState;
+
+import java.net.MalformedURLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,11 +21,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import javax.xml.datatype.XMLGregorianCalendar;
+
+import org.oscm.app.v2_0.BSSWebServiceFactory;
 import org.oscm.app.v2_0.data.PasswordAuthentication;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
 import org.oscm.app.v2_0.data.ServiceUser;
 import org.oscm.app.v2_0.data.Setting;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
+import org.oscm.app.v2_0.exceptions.ConfigurationException;
 import org.oscm.app.vmware.business.VMwareValue.Unit;
 import org.oscm.app.vmware.business.model.Cluster;
 import org.oscm.app.vmware.business.model.DistributedVirtualSwitch;
@@ -351,6 +356,25 @@ public class VMPropertyHandler {
   public static final String TS_VSPHERE_CONSOLE_PORT = "VSPHERE_CONSOLE_PORT";
 
   public static final String TS_IPPOOL_FOR_PORTGROUP = "IPPOOL_FOR_PORTGROUP";
+  
+  public static final String INSTANCE_ID = "INSTANCE_ID";
+  
+  /**
+   * Boolean service parameter.
+   * <ul>
+   * <li>True: Billing events will be generated for this tenant subscription
+   * <li>False: Service is free of charge. No billing events will be generated
+   * <ul>
+   */
+  public static final String IS_CHARGING = "IS_CHARGING";
+  
+  public static final String LAST_USAGE_FETCH = "LAST_USAGE_FETCH";
+  
+  /**
+   * To create a billing event the technical service id is required and will
+   * be stored as service parameter.
+   */
+  public static final String TECHNICAL_SERVICE_ID = "TECHNICAL_SERVICE_ID";
 
   public VMPropertyHandler(ProvisioningSettings settings) {
     this.settings = settings;
@@ -1607,6 +1631,20 @@ public class VMPropertyHandler {
       return new DataAccessService(getLocale());
     }
   }
+  
+  public String getInstanceId() {
+      return getValue(INSTANCE_ID, settings.getParameters());
+  }
+
+  public void setInstanceId(String value) {
+      setValue(INSTANCE_ID, value, settings.getParameters());
+  }
+  
+  public boolean isCharging() {
+      Setting setting = settings.getParameters().get(IS_CHARGING);
+      return setting == null ? false
+              : Boolean.parseBoolean(setting.getValue());
+  }
 
   private String getValue(String key, Map<String, Setting> source) {
     Setting setting = source.get(key);
@@ -1615,5 +1653,38 @@ public class VMPropertyHandler {
 
   private void setValue(String key, String value, Map<String, Setting> target) {
     target.put(key, new Setting(key, value));
+  }
+  
+  public String getTechnicalServiceId() {
+      return getValue(TECHNICAL_SERVICE_ID, settings.getParameters());
+  }
+
+  public void setTechnicalServiceId(String value) {
+      setValue(TECHNICAL_SERVICE_ID, value, settings.getParameters());
+  }
+  
+  /**
+   * Returns service interfaces for BSS web service calls.
+   */
+  public <T> T getWebService(Class<T> serviceClass)
+          throws ConfigurationException, MalformedURLException {
+      return BSSWebServiceFactory.getBSSWebService(serviceClass,
+              settings.getAuthentication());
+  }
+  
+  /**
+   * Returns the instance or controller specific technology manager
+   * authentication.
+   */
+  public PasswordAuthentication getTPAuthentication() {
+      return settings.getAuthentication();
+  }
+  
+  public String getLastUsageFetch() {
+      return getValue(LAST_USAGE_FETCH, settings.getParameters());
+  }
+
+  public void setLastUsageFetch(String value) {
+      setValue(LAST_USAGE_FETCH, value, settings.getParameters());
   }
 }

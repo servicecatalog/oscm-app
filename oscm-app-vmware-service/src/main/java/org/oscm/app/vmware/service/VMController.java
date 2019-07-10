@@ -20,6 +20,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
+
 import org.oscm.app.v2_0.APPlatformServiceFactory;
 import org.oscm.app.v2_0.data.*;
 import org.oscm.app.v2_0.exceptions.*;
@@ -35,6 +36,7 @@ import org.oscm.app.vmware.i18n.Messages;
 import org.oscm.app.vmware.persistence.VMwareCredentials;
 import org.oscm.app.vmware.remote.bes.Credentials;
 import org.oscm.app.vmware.remote.vmware.VMwareClient;
+import org.oscm.app.vmware.usage.VMUsageConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +83,7 @@ public class VMController implements APPlatformController {
 		try {
 			VMPropertyHandler ph = new VMPropertyHandler(settings);
 			ph.setRequestingUser(settings.getRequestingUser());
-
+			ph.setLastUsageFetch("");
 			InstanceDescription id = new InstanceDescription();
 			id.setInstanceId(Long.toString(System.currentTimeMillis()));
 			id.setChangedParameters(settings.getParameters());
@@ -648,6 +650,23 @@ public class VMController implements APPlatformController {
 			ProvisioningSettings arg3) throws APPlatformException {
 		return null;
 	}
+	
+       @Override
+        public boolean gatherUsageData(String controllerId, String instanceId, String startTime, String endTime,
+                        ProvisioningSettings settings) throws APPlatformException {
+           VMPropertyHandler propertyHandler = new VMPropertyHandler(settings);
+           propertyHandler.setInstanceId(instanceId);
+               if (propertyHandler.isCharging()) {
+                       try {
+                              new VMUsageConverter(propertyHandler).registerUsageEvents(startTime, endTime);
+                              return true;
+                       } catch (Exception e) {
+                               throw new APPlatformException("Failed to gather usage data", e);
+                       }
+                       
+       }
+           return false;
+       }
 
 	@Override
 	public void setControllerSettings(ControllerSettings settings) {
