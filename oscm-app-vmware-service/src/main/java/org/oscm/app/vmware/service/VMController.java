@@ -460,7 +460,7 @@ public class VMController implements APPlatformController {
 	}
 
 	protected void throwServiceNotReachable(Exception e) throws ServiceNotReachableException {
-		ServiceNotReachableException ex = new ServiceNotReachableException(
+	    ServiceNotReachableException ex = new ServiceNotReachableException(
 				getLocalizedErrorMessage("ui.config.error.unable.to.connect.to.vmware"), deepCause(e));
 		ex.setStackTrace(e.getStackTrace());
 		throw ex;
