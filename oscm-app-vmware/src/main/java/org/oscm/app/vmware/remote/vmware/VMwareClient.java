@@ -101,7 +101,9 @@ public class VMwareClient implements AutoCloseable {
                 LOG.error("Failed to establish connection to vSphere. URL: "
                         + url + ", UserId: " + user, e);
                 if (numFailedLogins > 2) {
-                    throw e;
+                    Exception ex = new Exception(e.getMessage());
+                    ex.setStackTrace(e.getStackTrace());
+                    throw ex;
                 }
                 numFailedLogins++;
                 repeatLogin = true;
