@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.net.URL;
+import java.util.Locale;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -29,6 +30,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
 public class ClusterImporterTest {
+    
 
     final String testXML = ""
             + "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
@@ -63,6 +65,7 @@ public class ClusterImporterTest {
     @Before
     public void setUpStreams() {
         System.setErr(new PrintStream(errContent));
+        Locale.setDefault(Locale.ENGLISH);
     }
 
     @After
