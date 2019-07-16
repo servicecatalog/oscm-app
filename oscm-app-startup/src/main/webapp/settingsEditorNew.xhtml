@@ -1,0 +1,49 @@
+<!-- Copyright FUJITSU LIMITED 2018-->
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:b="http://bootsfaces.net/ui"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+>
+
+    <b:panel look="primary" title="#{msg['ui.config.platform.settings']}" collapsible="false">
+      <h:outputText value="#{msg['ui.config.platform.description']}" />
+    
+
+    <h:form id="appSettings" >
+        <b:dataTable responsive="true" searching="false"
+             paginated="false"
+                        value="#{platformConfigurationCtrl.model.keys}"
+                        var="key" >
+            <b:dataTableColumn >
+                <f:facet name="header">
+                    <h:outputText
+                            value="#{msg['ui.config.platform.column.key']}"/>
+                </f:facet>
+                <h:outputText value="#{key}"/>
+            </b:dataTableColumn>
+            <b:dataTableColumn order-by="dom-text" data-type="text" >
+                <f:facet name="header">
+                    <h:outputText
+                            value="#{msg['ui.config.platform.column.value']}"/>
+                </f:facet>
+                <h:inputSecret
+                        rendered="#{platformConfigurationCtrl.encrypted(key)}"
+                        value="#{platformConfigurationCtrl.model.items[key]}"/>
+                <h:inputText
+                        rendered="#{not platformConfigurationCtrl.encrypted(key)}"
+                        value="#{platformConfigurationCtrl.model.items[key]}"/>
+            </b:dataTableColumn>
+        </b:dataTable>
+
+        <b:buttonGroup>
+           <b:commandButton look="primary" class="oscm_app_button"
+                                 value="#{msg['ui.config.action.save']}"
+                                 type="submit"
+                                 onclick="this.blur(); setOnSubmit(true);setDirty(false);"
+                                 action="#{platformConfigurationCtrl.save}"/>
+        </b:buttonGroup>
+    </h:form>
+    </b:panel>
+</ui:composition>

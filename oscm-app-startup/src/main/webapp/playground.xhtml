@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:b="http://bootsfaces.net/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+<h:head>
+  <title>BootsFaces Basic Page</title>
+</h:head>
+<h:body>
+<b:navBar brand="Brand" brandHref="#" inverse="true">
+  <b:navbarLinks>
+    <b:navLink value="Home" href="#"></b:navLink>
+    <b:navLink value="Link" href="#"></b:navLink>
+    <b:navLink value="Link" href="#"></b:navLink>
+  </b:navbarLinks>
+</b:navBar>
+  <b:container>
+  
+  <b:jumbotron>
+  <h1>Hello, Jumbotron!</h1>
+  <p>This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+  <p><a class="btn btn-primary btn-lg">Learn more</a></p>
+  </b:jumbotron>
+
+    <b:row>
+      <b:column>
+        <h1>Hello, world!</h1>
+      </b:column>
+    </b:row>
+
+    <b:buttonGroup>
+      <b:button value="Left" />
+      <b:button value="Middle" />
+      <b:button value="Right" />
+    </b:buttonGroup>
+    
+    <b>Full configuration with data protection (see below)</b><br/>
+<b:socialShare shares="twitter,linkedin,facebook"
+               showLabel="true" show-count="false"
+               text="BootsFaces rocks!" block-message="Click to unblock the share buttons" />
+<br/>
+<b>Basic configuration</b><br/>
+<b:socialShare shares="twitter,linkedin"
+               disable-block="true" />
+  </b:container>
+</h:body>
+</html>
