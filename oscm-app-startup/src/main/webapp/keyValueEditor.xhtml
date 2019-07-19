@@ -133,7 +133,6 @@
 				<h:commandButton id="pingButton" class="oscm_app_button"
 					onclick=" this.blur(); doShowProgress(true);"
 					rendered="#{appConfigurationModel.pingButtonVisibilityMap[key]}"
-					disabled="#{!appConfigurationModel.pingButtonVisibilityMap[key]}"
 					value="#{appConfigurationModel.pingButtonVisibilityMap[key] ? msg['ui.config.action.ping'] : msg['ui.app.controller.not.configured'] }"
 					action="#{appConfigurationCtrl.invokePing(key)}" />
 			</rich:column>
