@@ -1,19 +1,84 @@
 <!-- Copyright FUJITSU LIMITED 2018-->
 <!DOCTYPE html>
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:b="http://bootsfaces.net/ui" 
+                xmlns:b="http://bootsfaces.net/ui"   
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:rich="http://richfaces.org/rich"
                 xmlns:a4j="http://richfaces.org/a4j"
 >
 
- 
+    <script language="JavaScript1.2" type="text/javascript">
+        var onSubmitFlag = false;
+        function getUnloadMessage() { return "#{msg['ui.unsavedChanges.lost']}"; }
+        function setDirty(flag) { if ((onSubmitFlag &amp;&amp; (!flag)) || (!onSubmitFlag)) { window.onbeforeunload = (flag) ? getUnloadMessage : null; } }
+        function getDirty() { return null != window.onbeforeunload; }
+        function setOnSubmit(flag) { onSubmitFlag = flag; }
 
-    <b:panel look="primary" title="#{msg['ui.config.title']}" collapsible="false">
+        function doShowProgress(flag) {
+	        var e = document.getElementById("progressDiv");
+	        if (e) {
+		        if (flag) {
+			        e.style.display = "";
+			        document.body.style.cursor = "wait";
+		        } else {
+			        e.style.display = "none";
+			        document.body.style.cursor = "auto";
+		        }
+	        }
+	        return false;
+        }
+
+        setDirty(getDirty() || #{appConfigurationModel.dirty});
+
+    </script>
+
+  
+   <b:panel look="primary" title="#{msg['ui.config.title']}" collapsible="false">
+   
+      <div id="progressDiv" class="progressOverlay">
+        <table width="98%">
+            <tr>
+                <td></td>
+            </tr>
+        </table>
+    </div> 
+    
       <h:outputText value="#{msg['ui.config.description']}" /> 
   
-    <h:form id="configurationSettings" >
+  <b:container fluid="true">
+            
+
+      <a4j:outputPanel layout="block" styleClass="statusPanel">
+        <h:messages styleClass="statusMessages" errorClass="statusRed"
+                    infoClass="statusGreen"/>
+    </a4j:outputPanel>
+
+
+    <h:panelGroup class="statusPanel canPingMessagePanel">
+        <ui:repeat value="#{appConfigurationModel.canPingExceptionMessageSet}"
+                   var="e">
+            <span class="statusRed" onclick="alert('#{e.stackTrace}')">#{e.errorMessage}</span>
+            <ui:fragment><br/></ui:fragment>
+        </ui:repeat>
+    </h:panelGroup>
+
+    <a4j:outputPanel rendered="#{appConfigurationModel.restartRequired}"
+                     layout="block" styleClass="restartPanel">
+        <h:form id="restartForm">
+            <span class="statusRed"><h:outputText
+                    value="#{msg['ui.app.suspend']}"/> </span>
+            <b:commandButton
+                    class="oscm_app_button"
+                    value="#{msg['ui.config.action.restart']}" type="submit"
+                    onclick="this.blur(); setOnSubmit(true); setDirty(false);"
+                    action="#{appConfigurationCtrl.restart}"/>
+            <h:inputHidden value="#{appConfigurationModel.token}"/>
+        </h:form>
+    </a4j:outputPanel>
+
+    <b:form id="configurationSettings" inline="true" >
         <h:inputHidden value="#{appConfigurationModel.token}"/>
         <h:inputHidden id="dirty" value="#{appConfigurationModel.dirty}"/>
         <h:inputHidden id="selectedControllerId"
@@ -23,47 +88,58 @@
                            style="display: none;"
                            render="configurationSettings"/>
 
-        <b:dataTable responsive="true" paginated="false" searching="false"
+         <b:dataTable info="false" style="width:100%" paginated="false" searching="false"
                         value="#{appConfigurationModel.keys}" var="key">
-            <b:dataTableColumn>
+            <b:dataTableColumn >
                 <f:facet name="header">
-                    <h:outputText value="#{msg['ui.config.column.key']}"/>
+                    <h:outputText style="text-align: center;" value="#{msg['ui.config.column.key']}"/>
                 </f:facet>
                 <h:outputText value="#{key}"/>
                 <f:facet name="footer">
-                    <h:inputText id="newControllerId"
+                    <b:inputText inline="true" id="newControllerId" style="width:100%"
                                  value="#{appConfigurationModel.newControllerId}"
-                                />
+                                 onchange="setDirty(true)"/>
                 </f:facet>
             </b:dataTableColumn>
-            <b:dataTableColumn order-by="dom-text" >
+            <b:dataTableColumn >
                 <f:facet name="header">
                     <h:outputText value="#{msg['ui.config.column.value']}"/>
                 </f:facet>
-                <b:inputText id="configurationValue"
-                             value="#{appConfigurationModel.items[key]}"/>
+                <b:inputText inline="true" id="configurationValue" style="width:100%" typeahead="true" typeahead-values="PLATFORM_OPERATOR"
+                             value="#{appConfigurationModel.items[key]}"
+                             onchange="setDirty(true)"/>
                 <f:facet name="footer">
-                    <h:inputText id="newOrgnizationId"
-                                 value="#{appConfigurationModel.newOrganizationId}"/>
+                    <b:inputText inline="true" id="newOrgnizationId" style="width:100%" typeahead="true" typeahead-values="PLATFORM_OPERATOR"
+                                 value="#{appConfigurationModel.newOrganizationId}"
+                                 onchange="setDirty(true)"/>
                 </f:facet>
             </b:dataTableColumn>
-             <b:dataTableColumn  header-style-class="hidden">
-                <h:commandLink value="#{msg['ui.config.action.delete']}"
-                               type="submit"/>
+            <b:dataTableColumn>
+                <b:commandLink value="#{msg['ui.config.action.delete']}"
+                               type="submit" onclick="setOnSubmit(true);setDirty(false);#{rich:element('selectedControllerId')}.value='#{key}';#{rich:element('deleteController')}.click();return false;"/>
+                             
             </b:dataTableColumn>
-           <b:dataTableColumn header-style-class="hidden" >
+           <b:dataTableColumn>
 
-				<b:commandButton id="pingButton" class="connectivity_check_button"
-					disabled="#{!appConfigurationModel.pingButtonVisibilityMap[key]}"
+				<b:commandButton id="pingButton" class="oscm_app_button"
+					onclick=" this.blur(); doShowProgress(true);"
+					rendered="#{appConfigurationModel.pingButtonVisibilityMap[key]}"
 					value="#{appConfigurationModel.pingButtonVisibilityMap[key] ? msg['ui.config.action.ping'] : msg['ui.app.controller.not.configured'] }"
 					action="#{appConfigurationCtrl.invokePing(key)}" />
 			</b:dataTableColumn>
         </b:dataTable>
 
-    <b:buttonGroup>
-      <b:commandButton look="primary" class="oscm_app_button" value="#{msg['ui.config.action.save']}" type="submit" action="#{appConfigurationCtrl.save}" />
+     
+        
+         <b:buttonGroup>
+      <b:commandButton look="primary" class="oscm_app_button"
+      value="#{msg['ui.config.action.save']}" type="submit" 
+      onclick="this.blur(); setOnSubmit(true);setDirty(false);"
+      action="#{appConfigurationCtrl.save}" />
     </b:buttonGroup>
-  </h:form>
-
+    
+    </b:form>
+    
+     </b:container>
    </b:panel> 
 </ui:composition>

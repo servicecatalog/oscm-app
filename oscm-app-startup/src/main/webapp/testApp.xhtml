@@ -2,14 +2,14 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
   xmlns:b="http://bootsfaces.net/ui" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core"
-  xmlns:c="http://java.sun.com/jstl/core" xmlns:a4j="http://richfaces.org/a4j"
+  xmlns:c="http://java.sun.com/jstl/core" xmlns:rich="http://richfaces.org/rich" xmlns:a4j="http://richfaces.org/a4j"
   xmlns:adm="http://www.fujitsu.com/global/services/software/interstage">
 <h:head>
 
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   
   <title><h:outputText value="#{msg['ui.config.title']}" /></title>
- <!--  <link rel="stylesheet" type="text/css" href="css/style.css" />  -->
+  <link rel="stylesheet" type="text/css" href="css/style.css" /> 
   <link rel="icon" href="img/favicon.ico" type="image/x-icon" />
 
   
@@ -19,7 +19,8 @@
 
 <h:body >
   
- <!--  <adm:header userId="#{appConfigurationModel.loggedInUserId}"/> -->
+  <b:navBar brand="Open Service Catalog Manager" brandHref="#" brand-align="left" />
+
   <adm:initialize initializingMethod="#{appConfigurationCtrl.initialize}" />
   <ui:include src="keyValueEditorNew.xhtml" />
   <ui:include src="settingsEditorNew.xhtml" />

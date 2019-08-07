@@ -4,40 +4,45 @@
                 xmlns:b="http://bootsfaces.net/ui"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:rich="http://richfaces.org/rich"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 >
 
-    <b:panel look="primary" title="#{msg['ui.config.platform.settings']}" collapsible="false">
+    <b:panel look="primary" title="#{msg['ui.config.platform.settings']}" collapsible="true">
       <h:outputText value="#{msg['ui.config.platform.description']}" />
     
-
+   <b:container fluid="true" >
     <h:form id="appSettings" >
-        <b:dataTable responsive="true" searching="false"
+        <b:dataTable info="false" searching="false"
              paginated="false"
                         value="#{platformConfigurationCtrl.model.keys}"
                         var="key" >
-            <b:dataTableColumn >
-                <f:facet name="header">
+                        
+             <b:dataTableColumn span="6">
+                 <f:facet name="header">
                     <h:outputText
                             value="#{msg['ui.config.platform.column.key']}"/>
                 </f:facet>
                 <h:outputText value="#{key}"/>
-            </b:dataTableColumn>
-            <b:dataTableColumn order-by="dom-text" data-type="text" >
+             </b:dataTableColumn>
+             
+             <b:dataTableColumn span="6" order-by="dom-text" data-type="string">
+
                 <f:facet name="header">
                     <h:outputText
                             value="#{msg['ui.config.platform.column.value']}"/>
                 </f:facet>
-                <h:inputSecret
+                 <b:inputSecret inline="true" style="width:100%"
                         rendered="#{platformConfigurationCtrl.encrypted(key)}"
                         value="#{platformConfigurationCtrl.model.items[key]}"/>
-                <h:inputText
+                 <b:inputText inline="true" style="width:100%"
                         rendered="#{not platformConfigurationCtrl.encrypted(key)}"
                         value="#{platformConfigurationCtrl.model.items[key]}"/>
-            </b:dataTableColumn>
+             </b:dataTableColumn>
+
         </b:dataTable>
 
-        <b:buttonGroup>
+       <b:buttonGroup>
            <b:commandButton look="primary" class="oscm_app_button"
                                  value="#{msg['ui.config.action.save']}"
                                  type="submit"
@@ -45,5 +50,6 @@
                                  action="#{platformConfigurationCtrl.save}"/>
         </b:buttonGroup>
     </h:form>
-    </b:panel>
+    </b:container>
+     </b:panel> 
 </ui:composition>
