@@ -1,1 +1,1 @@
-VCenter,Datacenter,Cluster,Name,Gateway,SubnetMask,DNSServer,DNSSuffix,Enabled
+VCenter,Datacenter,Cluster,Name,Gateway,SubnetMask,DnsServer,DnsSuffix,Enabled
