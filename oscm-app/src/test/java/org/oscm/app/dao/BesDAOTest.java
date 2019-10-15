@@ -198,7 +198,7 @@ public class BesDAOTest {
     }
 
     @Test
-    public void getPasswordConstant_OIDC_SP() {
+    public void getPasswordConstant_OIDC() {
         // given
         Map<String, Setting> settings = getSettingsForMode("OIDC");
 
@@ -222,7 +222,7 @@ public class BesDAOTest {
     }
 
     @Test
-    public void getUsernameConstant_OIDC_SP() {
+    public void getUsernameConstant_OIDC() {
         // given
         Map<String, Setting> settings = getSettingsForMode("OIDC");
 
@@ -276,7 +276,7 @@ public class BesDAOTest {
     @Test
     public void getServicePort() throws MalformedURLException {
         // given
-        Map<String, Setting> settings = getSettingsForMode("OIDC_SP");
+        Map<String, Setting> settings = getSettingsForMode("OIDC");
         IdentityService idSvcMock = Mockito.mock(IdentityService.class);
         Service serviceMock = Mockito.mock(Service.class);
         doReturn(serviceMock).when(besDAO).createWebService(any(URL.class),
@@ -476,7 +476,7 @@ public class BesDAOTest {
     public void getUserDetails_givenUser_SSO() throws APPlatformException {
         // given
         besDAO.configService = confServ;
-        Map<String, Setting> settings = getSettingsForMode("OIDC_SP");
+        Map<String, Setting> settings = getSettingsForMode("OIDC");
         doReturn(settings).when(besDAO.configService)
                 .getAllProxyConfigurationSettings();
         doReturn(idServ).when(besDAO).getBESWebService(
@@ -1420,7 +1420,7 @@ public class BesDAOTest {
             throws MalformedURLException, BadResultException,
             APPlatformException {
         // given
-        Map<String, Setting> proxySettings = getSettingsForMode("OIDC_SP");
+        Map<String, Setting> proxySettings = getSettingsForMode("OIDC");
         Map<String, Setting> controllerSettings = getControllerSettings(true,
                 true, false);
         BesDAO besDAO = mockWebServiceSetup(proxySettings, controllerSettings);
@@ -1439,7 +1439,7 @@ public class BesDAOTest {
     public void getClientForBESTechnologyManager_SSO_userIdNotInConfig_userNotInTS()
             throws ConfigurationException, BadResultException {
         // given
-        Map<String, Setting> proxySettings = getSettingsForMode("OIDC_SP");
+        Map<String, Setting> proxySettings = getSettingsForMode("OIDC");
         Map<String, Setting> controllerSettings = getControllerSettings(false,
                 true, true);
         doReturn(controllerSettings).when(confServ)
@@ -1456,7 +1456,7 @@ public class BesDAOTest {
     public void getClientForBESTechnologyManager_SSO_userKeyNotInConfig_pwdNotInTS()
             throws ConfigurationException, BadResultException {
         // given
-        Map<String, Setting> proxySettings = getSettingsForMode("OIDC_SP");
+        Map<String, Setting> proxySettings = getSettingsForMode("OIDC");
         Map<String, Setting> controllerSettings = getControllerSettings(false,
                 true, true);
         doReturn(controllerSettings).when(confServ)
