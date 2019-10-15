@@ -475,8 +475,6 @@ public class PropertyImportTest {
         p.put(PlatformConfigurationKey.BSS_AUTH_MODE.name(), "INTERNAL");
         p.put(PlatformConfigurationKey.BSS_WEBSERVICE_WSDL_URL.name(),
                 "http://www.fujitsu.com/{service}/oscm/BASIC?wsdl");
-        p.put(PlatformConfigurationKey.BSS_STS_WEBSERVICE_WSDL_URL.name(),
-                "http://www.fujitsu.com/{service}/oscm/STS?wsdl");
         p.put(PlatformConfigurationKey.APP_KEY_PATH.name(), "./key");
         p.put(PlatformConfigurationKey.APP_TRUSTSTORE.name(), "./cacert.jsk");
         p.put(PlatformConfigurationKey.APP_TRUSTSTORE_PASSWORD.name(),

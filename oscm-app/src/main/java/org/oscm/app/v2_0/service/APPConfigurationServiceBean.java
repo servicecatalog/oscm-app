@@ -581,7 +581,7 @@ public class APPConfigurationServiceBean {
   }
 
   private boolean isSsoMode(Map<String, Setting> settings) {
-    return "SAML_SP".equals(settings.get(PlatformConfigurationKey.BSS_AUTH_MODE.name()).getValue());
+    return "OIDC".equals(settings.get(PlatformConfigurationKey.BSS_AUTH_MODE.name()).getValue());
   }
 
   public String getKeyFilePath() throws ConfigurationException {

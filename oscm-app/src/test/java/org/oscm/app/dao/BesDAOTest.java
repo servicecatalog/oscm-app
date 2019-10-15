@@ -75,6 +75,7 @@ import org.oscm.vo.VOSubscription;
 import org.oscm.vo.VOUser;
 import org.oscm.vo.VOUserDetails;
 
+@SuppressWarnings("unchecked")
 public class BesDAOTest {
 
     private final static String USER = "user";
@@ -103,7 +104,6 @@ public class BesDAOTest {
             extends IdentityService, BindingProvider {
     }
 
-    @SuppressWarnings("unchecked")
     @Before
     public void setup() throws APPlatformException, MalformedURLException {
         besDAO.configService = confServ;
@@ -124,7 +124,7 @@ public class BesDAOTest {
     @Test
     public void isSsoMode_true() {
         // given
-        Map<String, Setting> settings = getSettingsForMode("SAML_SP");
+        Map<String, Setting> settings = getSettingsForMode("OIDC");
 
         // when
         Boolean actual = Boolean.valueOf(besDAO.isSsoMode(settings));
@@ -159,19 +159,7 @@ public class BesDAOTest {
                 actual.toString());
     }
 
-    @Test
-    public void getWsdlUrl_SAML_SP() throws MalformedURLException {
-        // given
-        Map<String, Setting> settings = getSettingsForMode("SAML_SP");
-
-        // when
-        URL actual = besDAO.getWsdlUrl(IdentityService.class, settings);
-
-        // then
-        assertEquals(
-                "https://localhost:8181/oscm/v1.9/IdentityService/STS?wsdl",
-                actual.toString());
-    }
+   
 
     @Test
     public void getPortSuffix_INTERNAL() {
@@ -186,15 +174,15 @@ public class BesDAOTest {
     }
 
     @Test
-    public void getPortSuffix_SAML_SP() {
+    public void getPortSuffix_OIDC() {
         // given
-        Map<String, Setting> settings = getSettingsForMode("SAML_SP");
+        Map<String, Setting> settings = getSettingsForMode("OIDC");
 
         // when
         String actual = besDAO.getPortSuffix(settings);
 
         // then
-        assertEquals("PortSTS", actual);
+        assertEquals("PortBASIC", actual);
     }
 
     @Test
@@ -210,9 +198,9 @@ public class BesDAOTest {
     }
 
     @Test
-    public void getPasswordConstant_SAML_SP() {
+    public void getPasswordConstant_OIDC() {
         // given
-        Map<String, Setting> settings = getSettingsForMode("SAML_SP");
+        Map<String, Setting> settings = getSettingsForMode("OIDC");
 
         // when
         String actual = besDAO.getPasswordConstant(settings);
@@ -234,9 +222,9 @@ public class BesDAOTest {
     }
 
     @Test
-    public void getUsernameConstant_SAML_SP() {
+    public void getUsernameConstant_OIDC() {
         // given
-        Map<String, Setting> settings = getSettingsForMode("SAML_SP");
+        Map<String, Setting> settings = getSettingsForMode("OIDC");
 
         // when
         String actual = besDAO.getUsernameConstant(settings);
@@ -266,9 +254,9 @@ public class BesDAOTest {
     }
 
     @Test
-    public void setUserCredentialsInContext_SAML_SP() {
+    public void setUserCredentialsInContext_OIDC() {
         // given
-        Map<String, Setting> settings = getSettingsForMode("SAML_SP");
+        Map<String, Setting> settings = getSettingsForMode("OIDC");
         BindingProvider client = Mockito.mock(BindingProvider.class);
         Map<String, String> context = new HashMap<>();
         Mockito.doReturn(context).when(client).getRequestContext();
@@ -288,7 +276,7 @@ public class BesDAOTest {
     @Test
     public void getServicePort() throws MalformedURLException {
         // given
-        Map<String, Setting> settings = getSettingsForMode("SAML_SP");
+        Map<String, Setting> settings = getSettingsForMode("OIDC");
         IdentityService idSvcMock = Mockito.mock(IdentityService.class);
         Service serviceMock = Mockito.mock(Service.class);
         doReturn(serviceMock).when(besDAO).createWebService(any(URL.class),
@@ -303,7 +291,7 @@ public class BesDAOTest {
         // then
         assertTrue(IdentityService.class.isAssignableFrom(idSvc.getClass()));
     }
-
+    
     @Test
     public void getTechnologyProviderManagers() throws APPlatformException {
         // given
@@ -488,7 +476,7 @@ public class BesDAOTest {
     public void getUserDetails_givenUser_SSO() throws APPlatformException {
         // given
         besDAO.configService = confServ;
-        Map<String, Setting> settings = getSettingsForMode("SAML_SP");
+        Map<String, Setting> settings = getSettingsForMode("OIDC");
         doReturn(settings).when(besDAO.configService)
                 .getAllProxyConfigurationSettings();
         doReturn(idServ).when(besDAO).getBESWebService(
@@ -1241,7 +1229,7 @@ public class BesDAOTest {
     public void getClientForBESAdmin_SSO()
             throws APPlatformException, MalformedURLException {
         // given
-        Map<String, Setting> proxySettings = getSettingsForMode("SAML_SP");
+        Map<String, Setting> proxySettings = getSettingsForMode("OIDC");
         BesDAO besDAO = mockWebServiceSetup(proxySettings, null);
 
         // when
@@ -1257,7 +1245,7 @@ public class BesDAOTest {
     public void getClientForBESAdmin_SSO_noUserPwd()
             throws ConfigurationException {
         // given
-        Map<String, Setting> proxySettings = getSettingsForMode("SAML_SP", true,
+        Map<String, Setting> proxySettings = getSettingsForMode("OIDC", true,
                 true, false);
 
         // when
@@ -1269,7 +1257,7 @@ public class BesDAOTest {
     public void getClientForBESAdmin_SSO_noUserId()
             throws ConfigurationException {
         // given
-        Map<String, Setting> proxySettings = getSettingsForMode("SAML_SP",
+        Map<String, Setting> proxySettings = getSettingsForMode("OIDC",
                 false, true, true);
 
         // when
@@ -1393,7 +1381,7 @@ public class BesDAOTest {
     public void getClientForBESTechnologyManager_SSO_userInConfig()
             throws MalformedURLException, APPlatformException {
         // given
-        Map<String, Setting> proxySettings = getSettingsForMode("SAML_SP");
+        Map<String, Setting> proxySettings = getSettingsForMode("OIDC");
         Map<String, Setting> controllerSettings = getControllerSettings(true,
                 true, true);
         BesDAO besDAO = mockWebServiceSetup(proxySettings, controllerSettings);
@@ -1412,7 +1400,7 @@ public class BesDAOTest {
             throws MalformedURLException, BadResultException,
             APPlatformException {
         // given
-        Map<String, Setting> proxySettings = getSettingsForMode("SAML_SP");
+        Map<String, Setting> proxySettings = getSettingsForMode("OIDC");
         Map<String, Setting> controllerSettings = getControllerSettings(false,
                 true, true);
         BesDAO besDAO = mockWebServiceSetup(proxySettings, controllerSettings);
@@ -1424,7 +1412,7 @@ public class BesDAOTest {
 
         // then
         verify(besDAO, times(1)).setBinding((BindingProvider) client,
-                USER_TM_TechSvc, USER_PWD_TM_TechSvc);
+                USER, USER_PWD_TM_TechSvc);
     }
 
     @Test
@@ -1432,7 +1420,7 @@ public class BesDAOTest {
             throws MalformedURLException, BadResultException,
             APPlatformException {
         // given
-        Map<String, Setting> proxySettings = getSettingsForMode("SAML_SP");
+        Map<String, Setting> proxySettings = getSettingsForMode("OIDC");
         Map<String, Setting> controllerSettings = getControllerSettings(true,
                 true, false);
         BesDAO besDAO = mockWebServiceSetup(proxySettings, controllerSettings);
@@ -1451,7 +1439,7 @@ public class BesDAOTest {
     public void getClientForBESTechnologyManager_SSO_userIdNotInConfig_userNotInTS()
             throws ConfigurationException, BadResultException {
         // given
-        Map<String, Setting> proxySettings = getSettingsForMode("SAML_SP");
+        Map<String, Setting> proxySettings = getSettingsForMode("OIDC");
         Map<String, Setting> controllerSettings = getControllerSettings(false,
                 true, true);
         doReturn(controllerSettings).when(confServ)
@@ -1468,7 +1456,7 @@ public class BesDAOTest {
     public void getClientForBESTechnologyManager_SSO_userKeyNotInConfig_pwdNotInTS()
             throws ConfigurationException, BadResultException {
         // given
-        Map<String, Setting> proxySettings = getSettingsForMode("SAML_SP");
+        Map<String, Setting> proxySettings = getSettingsForMode("OIDC");
         Map<String, Setting> controllerSettings = getControllerSettings(false,
                 true, true);
         doReturn(controllerSettings).when(confServ)
@@ -1481,7 +1469,6 @@ public class BesDAOTest {
                         proxySettings);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void getBESWebService_nullInstance()
             throws MalformedURLException, APPlatformException {
@@ -1508,7 +1495,6 @@ public class BesDAOTest {
                 .getAuthenticationForAPPAdmin(anyMap());
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void getBESWebService_withInstance()
             throws MalformedURLException, APPlatformException {
@@ -1558,7 +1544,6 @@ public class BesDAOTest {
 
     }
 
-    @SuppressWarnings("unchecked")
     @Test(expected = ConfigurationException.class)
     public void getBESWebService_malformedURL()
             throws MalformedURLException, APPlatformException {
@@ -1574,7 +1559,6 @@ public class BesDAOTest {
         besDAO.getBESWebService(IdentityService.class, null, Optional.empty());
     }
 
-    @SuppressWarnings("unchecked")
     @Test(expected = APPlatformException.class)
     public void getBESWebService_configExceprion() throws APPlatformException {
         // given
@@ -1589,7 +1573,6 @@ public class BesDAOTest {
         besDAO.getBESWebService(IdentityService.class, null, Optional.empty());
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void notifyOnProvisioningStatusUpdate_deletedInstance()
             throws BESNotificationException, APPlatformException {
@@ -1606,7 +1589,6 @@ public class BesDAOTest {
                 any(ServiceInstance.class), any(Optional.class));
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void notifyAsyncSubscription_deletedInstance()
             throws BESNotificationException, APPlatformException {
@@ -1619,7 +1601,6 @@ public class BesDAOTest {
                 any(ServiceInstance.class), any(Optional.class));
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void notifyAsyncModifySubscription_deletedInstance()
             throws BESNotificationException, APPlatformException {
@@ -1632,7 +1613,6 @@ public class BesDAOTest {
                 any(ServiceInstance.class), any(Optional.class));
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void notifyAsyncUpgradeSubscription_deletedInstance()
             throws BESNotificationException, APPlatformException {
@@ -1658,7 +1638,6 @@ public class BesDAOTest {
         assertFalse(result);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void isBESAvalible_true() throws Exception {
         // when
@@ -1793,7 +1772,6 @@ public class BesDAOTest {
 
     }
 
-    @SuppressWarnings("unchecked")
     private BesDAO mockWebServiceSetup(final Map<String, Setting> proxySettings,
             final Map<String, Setting> controllerSettings)
             throws APPlatformException, MalformedURLException {
@@ -1821,10 +1799,10 @@ public class BesDAOTest {
     private Map<String, Setting> getSettingsForMode(String mode, boolean userId,
             boolean userKey, boolean userPwd) {
         Map<String, Setting> settings = new HashMap<>();
-        if ("SAML_SP".equals(mode)) {
+        if ("OIDC".equals(mode)) {
             settings.put(PlatformConfigurationKey.BSS_AUTH_MODE.name(),
                     new Setting(PlatformConfigurationKey.BSS_AUTH_MODE.name(),
-                            "SAML_SP"));
+                            "OIDC"));
         } else {
             settings.put(PlatformConfigurationKey.BSS_AUTH_MODE.name(),
                     new Setting(PlatformConfigurationKey.BSS_AUTH_MODE.name(),
@@ -1845,25 +1823,13 @@ public class BesDAOTest {
                     new Setting(PlatformConfigurationKey.BSS_USER_PWD.name(),
                             USER_PWD));
         }
+        
+        settings.put(PlatformConfigurationKey.BSS_WEBSERVICE_WSDL_URL.name(),new Setting(PlatformConfigurationKey.BSS_WEBSERVICE_WSDL_URL.name(), "https://localhost:8181/oscm/v1.9/{SERVICE}/BASIC?wsdl"));
+                
+   
         settings.put(PlatformConfigurationKey.BSS_WEBSERVICE_URL.name(),
                 new Setting(PlatformConfigurationKey.BSS_WEBSERVICE_URL.name(),
                         "https://localhost:8181/{SERVICE}/BASIC?wsdl"));
-        settings.put(PlatformConfigurationKey.BSS_STS_WEBSERVICE_URL.name(),
-                new Setting(
-                        PlatformConfigurationKey.BSS_STS_WEBSERVICE_URL.name(),
-                        "https://localhost:8181/{SERVICE}/STS?wsdl"));
-
-        settings.put(PlatformConfigurationKey.BSS_WEBSERVICE_WSDL_URL.name(),
-                new Setting(
-                        PlatformConfigurationKey.BSS_STS_WEBSERVICE_WSDL_URL
-                                .name(),
-                        "https://localhost:8181/oscm/v1.9/{SERVICE}/BASIC?wsdl"));
-        settings.put(
-                PlatformConfigurationKey.BSS_STS_WEBSERVICE_WSDL_URL.name(),
-                new Setting(
-                        PlatformConfigurationKey.BSS_STS_WEBSERVICE_WSDL_URL
-                                .name(),
-                        "https://localhost:8181/oscm/v1.9/{SERVICE}/STS?wsdl"));
         return settings;
     }
 

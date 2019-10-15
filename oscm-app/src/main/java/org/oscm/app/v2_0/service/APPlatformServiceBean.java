@@ -147,9 +147,6 @@ public class APPlatformServiceBean implements APPlatformService {
 
 	@Override
 	public String getBSSWebServiceUrl() throws ConfigurationException {
-		if ("SAML_SP".equals(configService.getProxyConfigurationSetting(PlatformConfigurationKey.BSS_AUTH_MODE))) {
-			return configService.getProxyConfigurationSetting(PlatformConfigurationKey.BSS_STS_WEBSERVICE_URL);
-		}
 		return configService.getProxyConfigurationSetting(PlatformConfigurationKey.BSS_WEBSERVICE_URL);
 	}
 
@@ -245,9 +242,6 @@ public class APPlatformServiceBean implements APPlatformService {
 
 	@Override
 	public String getBSSWebServiceWSDLUrl() throws ConfigurationException {
-		if ("SAML_SP".equals(configService.getProxyConfigurationSetting(PlatformConfigurationKey.BSS_AUTH_MODE))) {
-			return configService.getProxyConfigurationSetting(PlatformConfigurationKey.BSS_STS_WEBSERVICE_WSDL_URL);
-		}
 		return configService.getProxyConfigurationSetting(PlatformConfigurationKey.BSS_WEBSERVICE_WSDL_URL);
 	}
 
