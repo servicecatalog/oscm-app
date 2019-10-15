@@ -160,14 +160,14 @@ public class APPAuthenticationServiceBean {
 
         Map<String, Setting> settings = configService
                 .getAllProxyConfigurationSettings();
-        boolean isSsoMode = "SAML_SP".equals(settings
-                .get(PlatformConfigurationKey.BSS_AUTH_MODE.name()));
+        boolean isSsoMode = "OIDC_SP".equals(settings
+                .get(PlatformConfigurationKey.BSS_AUTH_MODE.name()).getValue());
 
         if (user.getUserId() == null && isSsoMode) {
             // in SSO mode the userId must always be present since no
             // lookup of ID by key is possible via IdentityService
             throw new AuthenticationException(
-                    "The provisioning platform is configured to authenticate using STS. Therefore in all requests the VOUser must have set a valid userId");
+                    "The provisioning platform is configured to authenticate using OIDC. Therefore in all requests the VOUser must have set a valid userId");
         }
 
         if (user.getKey() == 0 && !isSsoMode) {

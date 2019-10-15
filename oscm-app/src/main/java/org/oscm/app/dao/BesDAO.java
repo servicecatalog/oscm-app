@@ -73,20 +73,17 @@ public class BesDAO {
      * @param controllerId
      * @return a service interface to the requested OSCM service
      */
-    public <T> T getBESWebService(Class<T> serviceClass,
-            ServiceInstance serviceInstance, Optional<String> controllerId)
-            throws APPlatformException {
+    public <T> T getBESWebService(Class<T> serviceClass, ServiceInstance serviceInstance,
+            Optional<String> controllerId) throws APPlatformException {
 
         try {
             // the BES WSDL files are not protected with BasicAuth, but only by
             // certificates. So there is no need to use the WSPortConnector
-            Map<String, Setting> proxySettings = configService
-                    .getAllProxyConfigurationSettings();
+            Map<String, Setting> proxySettings = configService.getAllProxyConfigurationSettings();
             T client = getServicePort(serviceClass, proxySettings);
 
             PasswordAuthentication pwAuth = configService
-                    .getWebServiceAuthentication(serviceInstance, proxySettings,
-                            controllerId);
+                    .getWebServiceAuthentication(serviceInstance, proxySettings, controllerId);
 
             final String userName = pwAuth.getUserName();
             final String password = pwAuth.getPassword();
@@ -94,8 +91,7 @@ public class BesDAO {
             setBinding((BindingProvider) client, userName, password);
             return client;
         } catch (MalformedURLException e) {
-            ConfigurationException ce = new ConfigurationException(
-                    e.getMessage(),
+            ConfigurationException ce = new ConfigurationException(e.getMessage(),
                     PlatformConfigurationKey.BSS_WEBSERVICE_URL.name());
             throw ce;
         } catch (APPlatformException e) {
@@ -107,45 +103,35 @@ public class BesDAO {
         }
     }
 
-    public void setBinding(BindingProvider client, String userName,
-            String password) {
+    public void setBinding(BindingProvider client, String userName, String password) {
         final Binding binding = client.getBinding();
         List<Handler> handlerList = binding.getHandlerChain();
-        
+
         if (handlerList == null)
             handlerList = new ArrayList<>();
 
         List<Handler> handlers = handlerList.stream()
                 .filter(handler -> !(handler instanceof SOAPSecurityHandler))
                 .collect(Collectors.toList());
-        
+
         handlers.add(new SOAPSecurityHandler(userName, password));
         binding.setHandlerChain(handlers);
     }
 
-    public void setUserCredentialsInContext(BindingProvider client, String user,
-            String password, Map<String, Setting> settings) {
+    public void setUserCredentialsInContext(BindingProvider client, String user, String password,
+            Map<String, Setting> settings) {
         Map<String, Object> clientRequestContext = client.getRequestContext();
         clientRequestContext.put(getUsernameConstant(settings), user);
         clientRequestContext.put(getPasswordConstant(settings), password);
     }
 
-    public <T> void setEndpointInContext(BindingProvider client,
-            Map<String, Setting> settings, Class<T> serviceClass) {
+    public <T> void setEndpointInContext(BindingProvider client, Map<String, Setting> settings,
+            Class<T> serviceClass) {
         Map<String, Object> clientRequestContext = client.getRequestContext();
-        String wsUrl = "";
-        if (isSsoMode(settings)) {
-            wsUrl = settings
-                    .get(PlatformConfigurationKey.BSS_STS_WEBSERVICE_URL.name())
-                    .getValue();
-        } else {
-            wsUrl = settings
-                    .get(PlatformConfigurationKey.BSS_WEBSERVICE_URL.name())
-                    .getValue();
-        }
+        String wsUrl = settings.get(PlatformConfigurationKey.BSS_WEBSERVICE_URL.name()).getValue();
+        
         wsUrl = wsUrl.replace("{SERVICE}", serviceClass.getSimpleName());
-        clientRequestContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                wsUrl);
+        clientRequestContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, wsUrl);
     }
 
     public Service createWebService(URL wsdlUrl, QName serviceQName) {
@@ -160,12 +146,10 @@ public class BesDAO {
         List<VOUserDetails> mailUsers = new ArrayList<>();
         try {
             // Get all technology managers of TP organization
-            IdentityService is = getBESWebService(IdentityService.class, si,
-                    Optional.empty());
+            IdentityService is = getBESWebService(IdentityService.class, si, Optional.empty());
             List<VOUserDetails> orgUsers = is.getUsersForOrganization();
             for (VOUserDetails user : orgUsers) {
-                if (user.getUserRoles()
-                        .contains(UserRoleType.TECHNOLOGY_MANAGER)
+                if (user.getUserRoles().contains(UserRoleType.TECHNOLOGY_MANAGER)
                         && !Strings.isEmpty(user.getEMail())) {
                     mailUsers.add(user);
                 }
@@ -202,47 +186,30 @@ public class BesDAO {
     <T> T getServicePort(Class<T> serviceClass, Map<String, Setting> settings)
             throws MalformedURLException {
 
-        String targetNamespace = serviceClass.getAnnotation(WebService.class)
-                .targetNamespace();
-        QName serviceQName = new QName(targetNamespace,
-                serviceClass.getSimpleName());
+        String targetNamespace = serviceClass.getAnnotation(WebService.class).targetNamespace();
+        QName serviceQName = new QName(targetNamespace, serviceClass.getSimpleName());
 
-        Service service = createWebService(getWsdlUrl(serviceClass, settings),
-                serviceQName);
+        Service service = createWebService(getWsdlUrl(serviceClass, settings), serviceQName);
 
         return service.getPort(serviceClass);
     }
 
     <T> URL getWsdlUrl(Class<T> serviceClass, Map<String, Setting> settings)
             throws MalformedURLException {
-        String wsdlUrl = null;
-
-        if (isSsoMode(settings)) {
-            wsdlUrl = settings.get(
-                    PlatformConfigurationKey.BSS_STS_WEBSERVICE_WSDL_URL.name())
+        String wsdlUrl = settings.get(PlatformConfigurationKey.BSS_WEBSERVICE_WSDL_URL.name())
                     .getValue();
-        } else {
-            wsdlUrl = settings.get(
-                    PlatformConfigurationKey.BSS_WEBSERVICE_WSDL_URL.name())
-                    .getValue();
-        }
-
         wsdlUrl = wsdlUrl.replace("{SERVICE}", serviceClass.getSimpleName());
 
         return new URL(wsdlUrl);
     }
 
     String getPortSuffix(Map<String, Setting> settings) {
-        if (isSsoMode(settings)) {
-            return "PortSTS";
-        } else {
-            return "PortBASIC";
-        }
+        return "PortBASIC";
     }
 
     boolean isSsoMode(Map<String, Setting> settings) {
-        return "SAML_SP".equals(settings
-                .get(PlatformConfigurationKey.BSS_AUTH_MODE.name()).getValue());
+        return "OIDC"
+                .equals(settings.get(PlatformConfigurationKey.BSS_AUTH_MODE.name()).getValue());
     }
 
     public void terminateSubscription(ServiceInstance currentSI, String locale)
@@ -250,49 +217,43 @@ public class BesDAO {
 
         VOSubscription vo = null;
         try {
-            SubscriptionService subServ = getBESWebService(
-                    SubscriptionService.class, currentSI, Optional.empty());
+            SubscriptionService subServ = getBESWebService(SubscriptionService.class, currentSI,
+                    Optional.empty());
 
-            vo = subServ.getSubscriptionForCustomer(
-                    currentSI.getOrganizationId(),
+            vo = subServ.getSubscriptionForCustomer(currentSI.getOrganizationId(),
                     currentSI.getOriginalSubscriptionId());
-            String reason = Messages.get(locale,
-                    "terminate_subscription_reason");
+            String reason = Messages.get(locale, "terminate_subscription_reason");
             subServ.terminateSubscription(vo, reason);
         } catch (Exception e) {
-            throw new BESNotificationException(
-                    "The subscription cannot be terminated.", e);
+            throw new BESNotificationException("The subscription cannot be terminated.", e);
         }
 
     }
 
-    public void notifyAsyncSubscription(ServiceInstance currentSI,
-            InstanceResult instanceResult, boolean isCompleted,
-            APPlatformException cause) throws BESNotificationException {
+    public void notifyAsyncSubscription(ServiceInstance currentSI, InstanceResult instanceResult,
+            boolean isCompleted, APPlatformException cause) throws BESNotificationException {
 
         if (currentSI.isDeleted()) {
             return;
         }
 
         try {
-            SubscriptionService subServ = getBESWebService(
-                    SubscriptionService.class, currentSI, Optional.empty());
+            SubscriptionService subServ = getBESWebService(SubscriptionService.class, currentSI,
+                    Optional.empty());
 
             if (isCompleted) {
 
-                VOInstanceInfo voInstanceInfo = getInstanceInfo(currentSI,
-                        instanceResult);
+                VOInstanceInfo voInstanceInfo = getInstanceInfo(currentSI, instanceResult);
                 subServ.completeAsyncSubscription(currentSI.getSubscriptionId(),
                         currentSI.getOrganizationId(), voInstanceInfo);
             } else {
                 subServ.abortAsyncSubscription(currentSI.getSubscriptionId(),
-                        currentSI.getOrganizationId(), cause == null ? null
-                                : toBES(cause.getLocalizedMessages()));
+                        currentSI.getOrganizationId(),
+                        cause == null ? null : toBES(cause.getLocalizedMessages()));
             }
 
         } catch (SubscriptionStateException se) {
-            handleSubscriptionStateException(currentSI, instanceResult,
-                    isCompleted, se);
+            handleSubscriptionStateException(currentSI, instanceResult, isCompleted, se);
         } catch (ObjectNotFoundException onfe) {
             handleObjectNotFoundException(currentSI, instanceResult);
         } catch (Exception e) {
@@ -301,35 +262,31 @@ public class BesDAO {
     }
 
     public void notifyAsyncModifySubscription(ServiceInstance currentSI,
-            InstanceResult instanceResult, boolean isCompleted,
-            APPlatformException cause) throws BESNotificationException {
+            InstanceResult instanceResult, boolean isCompleted, APPlatformException cause)
+            throws BESNotificationException {
 
         if (currentSI.isDeleted()) {
             return;
         }
 
-        VOInstanceInfo voInstanceInfo = getInstanceInfo(currentSI,
-                instanceResult);
+        VOInstanceInfo voInstanceInfo = getInstanceInfo(currentSI, instanceResult);
 
         try {
-            SubscriptionService subServ = getBESWebService(
-                    SubscriptionService.class, currentSI, Optional.empty());
+            SubscriptionService subServ = getBESWebService(SubscriptionService.class, currentSI,
+                    Optional.empty());
             if (isCompleted) {
-                subServ.completeAsyncModifySubscription(
-                        currentSI.getSubscriptionId(),
+                subServ.completeAsyncModifySubscription(currentSI.getSubscriptionId(),
                         currentSI.getOrganizationId(), voInstanceInfo);
             } else {
-                subServ.abortAsyncModifySubscription(
-                        currentSI.getSubscriptionId(),
-                        currentSI.getOrganizationId(), cause == null ? null
-                                : toBES(cause.getLocalizedMessages()));
+                subServ.abortAsyncModifySubscription(currentSI.getSubscriptionId(),
+                        currentSI.getOrganizationId(),
+                        cause == null ? null : toBES(cause.getLocalizedMessages()));
             }
 
         } catch (SubscriptionStateException se) {
             // If the subscription is now in a wrong state we can skip the
             // complete request and proceed as usual...
-            handleSubscriptionStateException(currentSI, instanceResult,
-                    isCompleted, se);
+            handleSubscriptionStateException(currentSI, instanceResult, isCompleted, se);
         } catch (ObjectNotFoundException onfe) {
             // If the subscription is not recognized in BES, we cannot notify
             handleObjectNotFoundException(currentSI, instanceResult);
@@ -346,19 +303,17 @@ public class BesDAO {
         VOInstanceInfo voInstanceInfo = new VOInstanceInfo();
         voInstanceInfo.setVmsNumber(currentSI.getVmsNumber());
         try {
-            SubscriptionService subServ = getBESWebService(
-                    SubscriptionService.class, currentSI, Optional.empty());
-            subServ.notifySubscriptionAboutVmsNumber(
-                    currentSI.getSubscriptionId(),
+            SubscriptionService subServ = getBESWebService(SubscriptionService.class, currentSI,
+                    Optional.empty());
+            subServ.notifySubscriptionAboutVmsNumber(currentSI.getSubscriptionId(),
                     currentSI.getOrganizationId(), voInstanceInfo);
         } catch (Exception e) {
             handleException(currentSI, e);
         }
     }
 
-    public void notifyAsyncOperationStatus(ServiceInstance currentSI,
-            String transactionId, OperationStatus status,
-            List<LocalizedText> list) throws BESNotificationException {
+    public void notifyAsyncOperationStatus(ServiceInstance currentSI, String transactionId,
+            OperationStatus status, List<LocalizedText> list) throws BESNotificationException {
 
         if (currentSI.isDeleted()) {
             return;
@@ -366,10 +321,8 @@ public class BesDAO {
 
         SubscriptionService subServ;
         try {
-            subServ = getBESWebService(SubscriptionService.class, currentSI,
-                    Optional.empty());
-            subServ.updateAsyncOperationProgress(transactionId, status,
-                    toBES(list));
+            subServ = getBESWebService(SubscriptionService.class, currentSI, Optional.empty());
+            subServ.updateAsyncOperationProgress(transactionId, status, toBES(list));
             if (currentSI.getServiceAccessInfo() != null) {
                 VOInstanceInfo vo = new VOInstanceInfo();
                 vo.setInstanceId(currentSI.getInstanceId());
@@ -392,8 +345,7 @@ public class BesDAO {
 
         SubscriptionService subServ;
         try {
-            subServ = getBESWebService(SubscriptionService.class, currentSI,
-                    Optional.empty());
+            subServ = getBESWebService(SubscriptionService.class, currentSI, Optional.empty());
             VOInstanceInfo vo = new VOInstanceInfo();
             vo.setInstanceId(currentSI.getInstanceId());
             vo.setAccessInfo(currentSI.getServiceAccessInfo());
@@ -416,33 +368,27 @@ public class BesDAO {
         return transactionId;
     }
 
-    void handleException(ServiceInstance currentSI, Exception e)
-            throws BESNotificationException {
+    void handleException(ServiceInstance currentSI, Exception e) throws BESNotificationException {
         String statusText = "unknown";
         if (currentSI.getProvisioningStatus() != null) {
             statusText = currentSI.getProvisioningStatus().name();
         }
         // Forward mapped BES notification exception
         BESNotificationException bne = new BESNotificationException(
-                "Could not notify OSCM on processing result. Current status is "
-                        + statusText,
-                e);
+                "Could not notify OSCM on processing result. Current status is " + statusText, e);
         LOGGER.error(bne.getMessage(), e);
         throw bne;
     }
 
-    void handleObjectNotFoundException(ServiceInstance currentSI,
-            InstanceResult instanceResult) {
+    void handleObjectNotFoundException(ServiceInstance currentSI, InstanceResult instanceResult) {
         LOGGER.info(
                 "The processing of service instance '{}' failed with return code '{}' and description '{}', but OSCM doesn't recognize the subscription",
-                new Object[] { currentSI.getInstanceId(),
-                        Long.valueOf(instanceResult.getRc()),
+                new Object[] { currentSI.getInstanceId(), Long.valueOf(instanceResult.getRc()),
                         instanceResult.getDesc() });
     }
 
-    void handleSubscriptionStateException(ServiceInstance currentSI,
-            InstanceResult instanceResult, boolean isCompleted,
-            SubscriptionStateException se) {
+    void handleSubscriptionStateException(ServiceInstance currentSI, InstanceResult instanceResult,
+            boolean isCompleted, SubscriptionStateException se) {
         if (isCompleted) {
             LOGGER.info(
                     "The processing of service instance '{}' was completed, but OSCM couldn't be informed because of the wrong subscription state '{}'",
@@ -451,40 +397,34 @@ public class BesDAO {
         } else {
             LOGGER.info(
                     "The processing of service instance '{}' failed with return code '{}' and description '{}'. OSCM couldn't be informed because of the wrong subscription state '{}'",
-                    new Object[] { currentSI.getInstanceId(),
-                            Long.valueOf(instanceResult.getRc()),
-                            instanceResult.getDesc(),
-                            se.getFaultInfo().getReason().toString() });
+                    new Object[] { currentSI.getInstanceId(), Long.valueOf(instanceResult.getRc()),
+                            instanceResult.getDesc(), se.getFaultInfo().getReason().toString() });
         }
     }
 
     public void notifyAsyncUpgradeSubscription(ServiceInstance currentSI,
-            InstanceResult instanceResult, boolean isCompleted,
-            APPlatformException cause) throws BESNotificationException {
+            InstanceResult instanceResult, boolean isCompleted, APPlatformException cause)
+            throws BESNotificationException {
 
         if (currentSI.isDeleted()) {
             return;
         }
 
-        VOInstanceInfo voInstanceInfo = getInstanceInfo(currentSI,
-                instanceResult);
+        VOInstanceInfo voInstanceInfo = getInstanceInfo(currentSI, instanceResult);
 
         try {
-            SubscriptionService subServ = getBESWebService(
-                    SubscriptionService.class, currentSI, Optional.empty());
+            SubscriptionService subServ = getBESWebService(SubscriptionService.class, currentSI,
+                    Optional.empty());
             if (isCompleted) {
-                subServ.completeAsyncUpgradeSubscription(
-                        currentSI.getSubscriptionId(),
+                subServ.completeAsyncUpgradeSubscription(currentSI.getSubscriptionId(),
                         currentSI.getOrganizationId(), voInstanceInfo);
             } else {
-                subServ.abortAsyncUpgradeSubscription(
-                        currentSI.getSubscriptionId(),
-                        currentSI.getOrganizationId(), cause == null ? null
-                                : toBES(cause.getLocalizedMessages()));
+                subServ.abortAsyncUpgradeSubscription(currentSI.getSubscriptionId(),
+                        currentSI.getOrganizationId(),
+                        cause == null ? null : toBES(cause.getLocalizedMessages()));
             }
         } catch (SubscriptionStateException se) {
-            handleSubscriptionStateException(currentSI, instanceResult,
-                    isCompleted, se);
+            handleSubscriptionStateException(currentSI, instanceResult, isCompleted, se);
         } catch (ObjectNotFoundException onfe) {
             handleObjectNotFoundException(currentSI, instanceResult);
         } catch (Exception e) {
@@ -492,8 +432,7 @@ public class BesDAO {
         }
     }
 
-    VOInstanceInfo getInstanceInfo(ServiceInstance currentSI,
-            InstanceResult instanceResult) {
+    VOInstanceInfo getInstanceInfo(ServiceInstance currentSI, InstanceResult instanceResult) {
         InstanceInfo instanceInfo = instanceResult.getInstance();
         VOInstanceInfo voInstanceInfo = new VOInstanceInfo();
         voInstanceInfo.setInstanceId(currentSI.getInstanceId());
@@ -515,14 +454,12 @@ public class BesDAO {
         }
 
         try {
-            SubscriptionService subServ = getBESWebService(
-                    SubscriptionService.class, currentSI, Optional.empty());
-            subServ.updateAsyncSubscriptionProgress(
-                    currentSI.getSubscriptionId(),
+            SubscriptionService subServ = getBESWebService(SubscriptionService.class, currentSI,
+                    Optional.empty());
+            subServ.updateAsyncSubscriptionProgress(currentSI.getSubscriptionId(),
                     currentSI.getOrganizationId(), toBES(list));
 
-            LOGGER.info(
-                    "Updated status for service instance '{}' with message '{}'",
+            LOGGER.info("Updated status for service instance '{}' with message '{}'",
                     currentSI.getInstanceId(), getEnglishOrFirst(list));
 
         } catch (SubscriptionStateException se) {
@@ -530,15 +467,13 @@ public class BesDAO {
             // complete request and proceed as usual (e.g. already completed)
             LOGGER.info(
                     "Updated status for service instance '{}' with message '{}', but OSCM couldn't be informed because of the wrong subscription state '{}'",
-                    new Object[] { currentSI.getInstanceId(),
-                            getEnglishOrFirst(list),
+                    new Object[] { currentSI.getInstanceId(), getEnglishOrFirst(list),
                             se.getFaultInfo().getReason().toString() });
 
         } catch (Exception e) {
             // Forward mapped BES notification exception
             BESNotificationException bne = new BESNotificationException(
-                    "Could not notify OSCM on new service provisioning status",
-                    e);
+                    "Could not notify OSCM on new service provisioning status", e);
             LOGGER.error(bne.getMessage(), bne);
             throw bne;
         }
@@ -570,15 +505,12 @@ public class BesDAO {
      * @throws APPlatformException
      * @throws BESNotificationException
      */
-    public VOUserDetails getUserDetails(ServiceInstance si, VOUser user,
-            String password, Optional<String> controllerId)
-            throws APPlatformException {
+    public VOUserDetails getUserDetails(ServiceInstance si, VOUser user, String password,
+            Optional<String> controllerId) throws APPlatformException {
         VOUserDetails userDetails = null;
-        IdentityService idServ = getBESWebService(IdentityService.class, si,
-                controllerId);
+        IdentityService idServ = getBESWebService(IdentityService.class, si, controllerId);
         if (user != null) {
-            setBinding((BindingProvider) idServ, String.valueOf(user.getKey()),
-                    password);
+            setBinding((BindingProvider) idServ, String.valueOf(user.getKey()), password);
         }
 
         try {
@@ -590,20 +522,17 @@ public class BesDAO {
         return userDetails;
     }
 
-    public VOUser getUser(ServiceInstance si, VOUser user,
-            Optional<String> controllerId) throws APPlatformException {
+    public VOUser getUser(ServiceInstance si, VOUser user, Optional<String> controllerId)
+            throws APPlatformException {
         VOUser retrunUser = null;
-        IdentityService idServ = getBESWebService(IdentityService.class, si,
-                controllerId);
+        IdentityService idServ = getBESWebService(IdentityService.class, si, controllerId);
         try {
             retrunUser = idServ.getUser(user);
         } catch (SaaSApplicationException e) {
-            AuthenticationException ae = new AuthenticationException(
-                    e.getMessage(), e);
+            AuthenticationException ae = new AuthenticationException(e.getMessage(), e);
             String userId = (user.getUserId() != null) ? user.getUserId()
                     : Long.toString(user.getKey());
-            LOGGER.debug(
-                    "User {} could not be authenticated => call to retrieve user failed",
+            LOGGER.debug("User {} could not be authenticated => call to retrieve user failed",
                     userId);
             throw ae;
         } catch (Exception e) {
@@ -616,8 +545,7 @@ public class BesDAO {
         List<VOLocalizedText> result = new ArrayList<>();
         if (texts != null) {
             for (LocalizedText text : texts) {
-                result.add(
-                        new VOLocalizedText(text.getLocale(), text.getText()));
+                result.add(new VOLocalizedText(text.getLocale(), text.getText()));
             }
         }
         return result;
@@ -625,8 +553,7 @@ public class BesDAO {
 
     public boolean isBESAvalible() {
         try {
-            IdentityService is = getBESWebService(IdentityService.class, null,
-                    Optional.empty());
+            IdentityService is = getBESWebService(IdentityService.class, null, Optional.empty());
             is.getCurrentUserDetails();
         } catch (APPlatformException e) {
             return !isCausedByConnectionException(e);
