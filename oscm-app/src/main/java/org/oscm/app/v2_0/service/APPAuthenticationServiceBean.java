@@ -160,7 +160,7 @@ public class APPAuthenticationServiceBean {
 
         Map<String, Setting> settings = configService
                 .getAllProxyConfigurationSettings();
-        boolean isSsoMode = "OIDC_SP".equals(settings
+        boolean isSsoMode = "OIDC".equals(settings
                 .get(PlatformConfigurationKey.BSS_AUTH_MODE.name()).getValue());
 
         if (user.getUserId() == null && isSsoMode) {
