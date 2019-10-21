@@ -488,19 +488,13 @@ public class APPConfigurationServiceBean {
   public PasswordAuthentication getAuthenticationForBESTechnologyManager(
       String controllerId, ServiceInstance serviceInstance, Map<String, Setting> proxySettings)
       throws ConfigurationException {
-    if (proxySettings == null) {
-      proxySettings = getAllProxyConfigurationSettings();
-    }
-    boolean isSso = isSsoMode(proxySettings);
+
     if (serviceInstance != null) {
       controllerId = serviceInstance.getControllerId();
     }
     HashMap<String, Setting> controllerSettings = getControllerConfigurationSettings(controllerId);
 
-    String usernameKey =
-        isSso
-            ? ControllerConfigurationKey.BSS_USER_ID.name()
-            : ControllerConfigurationKey.BSS_USER_KEY.name();
+    String usernameKey = ControllerConfigurationKey.BSS_USER_KEY.name();
     Setting user = controllerSettings.get(usernameKey);
     Setting userPwd = controllerSettings.get(ControllerConfigurationKey.BSS_USER_PWD.name());
 
@@ -556,11 +550,8 @@ public class APPConfigurationServiceBean {
     if (proxySettings == null) {
       proxySettings = getAllProxyConfigurationSettings();
     }
-    boolean isSso = isSsoMode(proxySettings);
-    String usernameKey =
-        isSso
-            ? PlatformConfigurationKey.BSS_USER_ID.name()
-            : PlatformConfigurationKey.BSS_USER_KEY.name();
+    String usernameKey = PlatformConfigurationKey.BSS_USER_KEY.name();
+
     String ws_username =
         proxySettings.get(usernameKey) != null ? proxySettings.get(usernameKey).getValue() : null;
     String ws_password =

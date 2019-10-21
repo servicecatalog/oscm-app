@@ -1,9 +1,9 @@
 /*******************************************************************************
- *                                                                              
+ *
  *  Copyright FUJITSU LIMITED 2018
- *                                                                                                                                 
- *  Creation Date: 2014-02-25                                                      
- *                                                                              
+ *
+ *  Creation Date: 2014-02-25
+ *
  *******************************************************************************/
 package org.oscm.app.dao;
 
@@ -65,7 +65,7 @@ public class BesDAO {
      * service implementation. When a service instance is given, the respective
      * BES credentials will be set. The APP specific credentials will be used
      * otherwise.
-     * 
+     *
      * @param serviceClass
      *            the class of the requested service interface
      * @param serviceInstance
@@ -85,8 +85,12 @@ public class BesDAO {
             PasswordAuthentication pwAuth = configService
                     .getWebServiceAuthentication(serviceInstance, proxySettings, controllerId);
 
-            final String userName = pwAuth.getUserName();
-            final String password = pwAuth.getPassword();
+            String userName = pwAuth.getUserName();
+            String password = pwAuth.getPassword();
+
+            if(isSsoMode(proxySettings)){
+                addPasswordPrefix(password);
+            }
 
             setBinding((BindingProvider) client, userName, password);
             return client;
@@ -129,7 +133,7 @@ public class BesDAO {
             Class<T> serviceClass) {
         Map<String, Object> clientRequestContext = client.getRequestContext();
         String wsUrl = settings.get(PlatformConfigurationKey.BSS_WEBSERVICE_URL.name()).getValue();
-        
+
         wsUrl = wsUrl.replace("{SERVICE}", serviceClass.getSimpleName());
         clientRequestContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, wsUrl);
     }
@@ -496,7 +500,7 @@ public class BesDAO {
     /**
      * Gets the user details from BES. If user is null, the current user details
      * will be returned, otherwise of the specified user.
-     * 
+     *
      * @param si
      * @param user
      * @param password
@@ -507,11 +511,9 @@ public class BesDAO {
      */
     public VOUserDetails getUserDetails(ServiceInstance si, VOUser user, String password,
             Optional<String> controllerId) throws APPlatformException {
+
         VOUserDetails userDetails = null;
         IdentityService idServ = getBESWebService(IdentityService.class, si, controllerId);
-        if (user != null) {
-            setBinding((BindingProvider) idServ, String.valueOf(user.getKey()), password);
-        }
 
         try {
             userDetails = idServ.getCurrentUserDetails();
@@ -584,5 +586,9 @@ public class BesDAO {
             cause = e.getCause();
         }
         return cause;
+    }
+
+    void addPasswordPrefix(String password){
+        password = "WS"+password;
     }
 }
