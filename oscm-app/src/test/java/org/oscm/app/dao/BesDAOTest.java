@@ -50,16 +50,10 @@ import static org.mockito.Mockito.*;
 @SuppressWarnings("unchecked")
 public class BesDAOTest {
 
-  private static final String USER = "user";
-  private static final String PASSWORD = "pass";
   private static final String USER_ID = "userId";
   private static final String USER_KEY = "userKey";
   private static final String USER_PWD = "userPwd";
-  private static final String USER_ID_TM = "userId";
-  private static final String USER_KEY_TM = "userKey";
-  private static final String USER_PWD_TM = "userPwd";
   private static final String USER_TM_TechSvc = "user";
-  private static final String USER_PWD_TM_TechSvc = "userPwd";
 
   private final BesDAO besDAO = spy(new BesDAO());
   private final EnhancedIdentityService idServ = mock(EnhancedIdentityService.class);
@@ -796,7 +790,7 @@ public class BesDAOTest {
       throws APPlatformException, BESNotificationException, ObjectNotFoundException,
           SubscriptionStateException, TechnicalServiceNotAliveException,
           TechnicalServiceOperationException, OrganizationAuthoritiesException,
-          OperationNotPermittedException, ValidationException {
+          OperationNotPermittedException {
     // given
     doReturn(subServ)
         .when(besDAO)
@@ -1008,7 +1002,7 @@ public class BesDAOTest {
 
   @Test
   public void getEnglishOrFirst_emptyList() {
-    assertNull(BesDAO.getEnglishOrFirst(new ArrayList<LocalizedText>()));
+    assertNull(BesDAO.getEnglishOrFirst(new ArrayList<>()));
   }
 
   @Test
@@ -1149,7 +1143,7 @@ public class BesDAOTest {
         besDAO.getBESWebService(IdentityService.class, new ServiceInstance(), Optional.empty());
 
     // then
-    verify(besDAO, times(1)).setBinding((BindingProvider) client, USER_KEY_TM, USER_PWD_TM);
+    verify(besDAO, times(1)).setBinding((BindingProvider) client, USER_KEY, USER_PWD);
   }
 
   @Test
@@ -1166,7 +1160,7 @@ public class BesDAOTest {
 
     // then
     verify(besDAO, times(1))
-        .setBinding((BindingProvider) client, USER_TM_TechSvc, USER_PWD_TM_TechSvc);
+        .setBinding((BindingProvider) client, USER_TM_TechSvc, USER_PWD);
   }
 
   @Test
@@ -1183,55 +1177,54 @@ public class BesDAOTest {
 
     // then
     verify(besDAO, times(1))
-        .setBinding((BindingProvider) client, USER_TM_TechSvc, USER_PWD_TM_TechSvc);
+        .setBinding((BindingProvider) client, USER_TM_TechSvc, USER_PWD);
   }
 
   @Test(expected = ConfigurationException.class)
   public void getClientForBESTechnologyManager_INTERNAL_userKeyNotInConfig_userNotInTS()
       throws ConfigurationException, BadResultException {
+
     // given
-    Map<String, Setting> proxySettings = getSettingsForMode("INTERNAL");
     Map<String, Setting> controllerSettings = getControllerSettings(true, false, true);
     doReturn(controllerSettings).when(confServ).getControllerConfigurationSettings(anyString());
     ServiceInstance si = getServiceInstanceWithParameters(false, true);
 
     // when
     new APPConfigurationServiceBean()
-        .getAuthenticationForBESTechnologyManager(null, si, proxySettings);
+        .getAuthenticationForBESTechnologyManager(null, si);
   }
 
   @Test(expected = ConfigurationException.class)
   public void getClientForBESTechnologyManager_INTERNAL_userKeyNotInConfig_pwdNotInTS()
       throws ConfigurationException, BadResultException {
+
     // given
-    Map<String, Setting> proxySettings = getSettingsForMode("INTERNAL");
     Map<String, Setting> controllerSettings = getControllerSettings(true, false, true);
     doReturn(controllerSettings).when(confServ).getControllerConfigurationSettings(anyString());
     ServiceInstance si = getServiceInstanceWithParameters(true, false);
 
     // when
     new APPConfigurationServiceBean()
-        .getAuthenticationForBESTechnologyManager(null, si, proxySettings);
+        .getAuthenticationForBESTechnologyManager(null, si);
   }
 
   @Test(expected = ConfigurationException.class)
   public void getAuthenticationForBESTechnologyManager_INTERNAL_nothingInConfig()
-      throws ConfigurationException, BadResultException {
+      throws ConfigurationException {
+
     // given
-    Map<String, Setting> proxySettings = getSettingsForMode("INTERNAL");
     final HashMap<String, Setting> controllerSettings = getControllerSettings(false, false, false);
 
     // when
     APPConfigurationServiceBean configurationServiceBean =
         new APPConfigurationServiceBean() {
           @Override
-          public HashMap<String, Setting> getControllerConfigurationSettings(String controllerId)
-              throws ConfigurationException {
+          public HashMap<String, Setting> getControllerConfigurationSettings(String controllerId) {
             return controllerSettings;
           }
         };
     configurationServiceBean.getAuthenticationForBESTechnologyManager(
-        "ess.sample", null, proxySettings);
+        "ess.sample", null);
   }
 
   @Test
@@ -1247,7 +1240,7 @@ public class BesDAOTest {
         besDAO.getBESWebService(IdentityService.class, new ServiceInstance(), Optional.empty());
 
     // then
-    verify(besDAO, times(1)).setBinding((BindingProvider) client, USER_KEY_TM, USER_PWD_TM);
+    verify(besDAO, times(1)).setBinding((BindingProvider) client, USER_KEY, USER_PWD);
   }
 
   @Test
@@ -1263,7 +1256,7 @@ public class BesDAOTest {
     IdentityService client = besDAO.getBESWebService(IdentityService.class, si, Optional.empty());
 
     // then
-    verify(besDAO, times(1)).setBinding((BindingProvider) client, USER_KEY_TM, USER_PWD_TM_TechSvc);
+    verify(besDAO, times(1)).setBinding((BindingProvider) client, USER_KEY, USER_PWD);
   }
 
   @Test
@@ -1280,35 +1273,35 @@ public class BesDAOTest {
 
     // then
     verify(besDAO, times(1))
-        .setBinding((BindingProvider) client, USER_TM_TechSvc, USER_PWD_TM_TechSvc);
+        .setBinding((BindingProvider) client, USER_TM_TechSvc, USER_PWD);
   }
 
   @Test(expected = ConfigurationException.class)
   public void getClientForBESTechnologyManager_SSO_userIdNotInConfig_userNotInTS()
       throws ConfigurationException, BadResultException {
+
     // given
-    Map<String, Setting> proxySettings = getSettingsForMode("OIDC");
     Map<String, Setting> controllerSettings = getControllerSettings(false, true, true);
     doReturn(controllerSettings).when(confServ).getControllerConfigurationSettings(anyString());
     ServiceInstance si = getServiceInstanceWithParameters(false, true);
 
     // when
     new APPConfigurationServiceBean()
-        .getAuthenticationForBESTechnologyManager(null, si, proxySettings);
+        .getAuthenticationForBESTechnologyManager(null, si);
   }
 
   @Test(expected = ConfigurationException.class)
   public void getClientForBESTechnologyManager_SSO_userKeyNotInConfig_pwdNotInTS()
       throws ConfigurationException, BadResultException {
+
     // given
-    Map<String, Setting> proxySettings = getSettingsForMode("OIDC");
     Map<String, Setting> controllerSettings = getControllerSettings(false, true, true);
     doReturn(controllerSettings).when(confServ).getControllerConfigurationSettings(anyString());
     ServiceInstance si = getServiceInstanceWithParameters(true, false);
 
     // when
     new APPConfigurationServiceBean()
-        .getAuthenticationForBESTechnologyManager(null, si, proxySettings);
+        .getAuthenticationForBESTechnologyManager(null, si);
   }
 
   @Test
@@ -1355,10 +1348,10 @@ public class BesDAOTest {
 
     // then
     verify(besDAO.configService, times(1))
-        .getAuthenticationForBESTechnologyManager(anyString(), eq(si), anyMap());
+        .getAuthenticationForBESTechnologyManager(anyString(), eq(si));
   }
 
-  @Test
+  @Test(expected = NullPointerException.class)
   public void getWebServiceAuthentication_withoutProxySettings() throws ConfigurationException {
     // given
     BesDAO besDAO = spy(new BesDAO());
@@ -1666,17 +1659,17 @@ public class BesDAOTest {
     if (userId) {
       settings.put(
           ControllerConfigurationKey.BSS_USER_ID.name(),
-          new Setting(ControllerConfigurationKey.BSS_USER_ID.name(), USER_ID_TM));
+          new Setting(ControllerConfigurationKey.BSS_USER_ID.name(), USER_ID));
     }
     if (userKey) {
       settings.put(
           ControllerConfigurationKey.BSS_USER_KEY.name(),
-          new Setting(ControllerConfigurationKey.BSS_USER_KEY.name(), USER_KEY_TM));
+          new Setting(ControllerConfigurationKey.BSS_USER_KEY.name(), USER_KEY));
     }
     if (userPwd) {
       settings.put(
           ControllerConfigurationKey.BSS_USER_PWD.name(),
-          new Setting(ControllerConfigurationKey.BSS_USER_PWD.name(), USER_PWD_TM));
+          new Setting(ControllerConfigurationKey.BSS_USER_PWD.name(), USER_PWD));
     }
     return settings;
   }
@@ -1688,16 +1681,16 @@ public class BesDAOTest {
     if (user) {
       InstanceParameter p = spy(new InstanceParameter());
       p.setParameterKey(InstanceParameter.BSS_USER);
-      p.setParameterValue(USER_ID_TM);
+      p.setParameterValue(USER_ID);
       list.add(p);
       doReturn(USER_TM_TechSvc).when(p).getDecryptedValue();
     }
     if (userPwd) {
       InstanceParameter p = spy(new InstanceParameter());
       p.setParameterKey(InstanceParameter.BSS_USER_PWD);
-      p.setParameterValue(USER_PWD_TM);
+      p.setParameterValue(USER_PWD);
       list.add(p);
-      doReturn(USER_PWD_TM_TechSvc).when(p).getDecryptedValue();
+      doReturn(USER_PWD).when(p).getDecryptedValue();
     }
     si.setInstanceParameters(list);
 
