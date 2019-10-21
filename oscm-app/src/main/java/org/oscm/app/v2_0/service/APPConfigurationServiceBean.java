@@ -516,6 +516,10 @@ public class APPConfigurationServiceBean {
   public PasswordAuthentication getAuthenticationForAPPAdmin(Map<String, Setting> proxySettings)
       throws ConfigurationException {
 
+    if (proxySettings == null) {
+      proxySettings = getAllProxyConfigurationSettings();
+    }
+
     String userKeyName = PlatformConfigurationKey.BSS_USER_KEY.name();
     String ws_username =
         proxySettings.get(userKeyName) != null ? proxySettings.get(userKeyName).getValue() : null;

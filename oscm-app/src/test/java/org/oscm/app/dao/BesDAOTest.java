@@ -1352,7 +1352,7 @@ public class BesDAOTest {
         .getAuthenticationForBESTechnologyManager(anyString(), eq(si));
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void getWebServiceAuthentication_withoutProxySettings() throws ConfigurationException {
     // given
     BesDAO besDAO = spy(new BesDAO());
