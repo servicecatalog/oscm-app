@@ -84,7 +84,7 @@ public class BesDAO {
       String password = pwAuth.getPassword();
 
       if (isSsoMode(proxySettings)) {
-        addPasswordPrefix(password);
+        password = addPasswordPrefix(password);
       }
 
       setBinding((BindingProvider) client, userName, password);
@@ -564,7 +564,7 @@ public class BesDAO {
     return cause;
   }
 
-  void addPasswordPrefix(String password) {
-    password = "WS" + password;
+  String addPasswordPrefix(String password) {
+    return "WS" + password;
   }
 }

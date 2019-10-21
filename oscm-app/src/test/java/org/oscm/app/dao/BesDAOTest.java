@@ -53,6 +53,7 @@ public class BesDAOTest {
   private static final String USER_ID = "userId";
   private static final String USER_KEY = "userKey";
   private static final String USER_PWD = "userPwd";
+  private static final String USER_WS_PWD = "WSuserPwd";
   private static final String USER_TM_TechSvc = "user";
 
   private final BesDAO besDAO = spy(new BesDAO());
@@ -1109,7 +1110,7 @@ public class BesDAOTest {
     IdentityService client = besDAO.getBESWebService(IdentityService.class, null, Optional.empty());
 
     // then
-    verify(besDAO, times(1)).setBinding((BindingProvider) client, USER_KEY, USER_PWD);
+    verify(besDAO, times(1)).setBinding((BindingProvider) client, USER_KEY, USER_WS_PWD);
   }
 
   @Test(expected = ConfigurationException.class)
@@ -1240,7 +1241,7 @@ public class BesDAOTest {
         besDAO.getBESWebService(IdentityService.class, new ServiceInstance(), Optional.empty());
 
     // then
-    verify(besDAO, times(1)).setBinding((BindingProvider) client, USER_KEY, USER_PWD);
+    verify(besDAO, times(1)).setBinding((BindingProvider) client, USER_KEY, USER_WS_PWD);
   }
 
   @Test
@@ -1256,7 +1257,7 @@ public class BesDAOTest {
     IdentityService client = besDAO.getBESWebService(IdentityService.class, si, Optional.empty());
 
     // then
-    verify(besDAO, times(1)).setBinding((BindingProvider) client, USER_KEY, USER_PWD);
+    verify(besDAO, times(1)).setBinding((BindingProvider) client, USER_KEY, USER_WS_PWD);
   }
 
   @Test
@@ -1273,7 +1274,7 @@ public class BesDAOTest {
 
     // then
     verify(besDAO, times(1))
-        .setBinding((BindingProvider) client, USER_TM_TechSvc, USER_PWD);
+        .setBinding((BindingProvider) client, USER_TM_TechSvc, USER_WS_PWD);
   }
 
   @Test(expected = ConfigurationException.class)
