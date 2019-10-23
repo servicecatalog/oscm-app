@@ -293,10 +293,8 @@ public class APPConfigurationServiceBean {
       // this exception should not happen due to no decryption needed for
       // APP_SUSPEND, no handle needed
     }
-    if (!Strings.isEmpty(isSuspend)) {
-      return Boolean.parseBoolean(isSuspend);
-    }
-    return false;
+
+    return Boolean.parseBoolean(isSuspend);
   }
 
   @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
