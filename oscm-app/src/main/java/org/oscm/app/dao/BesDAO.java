@@ -493,6 +493,10 @@ public class BesDAO {
     VOUserDetails userDetails = null;
     IdentityService idServ = getBESWebService(IdentityService.class, si, controllerId);
 
+    if (user != null) {
+      setBinding((BindingProvider) idServ, String.valueOf(user.getKey()), password);
+    }
+
     try {
       userDetails = idServ.getCurrentUserDetails();
     } catch (Exception e) {
