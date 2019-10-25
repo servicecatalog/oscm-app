@@ -6,7 +6,6 @@ package org.oscm.app.v2_0.service;
 import org.oscm.app.business.exceptions.ServiceInstanceNotFoundException;
 import org.oscm.app.dao.BesDAO;
 import org.oscm.app.dao.ServiceInstanceDAO;
-import org.oscm.app.domain.PlatformConfigurationKey;
 import org.oscm.app.domain.ServiceInstance;
 import org.oscm.app.v2_0.data.ControllerConfigurationKey;
 import org.oscm.app.v2_0.data.PasswordAuthentication;
@@ -23,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.ejb.*;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -114,6 +112,7 @@ public class APPAuthenticationServiceBean {
       UserRoleType role,
       Optional<String> controllerId)
       throws APPlatformException {
+
     // check that either user key or user id is specified
     if (Strings.isEmpty(auth.getUserName())) {
       throw new IllegalArgumentException("User id must be specified");
@@ -129,8 +128,8 @@ public class APPAuthenticationServiceBean {
     }
     String password = auth.getPassword();
 
-    // if no explicit organizationID is set, the user to be authenticated
-    // must come from the organization currently set in the identityService
+    // if no explicit organizationID is set, the user to be authenticated must come from the
+    // organization currently set in the identityService
     if (organizationId == null) {
       VOUserDetails currentUserDetails =
           besDAO.getUserDetails(serviceInstance, null, null, controllerId);
@@ -138,8 +137,7 @@ public class APPAuthenticationServiceBean {
         organizationId = currentUserDetails.getOrganizationId();
         // check if current web service user equals requesting user
         if ((user.getKey() == 0 || currentUserDetails.getKey() == user.getKey())
-            && (user.getUserId() == null
-                || user.getUserId().equals(currentUserDetails.getUserId()))) {
+            && user.getUserId().equals(currentUserDetails.getUserId())) {
           PasswordAuthentication pwAuth =
               configService.getWebServiceAuthentication(serviceInstance, null, controllerId);
           String existingPW = String.valueOf(pwAuth.getPassword());
@@ -150,20 +148,9 @@ public class APPAuthenticationServiceBean {
       }
     }
 
-    Map<String, Setting> settings = configService.getAllProxyConfigurationSettings();
-    boolean isSsoMode =
-        "OIDC".equals(settings.get(PlatformConfigurationKey.BSS_AUTH_MODE.name()).getValue());
-
-    if (user.getUserId() == null && isSsoMode) {
-      // in SSO mode the userId must always be present since no
-      // lookup of ID by key is possible via IdentityService
-      throw new AuthenticationException(
-          "The provisioning platform is configured to authenticate using OIDC. Therefore in all requests the VOUser must have set a valid userId");
-    }
-
-    if (user.getKey() == 0 && !isSsoMode) {
-      // if we do not yet have the required user key
-      // available we first have to get it from BSS platform
+    if (user.getKey() == 0) {
+      // if we do not yet have the required user key available we first have to get it from BSS
+      // platform
       user = besDAO.getUser(serviceInstance, user, controllerId);
     }
 

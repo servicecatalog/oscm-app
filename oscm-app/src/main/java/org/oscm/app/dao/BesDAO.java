@@ -83,10 +83,6 @@ public class BesDAO {
       String userName = pwAuth.getUserName();
       String password = pwAuth.getPassword();
 
-      if (isSsoMode(proxySettings)) {
-        password = addPasswordPrefix(password);
-      }
-
       setBinding((BindingProvider) client, userName, password);
       return client;
     } catch (MalformedURLException e) {
@@ -101,7 +97,14 @@ public class BesDAO {
     }
   }
 
-  public void setBinding(BindingProvider client, String userName, String password) {
+  public void setBinding(BindingProvider client, String userName, String password) throws ConfigurationException {
+
+    Map<String, Setting> proxySettings = configService.getAllProxyConfigurationSettings();
+
+    if (isSsoMode(proxySettings)) {
+      password = addPasswordPrefix(password);
+    }
+
     final Binding binding = client.getBinding();
     List<Handler> handlerList = binding.getHandlerChain();
 
@@ -492,6 +495,10 @@ public class BesDAO {
 
     VOUserDetails userDetails = null;
     IdentityService idServ = getBESWebService(IdentityService.class, si, controllerId);
+
+    if (user != null) {
+      setBinding((BindingProvider) idServ, String.valueOf(user.getKey()), password);
+    }
 
     try {
       userDetails = idServ.getCurrentUserDetails();
