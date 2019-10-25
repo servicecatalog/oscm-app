@@ -53,7 +53,7 @@ public class BesDAOTest {
   private static final String USER_ID = "userId";
   private static final String USER_KEY = "userKey";
   private static final String USER_PWD = "userPwd";
-  private static final String USER_WS_PWD = "WSuserPwd";
+  private static final String USER_WS_PWD = "userPwd";
   private static final String USER_TM_TechSvc = "user";
 
   private final BesDAO besDAO = spy(new BesDAO());
