@@ -8,26 +8,21 @@
 
 package org.oscm.app.v2_0.service;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doReturn;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.oscm.app.domain.PlatformConfigurationKey;
+
+import java.util.*;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class APPlatformServiceBeanTest {
@@ -72,5 +67,31 @@ public class APPlatformServiceBeanTest {
     verify(appConfigurationService, never()).storeAppConfigurationSettings(any(HashMap.class));
     verify(appConfigurationService, never())
         .storeControllerConfigurationSettings(anyString(), any(HashMap.class));
+  }
+
+  @Test
+  public void isSsoMode_returnTrue_ifAuthModeIsOIDC() throws Exception{
+
+    //given
+    when(appConfigurationService.getProxyConfigurationSetting(PlatformConfigurationKey.BSS_AUTH_MODE)).thenReturn("OIDC");
+
+    //when
+    boolean ssoMode = applatformService.isSsoMode();
+
+    //then
+    assertTrue(ssoMode);
+  }
+
+  @Test
+  public void isSsoMode_returnFalse_ifAuthModeIsInternal() throws Exception{
+
+    //given
+    when(appConfigurationService.getProxyConfigurationSetting(PlatformConfigurationKey.BSS_AUTH_MODE)).thenReturn("INTERNAL");
+
+    //when
+    boolean ssoMode = applatformService.isSsoMode();
+
+    //then
+    assertFalse(ssoMode);
   }
 }
