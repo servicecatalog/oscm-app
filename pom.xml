@@ -230,32 +230,32 @@
             <dependency>
                 <groupId>com.github.servicecatalog.oscm-interfaces</groupId>
                 <artifactId>oscm-app-extsvc</artifactId>
-                <version>master-SNAPSHOT</version>
+                <version>sso-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.servicecatalog.oscm-interfaces</groupId>
                 <artifactId>oscm-extsvc</artifactId>
-                <version>master-SNAPSHOT</version>
+                <version>sso-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.servicecatalog.oscm-interfaces</groupId>
                 <artifactId>oscm-extsvc-internal</artifactId>
-                <version>master-SNAPSHOT</version>
+                <version>sso-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.servicecatalog.oscm-interfaces</groupId>
                 <artifactId>oscm-extsvc-provisioning</artifactId>
-                <version>master-SNAPSHOT</version>
+                <version>sso-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.servicecatalog.oscm-interfaces</groupId>
                 <artifactId>oscm-extsvc-operation</artifactId>
-                <version>master-SNAPSHOT</version>
+                <version>sso-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.servicecatalog.oscm-commons</groupId>
                 <artifactId>oscm-common</artifactId>
-                <version>master-SNAPSHOT</version>
+                <version>sso-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
