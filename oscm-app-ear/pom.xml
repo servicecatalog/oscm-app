@@ -79,7 +79,6 @@
                         lib/commons-lang*.jar,
                         lib/cssparser-*.jar,
                         lib/geronimo-javamail*.jar,
-                        lib/guava*.jar,
                         lib/jstl-*.jar,
                         lib/oro-*.jar,
                         lib/oscm-app-common-*.jar,
