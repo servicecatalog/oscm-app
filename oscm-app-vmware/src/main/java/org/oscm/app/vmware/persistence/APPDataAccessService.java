@@ -386,7 +386,6 @@ public class APPDataAccessService {
                                     "org.apache.openejb.core.OpenEJBInitialContextFactory");
                 Context namingContext = new InitialContext(p);
                 ds = (DataSource) namingContext.lookup(DATASOURCE); 
-                
             } catch (Exception e) {
                 throw new Exception("Datasource " + DATASOURCE + " not found.",
                         e);
