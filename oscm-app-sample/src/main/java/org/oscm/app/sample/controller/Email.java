@@ -99,7 +99,7 @@ public abstract class Email {
         
         try {
 
-            message.setRecipients(Message.RecipientType.TO, (InternetAddress[]) addrs.toArray());
+            message.setRecipients(Message.RecipientType.TO, (InternetAddress[]) addrs.toArray(new InternetAddress[addrs.size()] ));
             message.setSubject(subject, "UTF-8");
             message.setSentDate(new Date());
 
