@@ -4,7 +4,7 @@
 <tns:TechnicalServices xmlns:tns="oscm.serviceprovisioning/1.9/TechnicalService.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="oscm.serviceprovisioning/1.9/TechnicalService.xsd ../../oscm-serviceprovisioning/javares/TechnicalServices.xsd">
 
-  <tns:TechnicalService id="AppSampleService" build="2018.07.20" provisioningType="ASYNCHRONOUS"
+  <tns:TechnicalService id="AppSampleService" build="2019.12.13" provisioningType="ASYNCHRONOUS"
     provisioningUrl="http://oscm-app:8880/oscm-app/webservices/oscm-app/oscm-app/org.oscm.app.v2_0.service.AsynchronousProvisioningProxy?wsdl" provisioningVersion="1.0"
     accessType="DIRECT" loginPath="Dynamically provided." baseUrl="">
 
@@ -34,6 +34,14 @@
       default="">
       <LocalizedDescription locale="en">IAAS password</LocalizedDescription>
     </ParameterDefinition>
+    <!-- 
+        Use CSSSTYLE for HTML emails
+        
+        Example: default="td,th,caption{font:15px arial;} caption {font:bold 15px arial;background-color:#F2F2F2;margin:5px;} .tcol {width:200px;} .vcol {width:400px;} .ckey{font:15px arial;}.cval {font:15px arial;background-color: #F2F2F2;}" 
+     -->
+    <ParameterDefinition id="CSSSTYLE" configurable="true" mandatory="false" valueType="STRING"
+      default="">
+      <LocalizedDescription locale="en">Inline CSS for Email Notification</LocalizedDescription>
+    </ParameterDefinition>
   </tns:TechnicalService>
-
 </tns:TechnicalServices>
