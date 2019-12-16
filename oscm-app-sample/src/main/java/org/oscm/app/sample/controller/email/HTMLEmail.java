@@ -58,6 +58,7 @@ public class HTMLEmail extends Email {
             writeSettings(rows, out);
             out.println("         </tbody>");
             out.println("      </table>");
+            out.println("<p/>");
         }
     }
     

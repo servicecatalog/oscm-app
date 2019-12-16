@@ -37,7 +37,7 @@
     <!-- 
         Use CSSSTYLE for HTML emails
         
-        Example: default="td,th,caption{font:15px arial;} caption {font:bold 15px arial;background-color:#F2F2F2;margin:5px;} .tcol {width:200px;} .vcol {width:400px;} .ckey{font:15px arial;}.cval {font:15px arial;background-color: #F2F2F2;}" 
+        Example: default="td,th {font:15px arial;} caption {font:bold 15px arial;background-color:#9F9F9F;margin:5px;} .tcol {width:300px;} .vcol {width:400px;} .ckey{font:15px arial;}.cval {font:15px arial;background-color: #F2F2F2;}" 
      -->
     <ParameterDefinition id="CSSSTYLE" configurable="true" mandatory="false" valueType="STRING"
       default="">

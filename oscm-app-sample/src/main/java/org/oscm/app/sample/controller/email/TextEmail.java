@@ -39,6 +39,9 @@ public class TextEmail extends Email {
     protected void writeTable(String caption, HashMap<String, Setting> rows, PrintStream out) {
         if (!rows.isEmpty()) {
             out.println("\r\n"+  caption);
+            for (char c : caption.toCharArray())
+                out.print("-");
+            out.print("\n");
             writeSettings(rows, out);
         }
     }
@@ -54,7 +57,7 @@ public class TextEmail extends Email {
 
     @Override
     protected String row(String name, String value) {
-      return String.format(" %s : %s\r\n", name,
+      return String.format("%s : %s", name,
                 value);
     }
 
