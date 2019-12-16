@@ -34,7 +34,7 @@ public class HTMLEmail extends Email {
         out.println("   <head>");
         out.println("      <meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\">");
         out.println("      <style>");
-        out.println("            td, th, caption  { font: 15px arial;  }       caption  { font: bold 15px arial; background-color: #F2F2F2; margin:5px;}        .tcol       { width: 200px; }     .vcol       { width: 400px; }      .ckey        {  font: 15px arial; }      .cval        {  font: 15px arial; background-color: #F2F2F2; }   ");
+        out.println(css);
         out.println("      </style>");
         out.println("   </head>");
 
@@ -46,7 +46,7 @@ public class HTMLEmail extends Email {
         if (!rows.isEmpty()) {
             out.println("      <table>");
             
-            out.print("         <caption>%");
+            out.print("         <caption>");
             out.print(caption);
             out.println("</caption>");
             out.println("         <colgroup>");                        
@@ -55,23 +55,19 @@ public class HTMLEmail extends Email {
             out.println("         </colgroup>");
                         
             out.println("         <tbody>");
-            
-            rows.entrySet().stream().filter(f-> !f.getKey().equals("CSSSTYLE")).forEachOrdered(e -> {
-                out.println(row(e.getKey(), e.getValue().getKey(), e.getValue().getValue()));
-            });
-            
+            writeSettings(rows, out);
             out.println("         </tbody>");
             out.println("      </table>");
         }
     }
-
-    private String row(String key, String name, String value) {
-        return String.format("<tr><td class=\"ckey\">%s</td><td>%s</td><td class=\"cval\">%s</td></tr>", key, name, value);
+    
+    protected String row(String name, String value) {
+        return String.format("<tr><td>%s</td><td class=\"cval\">%s</td></tr>", name, value);
     }
 
     @Override
     protected String getContentType() {
-        return "text/html; charset=utf-8";
+        return "text/html;charset=UTF-8";
     }
 
     @Override

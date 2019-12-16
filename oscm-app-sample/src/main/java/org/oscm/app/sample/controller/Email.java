@@ -11,6 +11,7 @@ package org.oscm.app.sample.controller;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -51,6 +52,18 @@ public abstract class Email {
                 return new HTMLEmail(ps, CSS);
         }
         return new TextEmail(ps);
+    }
+    
+    static class Key {
+        static List<String> internals = Arrays.asList(new String[] {CSS_STYLE} );
+        
+        static boolean isPassword(String key) {
+            return key.endsWith("PWD");
+        }
+        
+        static boolean isInternal(String key) {
+            return isPassword(key) || internals.contains(key);
+        }
     }
 
     protected Email(ProvisioningSettings ps) {
@@ -150,7 +163,17 @@ public abstract class Email {
                     "APPMail", e.getMessage()));
         }
     }
+    protected void writeSettings(HashMap<String, Setting> rows, PrintStream out) {
+        rows.entrySet().stream().filter(f-> filter(f.getKey())).forEachOrdered(e -> {
+            out.println(row(e.getValue().getKey(), e.getValue().getValue()));
+        });
+    }
     
+    private boolean filter(String key) {
+        return !Key.isInternal(key);
+    }
+    
+    protected abstract String row(String name, String value);
     
     protected abstract void writeHeader(PrintStream out);
     
@@ -161,6 +184,5 @@ public abstract class Email {
     protected abstract String getContentType();
 
     protected abstract void writeTable(String caption, HashMap<String, Setting> rows, PrintStream out);
-
-
+    
 }

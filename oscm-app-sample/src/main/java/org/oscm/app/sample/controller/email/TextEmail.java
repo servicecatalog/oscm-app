@@ -39,14 +39,7 @@ public class TextEmail extends Email {
     protected void writeTable(String caption, HashMap<String, Setting> rows, PrintStream out) {
         if (!rows.isEmpty()) {
             out.println("\r\n"+  caption);
-
-            rows.entrySet().stream().filter(f -> !f.getKey().equals("CSSSTYLE"))
-                    .forEachOrdered(e -> {
-                        out.print(String.format("[%s]", e.getKey()));
-                        out.print(String.format(" %s : %s", e.getValue().getKey(),
-                                e.getValue().getValue()));
-                        out.print("\r\n");
-                    });
+            writeSettings(rows, out);
         }
     }
 
@@ -57,6 +50,12 @@ public class TextEmail extends Email {
 
     @Override
     protected void writeFooter(PrintStream out) {
+    }
+
+    @Override
+    protected String row(String name, String value) {
+      return String.format(" %s : %s\r\n", name,
+                value);
     }
 
 }
