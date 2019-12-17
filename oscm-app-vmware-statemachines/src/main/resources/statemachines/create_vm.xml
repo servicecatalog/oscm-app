@@ -89,6 +89,11 @@
   </state>
 
   <state id="EXECUTE_SCRIPT" action="executeScript">
+    <event id="success" state="UPDATE_LINUX_PASSWORD" />
+    <event id="failed" state="ERROR" />
+  </state>
+
+  <state id="UPDATE_LINUX_PASSWORD" action="updateLinuxPwd">
     <event id="success" state="SUSPEND_PROVISIONING_AFTER_CREATION" />
     <event id="failed" state="ERROR" />
   </state>

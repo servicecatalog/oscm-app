@@ -101,6 +101,19 @@ public class Script {
     }
 
     public Script(VMPropertyHandler ph, OS os) throws Exception {
+        initScript(ph, os);
+
+        script = downloadFile(ph
+                .getServiceSetting(VMPropertyHandler.TS_SCRIPT_URL));
+    }
+    
+    public Script(VMPropertyHandler ph, OS os, String script) throws Exception {
+        initScript(ph, os);
+
+        this.script = script;
+    }
+
+    private void initScript(VMPropertyHandler ph, OS os) throws Exception {
         this.ph = ph;
         this.os = os;
 
@@ -110,10 +123,8 @@ public class Script {
 
         // TODO load certificate from vSphere host and install somehow
         disableSSL();
-
-        script = downloadFile(ph
-                .getServiceSetting(VMPropertyHandler.TS_SCRIPT_URL));
     }
+    
 
     /**
      * Declare a host name verifier that will automatically enable the
@@ -438,12 +449,21 @@ public class Script {
             spec.setProgramPath(LINUX_GUEST_FILE_PATH);
             spec.setArguments(" > " + tempFilePath + " 2>&1");
         }
-
+        
         LOG.debug("Starting the specified program inside the guest");
         long pid = vimPort.startProgramInGuest(processManagerRef, vmwInstance,
                 auth, spec);
         LOG.debug("Process ID of the program started is: " + pid + "");
-
+        
+        if("UPDATE_LINUX_PASSWORD".equals(ph.getServiceSetting(VMPropertyHandler.SM_STATE))){
+            auth.setUsername(guestUserId);
+            auth.setPassword(ph
+                    .getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD));
+            guestPassword = ph
+                    .getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD);
+            Thread.sleep(5 * 1000);
+        }
+        
         List<GuestProcessInfo> procInfo = null;
         List<Long> pidsList = new ArrayList<Long>();
         pidsList.add(Long.valueOf(pid));

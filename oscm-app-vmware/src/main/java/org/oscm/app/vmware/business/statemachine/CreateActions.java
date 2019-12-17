@@ -191,6 +191,40 @@ public class CreateActions extends Actions {
       }
     }
   }
+  
+  @SuppressWarnings("resource")
+  @StateMachineAction
+  public String updateLinuxPwd(
+      String instanceId,
+      ProvisioningSettings settings,
+      @SuppressWarnings("unused") InstanceStatus result) {
+
+    VMPropertyHandler ph = new VMPropertyHandler(settings);
+    String vcenter = ph.getServiceSetting(VMPropertyHandler.TS_TARGET_VCENTER_SERVER);
+    VMwareClient vmClient = null;
+    try {
+      vmClient = VMClientPool.getInstance().getPool().borrowObject(vcenter);
+      if (ph.getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD) != null) {
+        VM vm = new VM(vmClient, ph.getInstanceName());
+        vm.updateLinuxVMPassword(ph);
+      }
+      return EVENT_SUCCESS;
+    } catch (Exception e) {
+      logger.error("Failed to execute script of instance " + instanceId, e);
+      String message =
+          Messages.get(ph.getLocale(), "error_execute_script", new Object[] {instanceId});
+      ph.setSetting(VMPropertyHandler.SM_ERROR_MESSAGE, message.concat(e.getMessage()));
+      return EVENT_FAILED;
+    } finally {
+      if (vmClient != null) {
+        try {
+          VMClientPool.getInstance().getPool().returnObject(vcenter, vmClient);
+        } catch (Exception e) {
+          logger.error("Failed to return VMware client into pool", e);
+        }
+      }
+    }
+  }
 
   @StateMachineAction
   public String suspendAfterCreation(

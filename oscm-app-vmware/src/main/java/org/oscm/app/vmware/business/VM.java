@@ -289,6 +289,17 @@ public class VM extends Template {
       script.execute(vmw, vmInstance);
     }
   }
+  
+  public void updateLinuxVMPassword(VMPropertyHandler paramHandler) throws Exception {
+      LOG.debug("instanceName: " + instanceName);
+      
+      String password = paramHandler.getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD);
+      String updateScript = VMScripts.updateLinuxVMRootPassword(password);
+      if (updateScript != null) {
+        Script script = new Script(paramHandler, detectOs(), updateScript);
+        script.execute(vmw, vmInstance);
+      }
+  }
 
   public int getNumberOfNICs() throws Exception {
     return NetworkManager.getNumberOfNICs(vmw, vmInstance);
