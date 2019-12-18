@@ -192,6 +192,8 @@ public class CreateActions extends Actions {
     }
   }
   
+
+  
   @SuppressWarnings("resource")
   @StateMachineAction
   public String updateLinuxPwd(
@@ -206,7 +208,9 @@ public class CreateActions extends Actions {
       vmClient = VMClientPool.getInstance().getPool().borrowObject(vcenter);
       if (ph.getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD) != null) {
         VM vm = new VM(vmClient, ph.getInstanceName());
-        vm.updateLinuxVMPassword(ph);
+          if(vm.isScriptExecuting() == false) {
+            vm.updateLinuxVMPassword(ph);
+          }
       }
       return EVENT_SUCCESS;
     } catch (Exception e) {
@@ -225,6 +229,7 @@ public class CreateActions extends Actions {
       }
     }
   }
+
 
   @StateMachineAction
   public String suspendAfterCreation(

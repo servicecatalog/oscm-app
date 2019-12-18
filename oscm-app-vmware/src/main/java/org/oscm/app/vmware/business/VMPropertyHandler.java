@@ -1619,6 +1619,11 @@ public class VMPropertyHandler {
   public String getServiceSetting(String key) {
     return getValue(key, settings.getParameters());
   }
+  
+  /** Returns a service setting or NULL if not set */
+  public void setServiceSetting(String key, String value) {
+     setValue(key, value, settings.getParameters());
+  }
 
   public void useMock(DataAccessService das) {
     das_stub = das;

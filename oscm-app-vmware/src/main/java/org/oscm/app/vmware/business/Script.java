@@ -48,6 +48,8 @@ public class Script {
     private static final String WINDOWS_GUEST_FILE_PATH = "C:\\Windows\\Temp\\runonce.bat";
     private static final String LINUX_GUEST_FILE_PATH = "/tmp/runonce.sh";
     static final String HIDDEN_PWD = "*****";
+    
+    private boolean scriptExecuting = false;
 
     private OS os;
     private VMPropertyHandler ph;
@@ -55,8 +57,45 @@ public class Script {
 
     private String guestUserId;
     private String guestPassword;
-    private String script;
+    private String executableScript;
+    
+    private static Script script = null;
+    
+    private Script() {};
+    
+    public static synchronized Script getInstance () {
+        if (script == null) {
+            script = new Script();
+        }
+        return script;
+      }
+    
+    
+    public void initScript(VMPropertyHandler ph, OS os) throws Exception {
+        initializeScript(ph, os);
 
+        executableScript = downloadFile(ph
+                .getServiceSetting(VMPropertyHandler.TS_SCRIPT_URL));
+    }
+    
+    public void initScript(VMPropertyHandler ph, OS os, String script) throws Exception {
+        initializeScript(ph, os);
+
+        this.executableScript = script;
+    }
+
+    private void initializeScript(VMPropertyHandler ph, OS os) throws Exception {
+        this.ph = ph;
+        this.os = os;
+
+        sp = new ServiceParamRetrieval(ph);
+        guestUserId = ph.getServiceSetting(VMPropertyHandler.TS_SCRIPT_USERID);
+        guestPassword = ph.getServiceSetting(VMPropertyHandler.TS_SCRIPT_PWD);
+
+        // TODO load certificate from vSphere host and install somehow
+        disableSSL();
+    }
+    
     public enum OS {
         LINUX("\n"), WINDOWS("\r\n");
 
@@ -99,32 +138,6 @@ public class Script {
             return;
         }
     }
-
-    public Script(VMPropertyHandler ph, OS os) throws Exception {
-        initScript(ph, os);
-
-        script = downloadFile(ph
-                .getServiceSetting(VMPropertyHandler.TS_SCRIPT_URL));
-    }
-    
-    public Script(VMPropertyHandler ph, OS os, String script) throws Exception {
-        initScript(ph, os);
-
-        this.script = script;
-    }
-
-    private void initScript(VMPropertyHandler ph, OS os) throws Exception {
-        this.ph = ph;
-        this.os = os;
-
-        sp = new ServiceParamRetrieval(ph);
-        guestUserId = ph.getServiceSetting(VMPropertyHandler.TS_SCRIPT_USERID);
-        guestPassword = ph.getServiceSetting(VMPropertyHandler.TS_SCRIPT_PWD);
-
-        // TODO load certificate from vSphere host and install somehow
-        disableSSL();
-    }
-    
 
     /**
      * Declare a host name verifier that will automatically enable the
@@ -249,12 +262,12 @@ public class Script {
     }
 
     private String insertServiceParameter() throws Exception {
-        LOG.debug("Script before patching:\n" + script);
+        LOG.debug("Script before patching:\n" + executableScript);
 
-        String firstLine = script.substring(0,
-                script.indexOf(os.getLineEnding()));
-        String rest = script.substring(script.indexOf(os.getLineEnding()) + 1,
-                script.length());
+        String firstLine = executableScript.substring(0,
+                executableScript.indexOf(os.getLineEnding()));
+        String rest = executableScript.substring(executableScript.indexOf(os.getLineEnding()) + 1,
+                executableScript.length());
 
         StringBuffer sb = new StringBuffer();
         List<String> passwords = new ArrayList<String>();
@@ -403,10 +416,20 @@ public class Script {
     private String getIndexedParam(String param, int index) {
         return param.replace('1', Integer.toString(index).charAt(0));
     }
-
+    
     public void execute(VMwareClient vmw, ManagedObjectReference vmwInstance)
             throws Exception {
+        if (scriptExecuting == false) {
+            executeScript(vmw, vmwInstance);
+        }
 
+    }
+
+    private void executeScript(VMwareClient vmw, ManagedObjectReference vmwInstance)
+            throws Exception {
+        
+        scriptExecuting = true;
+        
         LOG.debug("");
 
         String vcenter = ph
@@ -461,7 +484,9 @@ public class Script {
                     .getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD));
             guestPassword = ph
                     .getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD);
-            Thread.sleep(5 * 1000);
+            ph.setServiceSetting(ph.getServiceSetting(VMPropertyHandler.TS_SCRIPT_PWD), ph
+                    .getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD));
+            Thread.sleep(1000);
         }
         
         List<GuestProcessInfo> procInfo = null;
@@ -476,6 +501,7 @@ public class Script {
                 LOG.warn(
                         "listProcessesInGuest() failed. setting new Linux root password for authentication",
                         e);
+                scriptExecuting = false;
 
                 if (os == OS.WINDOWS) {
                     auth.setPassword(ph
@@ -485,7 +511,7 @@ public class Script {
                             .getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD));
                 }
             }
-            Thread.sleep(5 * 1000);
+            Thread.sleep(1000);
         } while (procInfo != null && procInfo.get(0).getEndTime() == null);
 
         if (procInfo != null && procInfo.get(0).getExitCode().intValue() != 0) {
@@ -499,6 +525,15 @@ public class Script {
             String scriptOutput = downloadFile(fileDownloadUrl);
             LOG.error("Script execution output: " + scriptOutput);
         }
-
+        scriptExecuting = false;
     }
+
+    public boolean isScriptExecuting() {
+        return scriptExecuting;
+    }
+
+    public void setScriptExecuting(boolean scriptIsExecuted) {
+        this.scriptExecuting = scriptIsExecuted;
+    }
+    
 }

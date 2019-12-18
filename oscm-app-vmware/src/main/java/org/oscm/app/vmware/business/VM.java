@@ -280,27 +280,48 @@ public class VM extends Template {
     return folder;
   }
 
-  public void runScript(VMPropertyHandler paramHandler) throws Exception {
-    LOG.debug("instanceName: " + instanceName);
+    public void runScript(VMPropertyHandler paramHandler) throws Exception {
+        LOG.debug("instanceName: " + instanceName);
 
-    String scriptURL = paramHandler.getServiceSetting(VMPropertyHandler.TS_SCRIPT_URL);
-    if (scriptURL != null) {
-      Script script = new Script(paramHandler, detectOs());
-      script.execute(vmw, vmInstance);
+        String scriptURL = paramHandler
+                .getServiceSetting(VMPropertyHandler.TS_SCRIPT_URL);
+
+        Script script = Script.getInstance();
+        if (scriptURL != null) {
+            try {
+                script.initScript(paramHandler, detectOs());
+                script.execute(vmw, vmInstance);
+            } catch (Exception e) {
+                script.setScriptExecuting(false);
+                throw e;
+            }
+        }
     }
-  }
   
-  public void updateLinuxVMPassword(VMPropertyHandler paramHandler) throws Exception {
-      LOG.debug("instanceName: " + instanceName);
-      
-      String password = paramHandler.getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD);
-      String updateScript = VMScripts.updateLinuxVMRootPassword(password);
-      if (updateScript != null) {
-        Script script = new Script(paramHandler, detectOs(), updateScript);
-        script.execute(vmw, vmInstance);
-      }
-  }
+    public void updateLinuxVMPassword(VMPropertyHandler paramHandler)
+            throws Exception {
+        LOG.debug("instanceName: " + instanceName);
 
+        String password = paramHandler
+                .getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD);
+        String updateScript = VMScripts.updateLinuxVMRootPassword(password);
+        Script script = Script.getInstance();
+        if (updateScript != null) {
+            try {
+                script.initScript(paramHandler, detectOs(), updateScript);
+                script.execute(vmw, vmInstance);
+            } catch (Exception e) {
+                script.setScriptExecuting(false);
+                throw e;
+            }
+        }
+    }
+
+    public boolean isScriptExecuting() {
+        Script script = Script.getInstance();
+        return script.isScriptExecuting();
+    }
+    
   public int getNumberOfNICs() throws Exception {
     return NetworkManager.getNumberOfNICs(vmw, vmInstance);
   }
