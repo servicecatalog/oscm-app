@@ -501,8 +501,6 @@ public class Script {
                 LOG.warn(
                         "listProcessesInGuest() failed. setting new Linux root password for authentication",
                         e);
-                scriptExecuting = false;
-
                 if (os == OS.WINDOWS) {
                     auth.setPassword(ph
                             .getServiceSetting(VMPropertyHandler.TS_WINDOWS_LOCAL_ADMIN_PWD));
