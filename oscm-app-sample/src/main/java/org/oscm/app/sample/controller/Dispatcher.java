@@ -12,15 +12,11 @@
 package org.oscm.app.sample.controller;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.oscm.app.sample.i18n.Messages;
 import org.oscm.app.v2_0.data.InstanceStatus;
 import org.oscm.app.v2_0.data.LocalizedText;
-import org.oscm.app.v2_0.data.ProvisioningSettings;
-import org.oscm.app.v2_0.data.Setting;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
 import org.oscm.app.v2_0.intf.APPlatformService;
 import org.slf4j.Logger;
@@ -45,8 +41,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Dispatcher {
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(Dispatcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Dispatcher.class);
 
     // The ID of the application instance
     private String instanceId;
@@ -166,8 +161,7 @@ public class Dispatcher {
         // Update the description of the instance status.
         // This description is displayed to users for a pending
         // subscription.
-        List<LocalizedText> messages = Messages
-                .getAll("status_" + paramHandler.getState());
+        List<LocalizedText> messages = Messages.getAll("status_" + paramHandler.getState());
         result.setDescription(messages);
 
         // Return the current parameters and settings to APP.
@@ -177,8 +171,7 @@ public class Dispatcher {
         // When provisioning is done, provide access information that can be
         // shown to the subscriber.
         if (result.isReady()) {
-            result.setAccessInfo(
-                    "Access information for instance " + instanceId);
+            result.setAccessInfo("Access information for instance " + instanceId);
         }
 
         return result;
@@ -193,45 +186,20 @@ public class Dispatcher {
      * @param currentState
      *            the current internal status of the provisioning operation
      * @throws APPlatformException
+     *             - if an error occurred on mail delivery
      */
-    private void sendMail(String instanceId, Status currentState)
-            throws APPlatformException {
+    private void sendMail(String instanceId, Status currentState) throws APPlatformException {
         // Create mail subject and contents
         String subject = Messages.get(Messages.DEFAULT_LOCALE, "mail.subject",
                 new Object[] { instanceId });
+
+        Email mail = Email.get(paramHandler.getSettings());
+
         String text = Messages.get(Messages.DEFAULT_LOCALE, "mail.text",
-                new Object[] { instanceId, paramHandler.getMessage(),
-                        currentState.toString() });
-        ProvisioningSettings ps = paramHandler.getSettings();
+                new Object[] { instanceId, paramHandler.getMessage(), currentState.toString() });
 
-        StringBuffer sb = new StringBuffer(text);
-
-        // include service parameters,
-        sb.append("\n\nParameters\n");
-        logSettings(sb, ps.getParameters());
-
-        // service attributes,
-        sb.append("\n\nAttributes\n");
-        logSettings(sb, ps.getAttributes());
-
-        // and customer attributes (UDAs)
-        sb.append("\n\nCustomAttributes\n");
-        logSettings(sb, ps.getCustomAttributes());
-
-        // Send mail via APPlatformService
-        platformService.sendMail(
-                Collections.singletonList(paramHandler.getEMail()), subject,
-                sb.toString());
-    }
-
-    private void logSettings(StringBuffer sb, HashMap<String, Setting> map) {
-        for (Entry<String, Setting> item : map.entrySet()) {
-            final String name = item.getKey();
-            final Setting setting = item.getValue();
-            String key = setting.getKey();
-            String value = setting.getValue();
-            sb.append(String.format("[%s] %s=%s\n", name, key, value));
-        }
+        // Send to configured recipients
+        mail.send(Collections.singletonList(paramHandler.getEMail()), subject, text);
     }
 
 }
