@@ -282,10 +282,8 @@ public class VM extends Template {
 
     public void runScript(VMPropertyHandler paramHandler) throws Exception {
         LOG.debug("instanceName: " + instanceName);
-
         String scriptURL = paramHandler
                 .getServiceSetting(VMPropertyHandler.TS_SCRIPT_URL);
-
         Script script = Script.getInstance();
         if (scriptURL != null) {
             try {
