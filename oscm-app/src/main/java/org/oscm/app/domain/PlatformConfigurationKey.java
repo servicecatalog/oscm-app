@@ -73,21 +73,9 @@ public enum PlatformConfigurationKey {
     APP_ADMIN_MAIL_ADDRESS("mail"),
 
     /**
-     * The BSS authentication mode (INTERNAL, SAML_SP, SAML_IDP, OPENID_RP)
+     * The BSS authentication mode (INTERNAL, OIDC)
      */
     BSS_AUTH_MODE("string"),
-
-    /**
-     * The URL base to the BSS service endpoint locations for SAML_SP
-     * authentication mode.
-     */
-    BSS_STS_WEBSERVICE_URL(false, "url"),
-
-    /**
-     * The URL base to the BSS service WSDL locations for SAML_SP authentication
-     * mode.
-     */
-    BSS_STS_WEBSERVICE_WSDL_URL(false, "url"),
 
     /**
      * The keystore password.

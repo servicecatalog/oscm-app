@@ -381,10 +381,11 @@ public class APPDataAccessService {
     protected DataSource getDatasource() throws Exception {
         if (ds == null) {
             try {
-                final Properties ctxProperties = new Properties();
-                ctxProperties.putAll(System.getProperties());
-                Context namingContext = getNamingContext(ctxProperties);
-                ds = (DataSource) namingContext.lookup(DATASOURCE);
+                Properties p = new Properties();
+                p.put(Context.INITIAL_CONTEXT_FACTORY,
+                                    "org.apache.openejb.core.OpenEJBInitialContextFactory");
+                Context namingContext = new InitialContext(p);
+                ds = (DataSource) namingContext.lookup(DATASOURCE); 
             } catch (Exception e) {
                 throw new Exception("Datasource " + DATASOURCE + " not found.",
                         e);
