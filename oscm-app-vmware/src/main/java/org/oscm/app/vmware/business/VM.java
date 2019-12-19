@@ -297,7 +297,7 @@ public class VM extends Template {
             }
         }
     }
-  
+
     public void updateLinuxVMPassword(VMPropertyHandler paramHandler)
             throws Exception {
         LOG.debug("instanceName: " + instanceName);
@@ -307,13 +307,8 @@ public class VM extends Template {
         String updateScript = VMScripts.updateLinuxVMRootPassword(password);
         Script script = Script.getInstance();
         if (updateScript != null) {
-            try {
-                script.initScript(paramHandler, detectOs(), updateScript);
-                script.execute(vmw, vmInstance);
-            } catch (Exception e) {
-                script.setScriptExecuting(false);
-                throw e;
-            }
+            script.initScript(paramHandler, detectOs(), updateScript);
+            script.execute(vmw, vmInstance);
         }
     }
 

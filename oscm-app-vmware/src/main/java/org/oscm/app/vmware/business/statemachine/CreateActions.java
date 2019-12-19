@@ -218,6 +218,7 @@ public class CreateActions extends Actions {
       String message =
           Messages.get(ph.getLocale(), "error_execute_script", new Object[] {instanceId});
       ph.setSetting(VMPropertyHandler.SM_ERROR_MESSAGE, message.concat(e.getMessage()));
+      
       return EVENT_FAILED;
     } finally {
       if (vmClient != null) {

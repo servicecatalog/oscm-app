@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -33,12 +34,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vmware.vim25.FileTransferInformation;
+import com.vmware.vim25.GuestOperationsFaultFaultMsg;
 import com.vmware.vim25.GuestPosixFileAttributes;
 import com.vmware.vim25.GuestProcessInfo;
 import com.vmware.vim25.GuestProgramSpec;
 import com.vmware.vim25.GuestWindowsFileAttributes;
+import com.vmware.vim25.InvalidStateFaultMsg;
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.NamePasswordAuthentication;
+import com.vmware.vim25.RuntimeFaultFaultMsg;
+import com.vmware.vim25.TaskInProgressFaultMsg;
 import com.vmware.vim25.VimPortType;
 
 public class Script {
@@ -88,12 +93,16 @@ public class Script {
         this.ph = ph;
         this.os = os;
 
-        sp = new ServiceParamRetrieval(ph);
+        sp = createServiceParameterRetrieval(ph);
         guestUserId = ph.getServiceSetting(VMPropertyHandler.TS_SCRIPT_USERID);
         guestPassword = ph.getServiceSetting(VMPropertyHandler.TS_SCRIPT_PWD);
 
         // TODO load certificate from vSphere host and install somehow
         disableSSL();
+    }
+
+    protected ServiceParamRetrieval createServiceParameterRetrieval(VMPropertyHandler ph) {
+        return new ServiceParamRetrieval(ph);
     }
     
     public enum OS {
@@ -197,7 +206,7 @@ public class Script {
         return writer.toString();
     }
 
-    private void uploadScriptFileToVM(VimPortType vimPort,
+    protected void uploadScriptFileToVM(VimPortType vimPort,
             ManagedObjectReference vmwInstance,
             ManagedObjectReference fileManagerRef,
             NamePasswordAuthentication auth, String script, String hostname)
@@ -262,7 +271,16 @@ public class Script {
     }
 
     private String insertServiceParameter() throws Exception {
-        LOG.debug("Script before patching:\n" + executableScript);
+        
+        String logExecutableScript = executableScript;
+        
+        if ("UPDATE_LINUX_PASSWORD"
+                .equals(ph.getServiceSetting(VMPropertyHandler.SM_STATE))) {
+            logExecutableScript = hideScriptPasswords(executableScript, 
+                    ph.getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD));
+        } 
+        
+        LOG.debug("Script before patching:\n" + logExecutableScript);
 
         String firstLine = executableScript.substring(0,
                 executableScript.indexOf(os.getLineEnding()));
@@ -287,11 +305,22 @@ public class Script {
             patchedScript = firstLine + os.getLineEnding() + sb.toString()
                     + os.getLineEnding() + rest;
         }
-
-        String logPatchedScript = hidePasswords(patchedScript, passwords, os);
-
+        String logPatchedScript ="";
+        if ("UPDATE_LINUX_PASSWORD"
+                .equals(ph.getServiceSetting(VMPropertyHandler.SM_STATE))) {
+            logPatchedScript = hideScriptPasswords(patchedScript, 
+                    ph.getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD));
+            logPatchedScript = hidePasswords(logPatchedScript, passwords, os);
+        } else {
+            logPatchedScript = hidePasswords(patchedScript, passwords, os);
+        }
+            
         LOG.debug("Patched script:\n" + logPatchedScript);
         return patchedScript;
+    }
+
+    static String hideScriptPasswords (String script, String newPassword) {
+        return script.replace(newPassword, "'" + HIDDEN_PWD + "'");
     }
 
     static String hidePasswords(String script, List<String> passwords, OS os) {
@@ -336,7 +365,7 @@ public class Script {
         return passwords;
     }
 
-    List<String> addOsIndependetServiceParameters(StringBuffer sb)
+    protected List<String> addOsIndependetServiceParameters(StringBuffer sb)
             throws Exception {
         List<String> passwords = new ArrayList<String>();
         sb.append(buildParameterCommand(VMPropertyHandler.TS_INSTANCENAME,
@@ -422,108 +451,136 @@ public class Script {
         if (scriptExecuting == false) {
             executeScript(vmw, vmwInstance);
         }
-
     }
 
-    private void executeScript(VMwareClient vmw, ManagedObjectReference vmwInstance)
-            throws Exception {
-        
-        scriptExecuting = true;
-        
-        LOG.debug("");
+    private void executeScript(VMwareClient vmw,
+            ManagedObjectReference vmwInstance) throws Exception {
+        try {
+            setScriptExecuting(true);
+            LOG.debug("");
 
-        String vcenter = ph
-                .getServiceSetting(VMPropertyHandler.TS_TARGET_VCENTER_SERVER);
-        VimPortType vimPort = vmw.getConnection().getService();
-        ServiceConnection conn = new ServiceConnection(vimPort, vmw
-                .getConnection().getServiceContent());
-        ManagedObjectAccessor moa = new ManagedObjectAccessor(conn);
-        ManagedObjectReference guestOpManger = vmw.getConnection()
-                .getServiceContent().getGuestOperationsManager();
-        ManagedObjectReference fileManagerRef = (ManagedObjectReference) moa
-                .getDynamicProperty(guestOpManger, "fileManager");
-        ManagedObjectReference processManagerRef = (ManagedObjectReference) moa
-                .getDynamicProperty(guestOpManger, "processManager");
+            String vcenter = ph.getServiceSetting(
+                    VMPropertyHandler.TS_TARGET_VCENTER_SERVER);
+            VimPortType vimPort = vmw.getConnection().getService();
+            ServiceConnection conn = new ServiceConnection(vimPort,
+                    vmw.getConnection().getServiceContent());
+            ManagedObjectAccessor moa = getAccessor(conn);
+            ManagedObjectReference guestOpManger = vmw.getConnection()
+                    .getServiceContent().getGuestOperationsManager();
+            ManagedObjectReference fileManagerRef = (ManagedObjectReference) moa
+                    .getDynamicProperty(guestOpManger, "fileManager");
+            ManagedObjectReference processManagerRef = (ManagedObjectReference) moa
+                    .getDynamicProperty(guestOpManger, "processManager");
 
-        NamePasswordAuthentication auth = new NamePasswordAuthentication();
-        auth.setUsername(guestUserId);
-        auth.setPassword(guestPassword);
-        auth.setInteractiveSession(false);
-
-        String scriptPatched = insertServiceParameter();
-
-        DataAccessService das = new DataAccessService(ph.getLocale());
-        URL vSphereURL = new URL(das.getCredentials(vcenter).getURL());
-
-        uploadScriptFileToVM(vimPort, vmwInstance, fileManagerRef, auth,
-                scriptPatched, vSphereURL.getHost());
-        LOG.debug("Executing CreateTemporaryFile guest operation");
-        String tempFilePath = vimPort.createTemporaryFileInGuest(
-                fileManagerRef, vmwInstance, auth, "", "", "");
-        LOG.debug("Successfully created a temporary file at: " + tempFilePath
-                + " inside the guest");
-
-        GuestProgramSpec spec = new GuestProgramSpec();
-
-        if (os == OS.WINDOWS) {
-            spec.setProgramPath(WINDOWS_GUEST_FILE_PATH);
-            spec.setArguments(" > " + tempFilePath);
-        } else {
-            spec.setProgramPath(LINUX_GUEST_FILE_PATH);
-            spec.setArguments(" > " + tempFilePath + " 2>&1");
-        }
-        
-        LOG.debug("Starting the specified program inside the guest");
-        long pid = vimPort.startProgramInGuest(processManagerRef, vmwInstance,
-                auth, spec);
-        LOG.debug("Process ID of the program started is: " + pid + "");
-        
-        if("UPDATE_LINUX_PASSWORD".equals(ph.getServiceSetting(VMPropertyHandler.SM_STATE))){
+            NamePasswordAuthentication auth = new NamePasswordAuthentication();
             auth.setUsername(guestUserId);
-            auth.setPassword(ph
-                    .getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD));
-            guestPassword = ph
-                    .getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD);
-            ph.setServiceSetting(ph.getServiceSetting(VMPropertyHandler.TS_SCRIPT_PWD), ph
-                    .getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD));
-            Thread.sleep(1000);
-        }
-        
-        List<GuestProcessInfo> procInfo = null;
-        List<Long> pidsList = new ArrayList<Long>();
-        pidsList.add(Long.valueOf(pid));
-        do {
-            LOG.debug("Waiting for the process to finish running.");
-            try {
-                procInfo = vimPort.listProcessesInGuest(processManagerRef,
-                        vmwInstance, auth, pidsList);
-            } catch (Exception e) {
-                LOG.warn(
-                        "listProcessesInGuest() failed. setting new Linux root password for authentication",
-                        e);
-                if (os == OS.WINDOWS) {
-                    auth.setPassword(ph
-                            .getServiceSetting(VMPropertyHandler.TS_WINDOWS_LOCAL_ADMIN_PWD));
-                } else {
-                    auth.setPassword(ph
-                            .getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD));
-                }
-            }
-            Thread.sleep(1000);
-        } while (procInfo != null && procInfo.get(0).getEndTime() == null);
+            auth.setPassword(guestPassword);
+            auth.setInteractiveSession(false);
 
-        if (procInfo != null && procInfo.get(0).getExitCode().intValue() != 0) {
-            LOG.error("Script return code: " + procInfo.get(0).getExitCode());
-            FileTransferInformation fileTransferInformation = null;
-            fileTransferInformation = vimPort.initiateFileTransferFromGuest(
-                    fileManagerRef, vmwInstance, auth, tempFilePath);
-            String fileDownloadUrl = fileTransferInformation.getUrl()
-                    .replaceAll("\\*", vSphereURL.getHost());
-            LOG.debug("Downloading the output file from :" + fileDownloadUrl);
-            String scriptOutput = downloadFile(fileDownloadUrl);
-            LOG.error("Script execution output: " + scriptOutput);
+            String scriptPatched = insertServiceParameter();
+
+            URL vSphereURL = getVSphereURL(vcenter);
+
+            uploadScriptFileToVM(vimPort, vmwInstance, fileManagerRef, auth,
+                    scriptPatched, vSphereURL.getHost());
+            LOG.debug("Executing CreateTemporaryFile guest operation");
+            String tempFilePath = vimPort.createTemporaryFileInGuest(
+                    fileManagerRef, vmwInstance, auth, "", "", "");
+            LOG.debug("Successfully created a temporary file at: "
+                    + tempFilePath + " inside the guest");
+
+            GuestProgramSpec spec = new GuestProgramSpec();
+
+            if (os == OS.WINDOWS) {
+                spec.setProgramPath(WINDOWS_GUEST_FILE_PATH);
+                spec.setArguments(" > " + tempFilePath);
+            } else {
+                spec.setProgramPath(LINUX_GUEST_FILE_PATH);
+                spec.setArguments(" > " + tempFilePath + " 2>&1");
+            }
+
+            LOG.debug("Starting the specified program inside the guest");
+            long pid = vimPort.startProgramInGuest(processManagerRef,
+                    vmwInstance, auth, spec);
+            LOG.debug("Process ID of the program started is: " + pid + "");
+
+            if ("UPDATE_LINUX_PASSWORD"
+                    .equals(ph.getServiceSetting(VMPropertyHandler.SM_STATE))) {
+                auth.setUsername(guestUserId);
+                auth.setPassword(ph.getServiceSetting(
+                        VMPropertyHandler.TS_LINUX_ROOT_PWD));
+                guestPassword = ph
+                        .getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD);
+                ph.setServiceSetting(
+                        ph.getServiceSetting(VMPropertyHandler.TS_SCRIPT_PWD),
+                        ph.getServiceSetting(
+                                VMPropertyHandler.TS_LINUX_ROOT_PWD));
+                Thread.sleep(1000);
+            }
+
+            List<GuestProcessInfo> procInfo = null;
+            List<Long> pidsList = new ArrayList<Long>();
+            pidsList.add(Long.valueOf(pid));
+            do {
+                LOG.debug("Waiting for the process to finish running.");
+                try {
+                    procInfo = getProcInfo(vmwInstance, vimPort, processManagerRef, auth,
+                            pidsList);
+                } catch (Exception e) {
+                    LOG.warn(
+                            "listProcessesInGuest() failed. setting new Linux root password for authentication",
+                            e);
+                    if (os == OS.WINDOWS) {
+                        auth.setPassword(ph.getServiceSetting(
+                                VMPropertyHandler.TS_WINDOWS_LOCAL_ADMIN_PWD));
+                    } else {
+                        auth.setPassword(ph.getServiceSetting(
+                                VMPropertyHandler.TS_LINUX_ROOT_PWD));
+                    }
+                }
+                Thread.sleep(1000);
+            } while (procInfo != null && procInfo.get(0).getEndTime() == null);
+
+            if (procInfo != null
+                    && procInfo.get(0).getExitCode().intValue() != 0) {
+                LOG.error(
+                        "Script return code: " + procInfo.get(0).getExitCode());
+                FileTransferInformation fileTransferInformation = null;
+                fileTransferInformation = vimPort.initiateFileTransferFromGuest(
+                        fileManagerRef, vmwInstance, auth, tempFilePath);
+                String fileDownloadUrl = fileTransferInformation.getUrl()
+                        .replaceAll("\\*", vSphereURL.getHost());
+                LOG.debug(
+                        "Downloading the output file from :" + fileDownloadUrl);
+                String scriptOutput = downloadFile(fileDownloadUrl);
+                LOG.error("Script execution output: " + scriptOutput);
+            }
+            setScriptExecuting(false);
+            
+        } catch (Exception e) {
+            setScriptExecuting(false);
+            throw e;
         }
-        scriptExecuting = false;
+    }
+
+    protected List<GuestProcessInfo> getProcInfo(
+            ManagedObjectReference vmwInstance, VimPortType vimPort,
+            ManagedObjectReference processManagerRef,
+            NamePasswordAuthentication auth, List<Long> pidsList)
+            throws GuestOperationsFaultFaultMsg, InvalidStateFaultMsg,
+            RuntimeFaultFaultMsg, TaskInProgressFaultMsg {
+        return vimPort.listProcessesInGuest(processManagerRef,
+                vmwInstance, auth, pidsList);
+    }
+
+    protected URL getVSphereURL(String vcenter)
+            throws MalformedURLException, Exception {
+        DataAccessService das = new DataAccessService(ph.getLocale());
+        return new URL(das.getCredentials(vcenter).getURL());
+    }
+
+    protected ManagedObjectAccessor getAccessor(ServiceConnection conn) {
+        return new ManagedObjectAccessor(conn);
     }
 
     public boolean isScriptExecuting() {
