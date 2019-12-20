@@ -129,7 +129,7 @@ public class ScriptTest {
     @Test
     public void initScript() throws Exception {
         // given
-        String updateScript = VMScripts
+        String updateScript = VMScript
                 .updateLinuxVMRootPassword("testPassword");
 
         // when
@@ -142,7 +142,7 @@ public class ScriptTest {
     @Test
     public void executeUpdateScript() throws Exception {
         // given
-        String updateScript = VMScripts
+        String updateScript = VMScript
                 .updateLinuxVMRootPassword("testPassword");
         script.initScript(vph, os, updateScript);
 
@@ -158,7 +158,7 @@ public class ScriptTest {
     @Test
     public void executeUpdateScript_withSetPwException() throws Exception {
         // given
-        String updateScript = VMScripts
+        String updateScript = VMScript
                 .updateLinuxVMRootPassword("testPassword");
         script.initScript(vph, os, updateScript);
 
@@ -176,7 +176,7 @@ public class ScriptTest {
     @Test
     public void executeUpdateScript_withException() throws Exception {
         // given
-        String updateScript = VMScripts
+        String updateScript = VMScript
                 .updateLinuxVMRootPassword("testPassword");
         script.initScript(vph, os, updateScript);
 

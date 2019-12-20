@@ -12,7 +12,7 @@ package org.oscm.app.vmware.business;
  * @author worf
  *
  */
-public class VMScripts {
+public class VMScript {
 
     private static final String LINUX_SCRIPT_HEADER = "#!/bin/sh";
     
