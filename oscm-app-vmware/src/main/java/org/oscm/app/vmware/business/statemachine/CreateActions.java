@@ -208,7 +208,7 @@ public class CreateActions extends Actions {
       vmClient = VMClientPool.getInstance().getPool().borrowObject(vcenter);
       if (ph.getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD) != null) {
         VM vm = new VM(vmClient, ph.getInstanceName());
-          if(vm.isScriptExecuting() == false) {
+          if(!vm.isScriptExecuting()) {
             vm.updateLinuxVMPassword(ph);
           }
       }

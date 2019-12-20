@@ -106,10 +106,10 @@ public class ScriptTest {
     
     private void mockScript() {
         script = spy(script);
-        setMock(script);
+        setSpy(script);
     }
 
-    private void setMock(Script mock) {
+    private void setSpy(Script mock) {
         try {
             Field script = Script.class.getDeclaredField("script");
             script.setAccessible(true);

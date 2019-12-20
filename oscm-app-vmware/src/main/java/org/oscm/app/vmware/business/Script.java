@@ -274,8 +274,7 @@ public class Script {
         
         String logExecutableScript = executableScript;
         
-        if ("UPDATE_LINUX_PASSWORD"
-                .equals(ph.getServiceSetting(VMPropertyHandler.SM_STATE))) {
+        if (isUpdatingLinuxPassword()) {
             logExecutableScript = hideScriptPasswords(executableScript, 
                     ph.getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD));
         } 
@@ -306,8 +305,7 @@ public class Script {
                     + os.getLineEnding() + rest;
         }
         String logPatchedScript ="";
-        if ("UPDATE_LINUX_PASSWORD"
-                .equals(ph.getServiceSetting(VMPropertyHandler.SM_STATE))) {
+        if (isUpdatingLinuxPassword()) {
             logPatchedScript = hideScriptPasswords(patchedScript, 
                     ph.getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD));
             logPatchedScript = hidePasswords(logPatchedScript, passwords, os);
@@ -504,8 +502,7 @@ public class Script {
                     vmwInstance, auth, spec);
             LOG.debug("Process ID of the program started is: " + pid + "");
 
-            if ("UPDATE_LINUX_PASSWORD"
-                    .equals(ph.getServiceSetting(VMPropertyHandler.SM_STATE))) {
+            if (isUpdatingLinuxPassword()) {
                 auth.setUsername(guestUserId);
                 auth.setPassword(ph.getServiceSetting(
                         VMPropertyHandler.TS_LINUX_ROOT_PWD));
@@ -561,6 +558,11 @@ public class Script {
             setScriptExecuting(false);
             throw e;
         }
+    }
+
+    private boolean isUpdatingLinuxPassword() {
+        return "UPDATE_LINUX_PASSWORD"
+                .equals(ph.getServiceSetting(VMPropertyHandler.SM_STATE));
     }
 
     protected List<GuestProcessInfo> getProcInfo(
