@@ -38,13 +38,10 @@ public class ScriptExecutionObjectReferences {
         moa = getAccessor(conn);
         guestOpManger = vmw.getConnection()
                 .getServiceContent().getGuestOperationsManager();
-        
         fileManagerRef = (ManagedObjectReference) moa
                 .getDynamicProperty(guestOpManger, "fileManager");
-        
         processManagerRef = (ManagedObjectReference) moa
                 .getDynamicProperty(guestOpManger, "processManager");
-
     }
     
     protected ManagedObjectAccessor getAccessor(ServiceConnection conn) {
