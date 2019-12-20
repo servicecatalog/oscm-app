@@ -61,8 +61,6 @@ public class ServiceParamRetrieval {
 			VOSubscriptionDetails subscr = subSvc.getSubscriptionForCustomer(customerOrgId,
 					ph.getSettings().getSubscriptionId());
 
-			APPDataAccessService das = new APPDataAccessService();
-			credentials = das.getCredentials(subscr.getSubscribedService().getSellerId());
 			ServiceProvisioningService provSvc = bes.getWebService(ServiceProvisioningService.class, credentials);
 			VOService svc = subscr.getSubscribedService();
 			service = provSvc.getServiceDetails(svc);
