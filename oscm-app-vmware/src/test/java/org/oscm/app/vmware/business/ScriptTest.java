@@ -62,6 +62,7 @@ public class ScriptTest {
     @Mock ManagedObjectReference processManagerRef;
     @Mock ManagedObjectAccessor moa;
     @Mock GuestProcessInfo procInf;
+    @Mock ScriptExecutionObjectReferences objectRef;
     
     
 
@@ -82,15 +83,14 @@ public class ScriptTest {
         procInfo.add(procInf);
         
         doReturn(spr).when(script).createServiceParameterRetrieval(any(VMPropertyHandler.class));
-        when(vmw.getConnection()).thenReturn(sCon);
-        when(sCon.getService()).thenReturn(vimPort);
-        when(sCon.getServiceContent()).thenReturn(sCont);
-        when(sCont.getGuestOperationsManager()).thenReturn(guestOpManager);
-        doReturn(moa).when(script).getAccessor(any());
-        doReturn(fileManagerRef).when(moa).getDynamicProperty(Matchers.any(), Matchers.eq("fileManager"));
-        doReturn(processManagerRef).when(moa).getDynamicProperty(Matchers.any(), Matchers.eq("processManager"));
+        doReturn(objectRef).when(script).getScriptExecutionObjectReferences(any());
+        doReturn(guestOpManager).when(objectRef).getGuestOpManger();
+        doReturn(fileManagerRef).when(objectRef).getFileManagerRef();
+        doReturn(processManagerRef).when(objectRef).getProcessManagerRef();
+        doReturn(vimPort).when(objectRef).getVimPort();
+        doReturn(moa).when(objectRef).getMoa();
         doReturn(pwList).when(script).addOsIndependetServiceParameters(any());
-        doReturn(new URL("https://github.com/servicecatalog/")).when(script).getVSphereURL(any());
+        doReturn(new URL("https://github.com/servicecatalog/")).when(script).getVSphereURL();
         doNothing().when(script).uploadScriptFileToVM(any(), any(), any(), any(), any(), any());
         doReturn(procInfo).when(script).getProcInfo(any(), any(), any(), any(), any());
         when(procInf.getEndTime()).thenReturn(getDate());
@@ -182,7 +182,7 @@ public class ScriptTest {
 
         // when
         try {
-            when(script.getVSphereURL(any()))
+            when(script.getVSphereURL())
                     .thenThrow(new Exception(any(), any()));
             script.execute(vmw, vmwInstance);
         } catch (Exception e) {
