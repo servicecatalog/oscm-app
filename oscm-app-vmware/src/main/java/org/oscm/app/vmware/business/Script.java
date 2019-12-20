@@ -446,7 +446,7 @@ public class Script {
     
     public void execute(VMwareClient vmw, ManagedObjectReference vmwInstance)
             throws Exception {
-        if (scriptExecuting == false) {
+        if (!scriptExecuting) {
             executeScript(vmw, vmwInstance);
         }
     }
@@ -503,16 +503,7 @@ public class Script {
             LOG.debug("Process ID of the program started is: " + pid + "");
 
             if (isUpdatingLinuxPassword()) {
-                auth.setUsername(guestUserId);
-                auth.setPassword(ph.getServiceSetting(
-                        VMPropertyHandler.TS_LINUX_ROOT_PWD));
-                guestPassword = ph
-                        .getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD);
-                ph.setServiceSetting(
-                        ph.getServiceSetting(VMPropertyHandler.TS_SCRIPT_PWD),
-                        ph.getServiceSetting(
-                                VMPropertyHandler.TS_LINUX_ROOT_PWD));
-                Thread.sleep(1000);
+                setUpdatedPassword(auth);
             }
 
             List<GuestProcessInfo> procInfo = null;
@@ -558,6 +549,20 @@ public class Script {
             setScriptExecuting(false);
             throw e;
         }
+    }
+
+    private void setUpdatedPassword(NamePasswordAuthentication auth)
+            throws InterruptedException {
+        auth.setUsername(guestUserId);
+        auth.setPassword(ph.getServiceSetting(
+                VMPropertyHandler.TS_LINUX_ROOT_PWD));
+        guestPassword = ph
+                .getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD);
+        ph.setServiceSetting(
+                ph.getServiceSetting(VMPropertyHandler.TS_SCRIPT_PWD),
+                ph.getServiceSetting(
+                        VMPropertyHandler.TS_LINUX_ROOT_PWD));
+        Thread.sleep(1000);
     }
 
     private boolean isUpdatingLinuxPassword() {

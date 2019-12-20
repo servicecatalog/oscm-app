@@ -1615,7 +1615,7 @@ public class VMPropertyHandler {
     return value;
   }
 
-  /** Returns a service setting or NULL if not set */
+  /** Set a service setting*/
   public String getServiceSetting(String key) {
     return getValue(key, settings.getParameters());
   }
