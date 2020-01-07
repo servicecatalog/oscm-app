@@ -8,6 +8,7 @@
 
 package org.oscm.app.vmware.business;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
@@ -22,7 +23,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -36,6 +36,7 @@ import org.oscm.app.vmware.remote.vmware.VMwareClient;
 
 import com.vmware.vim25.GuestOperationsFaultFaultMsg;
 import com.vmware.vim25.GuestProcessInfo;
+import com.vmware.vim25.GuestProgramSpec;
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.ServiceContent;
 import com.vmware.vim25.VimPortType;
@@ -64,7 +65,8 @@ public class ScriptTest {
     @Mock GuestProcessInfo procInf;
     @Mock ScriptExecutionObjectReferences objectRef;
     
-    
+    String WINDOWS_GUEST_FILE_PATH = "WINDOWS_GUEST_FILE_PATH";
+    String LINUX_GUEST_FILE_PATH = "LINUX_GUEST_FILE_PATH";
 
     @Before
     public void setUp() throws Exception {
@@ -372,5 +374,47 @@ public class ScriptTest {
         assertTrue(changedScript.contains("SCRIPT_PWD=" + Script.HIDDEN_PWD));
         System.out.println(changedScript);
     }
-
+    
+    @Test
+    public void getGuestProgramSpecLinux(){
+        //given
+        String tempFilePath = "test/testPath/Linux";
+        
+        //when
+        GuestProgramSpec spec = script.getGuestProgramSpec(tempFilePath);
+        
+        //then
+        assertEquals(spec.getArguments(), " > " + tempFilePath + " 2>&1");
+    }
+    
+    @Test
+    public void getGuestProgramSpecWindows() throws Exception{
+        //given
+        String tempFilePath = "test\\testPath\\Windows";
+        os = OS.WINDOWS;
+        String updateScript = VMScript
+                .updateLinuxVMRootPassword("testPassword");
+        script.initScript(vph, os, updateScript);
+        //when
+        GuestProgramSpec spec = script.getGuestProgramSpec(tempFilePath);
+        
+        //then
+        assertEquals(spec.getArguments(), " > " + tempFilePath);
+    }
+    
+    @Test
+    public void getScriptExecutionObjectReferences() throws Exception {
+        //given
+        
+        //when
+        ScriptExecutionObjectReferences objectRef = script.getScriptExecutionObjectReferences(
+                vmw);
+        
+        //then
+        assertEquals(objectRef.getGuestOpManger(), guestOpManager);
+        assertEquals(objectRef.getFileManagerRef(), fileManagerRef);
+        assertEquals(objectRef.getMoa(), moa);
+        assertEquals(objectRef.getProcessManagerRef(), processManagerRef);
+    }
+    
 }

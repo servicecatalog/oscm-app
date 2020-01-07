@@ -552,7 +552,7 @@ public class Script {
         }
     }
 
-    private GuestProgramSpec getGuestProgramSpec(String tempFilePath) {
+    protected GuestProgramSpec getGuestProgramSpec(String tempFilePath) {
         GuestProgramSpec spec = new GuestProgramSpec();
 
         if (os == OS.WINDOWS) {
