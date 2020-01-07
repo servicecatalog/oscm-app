@@ -1615,12 +1615,10 @@ public class VMPropertyHandler {
     return value;
   }
 
-  /** Set a service setting*/
   public String getServiceSetting(String key) {
     return getValue(key, settings.getParameters());
   }
   
-  /** Returns a service setting or NULL if not set */
   public void setServiceSetting(String key, String value) {
      setValue(key, value, settings.getParameters());
   }

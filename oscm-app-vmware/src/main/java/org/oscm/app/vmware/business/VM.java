@@ -302,7 +302,7 @@ public class VM extends Template {
 
         String password = paramHandler
                 .getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD);
-        String updateScript = VMScripts.updateLinuxVMRootPassword(password);
+        String updateScript = VMScript.updateLinuxVMRootPassword(password);
         Script script = Script.getInstance();
         if (updateScript != null) {
             script.initScript(paramHandler, detectOs(), updateScript);

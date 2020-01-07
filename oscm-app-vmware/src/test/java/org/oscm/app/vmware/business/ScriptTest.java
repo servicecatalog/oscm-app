@@ -8,6 +8,7 @@
 
 package org.oscm.app.vmware.business;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
@@ -22,7 +23,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -36,7 +36,9 @@ import org.oscm.app.vmware.remote.vmware.VMwareClient;
 
 import com.vmware.vim25.GuestOperationsFaultFaultMsg;
 import com.vmware.vim25.GuestProcessInfo;
+import com.vmware.vim25.GuestProgramSpec;
 import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.NamePasswordAuthentication;
 import com.vmware.vim25.ServiceContent;
 import com.vmware.vim25.VimPortType;
 
@@ -62,9 +64,13 @@ public class ScriptTest {
     @Mock ManagedObjectReference processManagerRef;
     @Mock ManagedObjectAccessor moa;
     @Mock GuestProcessInfo procInf;
+    @Mock ScriptExecutionObjectReferences objectRef;
     
+    String WINDOWS_GUEST_FILE_PATH = "WINDOWS_GUEST_FILE_PATH";
+    String LINUX_GUEST_FILE_PATH = "LINUX_GUEST_FILE_PATH";
+    String guestUserId = "guestUserId";
+    String guestPassword = "guestPassword";
     
-
     @Before
     public void setUp() throws Exception {
         mockScript();
@@ -82,15 +88,14 @@ public class ScriptTest {
         procInfo.add(procInf);
         
         doReturn(spr).when(script).createServiceParameterRetrieval(any(VMPropertyHandler.class));
-        when(vmw.getConnection()).thenReturn(sCon);
-        when(sCon.getService()).thenReturn(vimPort);
-        when(sCon.getServiceContent()).thenReturn(sCont);
-        when(sCont.getGuestOperationsManager()).thenReturn(guestOpManager);
-        doReturn(moa).when(script).getAccessor(any());
-        doReturn(fileManagerRef).when(moa).getDynamicProperty(Matchers.any(), Matchers.eq("fileManager"));
-        doReturn(processManagerRef).when(moa).getDynamicProperty(Matchers.any(), Matchers.eq("processManager"));
+        doReturn(objectRef).when(script).getScriptExecutionObjectReferences(any());
+        doReturn(guestOpManager).when(objectRef).getGuestOpManger();
+        doReturn(fileManagerRef).when(objectRef).getFileManagerRef();
+        doReturn(processManagerRef).when(objectRef).getProcessManagerRef();
+        doReturn(vimPort).when(objectRef).getVimPort();
+        doReturn(moa).when(objectRef).getMoa();
         doReturn(pwList).when(script).addOsIndependetServiceParameters(any());
-        doReturn(new URL("https://github.com/servicecatalog/")).when(script).getVSphereURL(any());
+        doReturn(new URL("https://github.com/servicecatalog/")).when(script).getVSphereURL();
         doNothing().when(script).uploadScriptFileToVM(any(), any(), any(), any(), any(), any());
         doReturn(procInfo).when(script).getProcInfo(any(), any(), any(), any(), any());
         when(procInf.getEndTime()).thenReturn(getDate());
@@ -126,23 +131,11 @@ public class ScriptTest {
        script.set(null, null);
     }
     
-    @Test
-    public void initScript() throws Exception {
-        // given
-        String updateScript = VMScripts
-                .updateLinuxVMRootPassword("testPassword");
-
-        // when
-        script.initScript(vph, os, updateScript);
-
-        // then
-        verify(script).initScript(vph, os, updateScript);
-    }
 
     @Test
     public void executeUpdateScript() throws Exception {
         // given
-        String updateScript = VMScripts
+        String updateScript = VMScript
                 .updateLinuxVMRootPassword("testPassword");
         script.initScript(vph, os, updateScript);
 
@@ -158,7 +151,7 @@ public class ScriptTest {
     @Test
     public void executeUpdateScript_withSetPwException() throws Exception {
         // given
-        String updateScript = VMScripts
+        String updateScript = VMScript
                 .updateLinuxVMRootPassword("testPassword");
         script.initScript(vph, os, updateScript);
 
@@ -176,13 +169,13 @@ public class ScriptTest {
     @Test
     public void executeUpdateScript_withException() throws Exception {
         // given
-        String updateScript = VMScripts
+        String updateScript = VMScript
                 .updateLinuxVMRootPassword("testPassword");
         script.initScript(vph, os, updateScript);
 
         // when
         try {
-            when(script.getVSphereURL(any()))
+            when(script.getVSphereURL())
                     .thenThrow(new Exception(any(), any()));
             script.execute(vmw, vmwInstance);
         } catch (Exception e) {
@@ -372,5 +365,63 @@ public class ScriptTest {
         assertTrue(changedScript.contains("SCRIPT_PWD=" + Script.HIDDEN_PWD));
         System.out.println(changedScript);
     }
-
+    
+    @Test
+    public void getGuestProgramSpecLinux(){
+        //given
+        String tempFilePath = "test/testPath/Linux";
+        
+        //when
+        GuestProgramSpec spec = script.getGuestProgramSpec(tempFilePath);
+        
+        //then
+        assertEquals(spec.getArguments(), " > " + tempFilePath + " 2>&1");
+    }
+    
+    @Test
+    public void getGuestProgramSpecWindows() throws Exception{
+        //given
+        String tempFilePath = "test\\testPath\\Windows";
+        os = OS.WINDOWS;
+        String updateScript = VMScript
+                .updateLinuxVMRootPassword("testPassword");
+        script.initScript(vph, os, updateScript);
+        //when
+        GuestProgramSpec spec = script.getGuestProgramSpec(tempFilePath);
+        
+        //then
+        assertEquals(spec.getArguments(), " > " + tempFilePath);
+    }
+    
+    @Test
+    public void getScriptExecutionObjectReferences() throws Exception {
+        //given
+        
+        //when
+        ScriptExecutionObjectReferences objectRef = script.getScriptExecutionObjectReferences(
+                vmw);
+        
+        //then
+        assertEquals(objectRef.getGuestOpManger(), guestOpManager);
+        assertEquals(objectRef.getFileManagerRef(), fileManagerRef);
+        assertEquals(objectRef.getMoa(), moa);
+        assertEquals(objectRef.getProcessManagerRef(), processManagerRef);
+    }
+    
+    @Test
+    public void getPasswordAuthentication() {
+        //given
+        NamePasswordAuthentication autentication = new NamePasswordAuthentication();
+        autentication.setPassword(guestPassword);
+        autentication.setUsername(guestUserId);
+        doReturn(autentication).when(script).getPasswordAuthentication();
+        
+        //when
+        NamePasswordAuthentication auth = script.getPasswordAuthentication();
+        
+        //then
+        assertEquals(guestPassword, auth.getPassword());
+        assertEquals(guestUserId, auth.getUsername());
+    }
+    
 }
