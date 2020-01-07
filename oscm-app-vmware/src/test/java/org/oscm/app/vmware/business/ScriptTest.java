@@ -131,18 +131,6 @@ public class ScriptTest {
        script.set(null, null);
     }
     
-    @Test
-    public void initScript() throws Exception {
-        // given
-        String updateScript = VMScript
-                .updateLinuxVMRootPassword("testPassword");
-
-        // when
-        script.initScript(vph, os, updateScript);
-
-        // then
-        verify(script).initScript(vph, os, updateScript);
-    }
 
     @Test
     public void executeUpdateScript() throws Exception {
