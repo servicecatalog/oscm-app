@@ -565,7 +565,7 @@ public class Script {
         return spec;
     }
 
-    private NamePasswordAuthentication getPasswordAuthentication() {
+    protected NamePasswordAuthentication getPasswordAuthentication() {
         NamePasswordAuthentication auth = new NamePasswordAuthentication();
         auth.setUsername(guestUserId);
         auth.setPassword(guestPassword);

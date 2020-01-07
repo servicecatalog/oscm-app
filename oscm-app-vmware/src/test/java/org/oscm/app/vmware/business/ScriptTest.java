@@ -38,6 +38,7 @@ import com.vmware.vim25.GuestOperationsFaultFaultMsg;
 import com.vmware.vim25.GuestProcessInfo;
 import com.vmware.vim25.GuestProgramSpec;
 import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.NamePasswordAuthentication;
 import com.vmware.vim25.ServiceContent;
 import com.vmware.vim25.VimPortType;
 
@@ -67,7 +68,9 @@ public class ScriptTest {
     
     String WINDOWS_GUEST_FILE_PATH = "WINDOWS_GUEST_FILE_PATH";
     String LINUX_GUEST_FILE_PATH = "LINUX_GUEST_FILE_PATH";
-
+    String guestUserId = "guestUserId";
+    String guestPassword = "guestPassword";
+    
     @Before
     public void setUp() throws Exception {
         mockScript();
@@ -415,6 +418,22 @@ public class ScriptTest {
         assertEquals(objectRef.getFileManagerRef(), fileManagerRef);
         assertEquals(objectRef.getMoa(), moa);
         assertEquals(objectRef.getProcessManagerRef(), processManagerRef);
+    }
+    
+    @Test
+    public void getPasswordAuthentication() {
+        //given
+        NamePasswordAuthentication autentication = new NamePasswordAuthentication();
+        autentication.setPassword(guestPassword);
+        autentication.setUsername(guestUserId);
+        doReturn(autentication).when(script).getPasswordAuthentication();
+        
+        //when
+        NamePasswordAuthentication auth = script.getPasswordAuthentication();
+        
+        //then
+        assertEquals(guestPassword, auth.getPassword());
+        assertEquals(guestUserId, auth.getUsername());
     }
     
 }
