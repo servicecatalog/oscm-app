@@ -76,6 +76,12 @@ public class PropertyHandler {
      * used for service calls to Catalog Manager.
      */
     public static final String BSS_USER_PWD = "APP_BSS_USER_PWD";
+    
+    /**
+     * The key of the property for specifying the APP base URL 
+     * used to create the event link to notify the instance.
+     */
+    public static final String APP_BASE_URL = "APP_BASE_URL";
 
     /**
      * Default constructor.
@@ -124,6 +130,15 @@ public class PropertyHandler {
      */
     public String getPassword() {
         return getValue(TECPARAM_PWD, settings.getParameters());
+    }
+    
+    /**
+     * Returns the APP base URL.
+     * 
+     * @return the APP base URL as a string
+     */
+    public String getAppBaseUrl() {
+        return getValue(APP_BASE_URL, settings.getParameters());
     }
 
     /**

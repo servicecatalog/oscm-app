@@ -26,6 +26,7 @@ import javax.mail.internet.MimeMessage;
 import javax.naming.InitialContext;
 
 import org.oscm.app.sample.controller.email.HTMLEmail;
+import org.oscm.app.sample.controller.email.ProvisioningEmail;
 import org.oscm.app.sample.controller.email.TextEmail;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
 import org.oscm.app.v2_0.data.Setting;
@@ -45,13 +46,18 @@ public abstract class Email {
     protected PrintStream ps;
   
     static Email get(ProvisioningSettings ps) {
+        PropertyHandler propertyHandler = new PropertyHandler(ps);
         final Setting style = ps.getParameters().get(CSS_STYLE);
         if (style != null) {
             String CSS = style.getValue();
             if (CSS.length() > 0)
                 return new HTMLEmail(ps, CSS);
         }
-        return new TextEmail(ps);
+        if (Status.MANUAL_CREATION == propertyHandler.getState()) {
+            return new ProvisioningEmail(ps);
+        } else {
+            return new TextEmail(ps);
+        }
     }
     
     static class Key {

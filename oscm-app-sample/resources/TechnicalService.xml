@@ -34,6 +34,10 @@
       default="">
       <LocalizedDescription locale="en">IAAS password</LocalizedDescription>
     </ParameterDefinition>
+    <ParameterDefinition id="APP_BASE_URL" configurable="true" mandatory="false" valueType="STRING"
+      default="">
+      <LocalizedDescription locale="en">The APP base URL</LocalizedDescription>
+    </ParameterDefinition>
     <!-- 
         Use CSSSTYLE for HTML emails
         

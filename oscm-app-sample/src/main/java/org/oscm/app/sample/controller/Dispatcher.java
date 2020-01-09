@@ -11,6 +11,8 @@
 
 package org.oscm.app.sample.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,7 +43,8 @@ import org.slf4j.LoggerFactory;
  */
 public class Dispatcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Dispatcher.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(Dispatcher.class);
 
     // The ID of the application instance
     private String instanceId;
@@ -51,6 +54,10 @@ public class Dispatcher {
 
     // An APPlatformService instance which provides for email communication
     private APPlatformService platformService;
+
+    private static final String EVENT_KEY_NOTIFY = "notify";
+    private static final String EVENT_KEY_RESUME = "_resume";
+    private static final String EVENT_VALUE_YES = "yes";
 
     /**
      * Constructs a new dispatcher.
@@ -120,19 +127,39 @@ public class Dispatcher {
         case CREATION_STEP1:
             platformService.lockServiceInstance("ess.sample", instanceId,
                     paramHandler.getTPAuthentication());
-            newStatus = Status.CREATION_STEP2;
+            
+            if (null == paramHandler.getAppBaseUrl()
+                    || paramHandler.getAppBaseUrl().isEmpty()) {
+                newStatus = Status.CREATION_STEP2;
+            } else
+                newStatus = Status.MANUAL_CREATION;
             break;
 
         case CREATION_STEP2:
             platformService.unlockServiceInstance("ess.sample", instanceId,
                     paramHandler.getTPAuthentication());
             newStatus = Status.FINISHED;
-            sendMail(instanceId, currentState);
+            sendMail(instanceId, getSampleText(currentState));
             break;
 
+        case MANUAL_CREATION:
+            platformService.unlockServiceInstance("ess.sample", instanceId,
+                    paramHandler.getTPAuthentication());
+            newStatus = Status.WAITING_FOR_ACTIVATION;
+            sendMail(instanceId, getManualProvisioningText(currentState));
+            break;
+            
+        case WAITING_FOR_ACTIVATION:
+            //do nothing, just wait until the status changes
+            break;
+        
+        case FINSIHING_MANUAL_PROVISIONING:
+            newStatus = Status.FINISHED;
+            break;
+            
         case UPDATING:
             newStatus = Status.FINISHED;
-            sendMail(instanceId, currentState);
+            sendMail(instanceId, getSampleText(currentState));
             break;
 
         case DELETING:
@@ -173,8 +200,43 @@ public class Dispatcher {
         if (result.isReady()) {
             result.setAccessInfo("Access information for instance " + instanceId);
         }
-
+        
+        if(Status.WAITING_FOR_ACTIVATION.equals(paramHandler.getState())){
+            result.setRunWithTimer(false);
+        }
+        
         return result;
+    }
+    
+    private String getSampleText(Status currentState) {
+        return Messages.get(Messages.DEFAULT_LOCALE, "mail.text",
+                new Object[] { instanceId, paramHandler.getMessage(),
+                        currentState.toString() });
+    }
+
+    protected String getManualProvisioningText(Status currentState) {
+        return Messages.get(Messages.DEFAULT_LOCALE,
+                "mail.text.manual.provisioning",
+                new Object[] { paramHandler.getMessage(), getEventLink()});
+    }
+
+    protected String getEventLink() {
+        StringBuffer eventLink = new StringBuffer();
+        try {
+            eventLink.append(paramHandler.getAppBaseUrl()).append("/")
+                    .append(EVENT_KEY_NOTIFY).append("?").append("sid=")
+                    .append(URLEncoder.encode(instanceId, "UTF-8")).append('&')
+                    .append("controllerid=")
+                    .append(URLEncoder.encode(
+                            paramHandler.getSettings().getParameters()
+                                    .get("APP_CONTROLLER_ID").getValue(),
+                            "UTF-8"))
+                    .append('&').append(EVENT_KEY_RESUME).append('=')
+                    .append(EVENT_VALUE_YES);
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.error("Failed to create event link", e);
+        }
+        return eventLink.toString();
     }
 
     /**
@@ -188,18 +250,18 @@ public class Dispatcher {
      * @throws APPlatformException
      *             - if an error occurred on mail delivery
      */
-    private void sendMail(String instanceId, Status currentState) throws APPlatformException {
+    protected void sendMail(String instanceId, String text)
+            throws APPlatformException {
         // Create mail subject and contents
         String subject = Messages.get(Messages.DEFAULT_LOCALE, "mail.subject",
                 new Object[] { instanceId });
 
         Email mail = Email.get(paramHandler.getSettings());
 
-        String text = Messages.get(Messages.DEFAULT_LOCALE, "mail.text",
-                new Object[] { instanceId, paramHandler.getMessage(), currentState.toString() });
 
         // Send to configured recipients
-        mail.send(Collections.singletonList(paramHandler.getEMail()), subject, text);
+        mail.send(Collections.singletonList(paramHandler.getEMail()), subject,
+                text);
     }
 
 }
