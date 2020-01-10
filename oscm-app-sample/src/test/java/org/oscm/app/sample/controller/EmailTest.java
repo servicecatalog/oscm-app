@@ -13,6 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
 import org.oscm.app.v2_0.data.Setting;
+import org.oscm.app.v2_0.exceptions.APPlatformException;
 
 import junit.framework.Assert;
 
@@ -75,12 +76,66 @@ public class EmailTest {
 
         assertNoPassword(body);
     }
+    
+  @Test
+  public void testCreateConfirmationLink() throws APPlatformException {
+      //given
+      givenCSSIsNotUsed();
+      setAppBaseUrl();
+      setAppControllerID();
+      Email e = getEmail();
+      //when
+      String result = e.createConfirmationLink("1");
+      
+      //then
+      assertConfirmationLink(result);
+  }
+  
+  @Test
+  public void testCreateConfirmationLinkHTML() throws APPlatformException {
+      //given
+      givenCSSIsUsed();
+      setAppBaseUrl();
+      setAppControllerID();
+      Email e = getEmail();
+      
+      //when
+      String result = e.createConfirmationLink("1");
+      
+      //then
+      assertHTMLConfirmationLink(result);
+  }
+
+  private String getConfirmationLink() {
+      return "https://fujitsu.com/global/notify?sid=1&controllerid=ess.sample&_resume=yes";
+  }
+  
+  private String getExpectedHTMLConfirmationLink() {
+      return "<a href=https://fujitsu.com/global/notify?sid=1&controllerid=ess.sample&_resume=yes>";
+  }
+
+  private void setAppControllerID() {
+      HashMap<String, Setting> params = ps.getParameters();
+      params.put("APP_CONTROLLER_ID", new Setting("APP_CONTROLLER_ID", "ess.sample"));
+  }
+  
+  private void setAppBaseUrl() {
+      HashMap<String, Setting> params = ps.getParameters();
+      params.put("APP_BASE_URL", new Setting("APP_BASE_URL", "https://fujitsu.com/global"));
+  }
 
     private void assertNoPassword(String body) {
         Assert.assertFalse(body.contains("PWD"));
-
+    }
+    
+    private void assertHTMLConfirmationLink(String result) {
+        Assert.assertEquals(getExpectedHTMLConfirmationLink(), result);
     }
 
+    private void assertConfirmationLink(String result) {
+        Assert.assertEquals(getConfirmationLink(), result);
+    }
+    
     private void assertHTMLType(Email e) {
         Assert.assertTrue(e.getBody().contains("<html>"));
         Assert.assertTrue(e.getBody().contains("meta content=\"text/html"));

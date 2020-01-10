@@ -14,6 +14,7 @@ import java.util.HashMap;
 import org.oscm.app.sample.controller.Email;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
 import org.oscm.app.v2_0.data.Setting;
+import org.oscm.app.v2_0.exceptions.APPlatformException;
 
 /**
  * @author goebel
@@ -26,6 +27,16 @@ public class HTMLEmail extends Email {
     public HTMLEmail(ProvisioningSettings ps, String css) {
         super(ps);
         this.css = css;
+    }
+    
+    @Override
+    protected String createConfirmationLink(String instanceId)
+            throws APPlatformException {
+        StringBuilder eventLink = new StringBuilder();
+        eventLink.append("<a href=");
+        eventLink.append(super.createConfirmationLink(instanceId));
+        eventLink.append(">");
+        return eventLink.toString();
     }
 
     @Override

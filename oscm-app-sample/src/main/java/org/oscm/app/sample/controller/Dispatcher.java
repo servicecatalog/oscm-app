@@ -139,14 +139,14 @@ public class Dispatcher {
             platformService.unlockServiceInstance("ess.sample", instanceId,
                     paramHandler.getTPAuthentication());
             newStatus = Status.FINISHED;
-            sendMail(instanceId, getSampleText(currentState));
+            sendMail(instanceId,currentState);
             break;
 
         case MANUAL_CREATION:
             platformService.unlockServiceInstance("ess.sample", instanceId,
                     paramHandler.getTPAuthentication());
+            sendMail(instanceId, currentState);
             newStatus = Status.WAITING_FOR_ACTIVATION;
-            sendMail(instanceId, getManualProvisioningText(currentState));
             break;
             
         case WAITING_FOR_ACTIVATION:
@@ -159,7 +159,7 @@ public class Dispatcher {
             
         case UPDATING:
             newStatus = Status.FINISHED;
-            sendMail(instanceId, getSampleText(currentState));
+            sendMail(instanceId, currentState);
             break;
 
         case DELETING:
@@ -214,10 +214,10 @@ public class Dispatcher {
                         currentState.toString() });
     }
 
-    protected String getManualProvisioningText(Status currentState) {
+    protected String getManualProvisioningText(String eventLink) {
         return Messages.get(Messages.DEFAULT_LOCALE,
                 "mail.text.manual.provisioning",
-                new Object[] { paramHandler.getMessage(), getEventLink()});
+                new Object[] { paramHandler.getMessage(), eventLink});
     }
 
     protected String getEventLink() {
@@ -250,14 +250,19 @@ public class Dispatcher {
      * @throws APPlatformException
      *             - if an error occurred on mail delivery
      */
-    protected void sendMail(String instanceId, String text)
+    protected void sendMail(String instanceId, Status currentState)
             throws APPlatformException {
         // Create mail subject and contents
         String subject = Messages.get(Messages.DEFAULT_LOCALE, "mail.subject",
                 new Object[] { instanceId });
-
+        
+        String text;
         Email mail = Email.get(paramHandler.getSettings());
-
+        if(Status.MANUAL_CREATION == paramHandler.getState()) {
+            text = getManualProvisioningText(mail.createConfirmationLink(instanceId));
+        } else {
+            text = getSampleText(currentState);
+        }
 
         // Send to configured recipients
         mail.send(Collections.singletonList(paramHandler.getEMail()), subject,

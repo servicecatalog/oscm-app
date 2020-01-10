@@ -118,28 +118,6 @@ public class DispatcherTest {
         assertEquals(Status.FINISHED, paramHandler.getState());
     }
 
-
-    @Test
-    public void getEventLink() {
-        //given
-        setAppBaseUrl();
-        setAppControllerID();
-        
-        //when
-        String result = dispatcher.getEventLink();
-        
-        //then
-        assertEquals(getExpectedEventLink(), result);
-    }
-    
-    private String getExpectedEventLink() {
-        return "https://fujitsu.com/global/notify?sid=1&controllerid=ess.sample&_resume=yes";
-    }
-
-    private void setAppControllerID() {
-        paramHandler.getSettings().getParameters().put("APP_CONTROLLER_ID", new Setting("APP_CONTROLLER_ID", "ess.sample"));
-    }
-    
     private void setAppBaseUrl() {
         paramHandler.getSettings().getParameters().put("APP_BASE_URL", new Setting("APP_BASE_URL", "https://fujitsu.com/global"));
     }
