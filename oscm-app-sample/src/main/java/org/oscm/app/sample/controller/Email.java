@@ -10,6 +10,8 @@ package org.oscm.app.sample.controller;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,7 +28,6 @@ import javax.mail.internet.MimeMessage;
 import javax.naming.InitialContext;
 
 import org.oscm.app.sample.controller.email.HTMLEmail;
-import org.oscm.app.sample.controller.email.ProvisioningEmail;
 import org.oscm.app.sample.controller.email.TextEmail;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
 import org.oscm.app.v2_0.data.Setting;
@@ -46,18 +47,13 @@ public abstract class Email {
     protected PrintStream ps;
   
     static Email get(ProvisioningSettings ps) {
-        PropertyHandler propertyHandler = new PropertyHandler(ps);
         final Setting style = ps.getParameters().get(CSS_STYLE);
         if (style != null) {
             String CSS = style.getValue();
             if (CSS.length() > 0)
                 return new HTMLEmail(ps, CSS);
         }
-        if (Status.MANUAL_CREATION == propertyHandler.getState()) {
-            return new ProvisioningEmail(ps);
-        } else {
-            return new TextEmail(ps);
-        }
+        return new TextEmail(ps);
     }
     
     static class Key {
@@ -70,6 +66,24 @@ public abstract class Email {
         static boolean isInternal(String key) {
             return isPassword(key) || internals.contains(key);
         }
+    }
+    
+    protected String createConfirmationLink(String instanceId) throws APPlatformException {
+        StringBuilder eventLink = new StringBuilder();
+        try {
+            eventLink.append(parameters.get("APP_BASE_URL").getValue()).append("/")
+                    .append("notify").append("?").append("sid=")
+                    .append(URLEncoder.encode(instanceId, "UTF-8")).append('&')
+                    .append("controllerid=")
+                    .append(URLEncoder.encode(
+                            parameters.get("APP_CONTROLLER_ID").getValue(),
+                            "UTF-8"))
+                    .append('&').append("_resume").append('=')
+                    .append("yes");
+        } catch (UnsupportedEncodingException e) {
+            throw new APPlatformException("Failed to create event link.", e);
+        }
+        return eventLink.toString();
     }
 
     protected Email(ProvisioningSettings ps) {
