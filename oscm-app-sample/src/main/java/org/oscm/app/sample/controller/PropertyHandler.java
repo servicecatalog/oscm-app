@@ -82,7 +82,13 @@ public class PropertyHandler {
      * used to create the event link to notify the instance.
      */
     public static final String APP_BASE_URL = "APP_BASE_URL";
-
+    
+    /**
+     * The key of the property for specifying the email subject,
+     * if a customized email subject is configured. 
+     */    
+    public static final String EMAIL_SUBJECT = "EMAIL_SUBJECT";
+        
     /**
      * Default constructor.
      * 
@@ -140,6 +146,18 @@ public class PropertyHandler {
     public String getAppBaseUrl() {
         return getValue(APP_BASE_URL, settings.getParameters());
     }
+    
+    /**
+     * Returns the subject of the email.
+     * The subject is not mandatory, it´s just to customize the email.
+     * 
+     * @return the email subject
+     */
+    public String getEmailSubject() {
+        return getValue(EMAIL_SUBJECT, settings.getParameters());
+    }
+    
+    
 
     /**
      * Returns the internal status of the current provisioning operation as set

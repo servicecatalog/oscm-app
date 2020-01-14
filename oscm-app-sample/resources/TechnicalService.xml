@@ -38,6 +38,10 @@
       default="">
       <LocalizedDescription locale="en">The APP base URL</LocalizedDescription>
     </ParameterDefinition>
+    <ParameterDefinition id="EMAIL_SUBJECT" configurable="true" mandatory="false" valueType="STRING"
+      default="">
+      <LocalizedDescription locale="en">The Email subject</LocalizedDescription>
+    </ParameterDefinition>
     <!-- 
         Use CSSSTYLE for HTML emails
         

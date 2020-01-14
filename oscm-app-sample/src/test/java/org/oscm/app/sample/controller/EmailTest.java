@@ -7,6 +7,8 @@
  *******************************************************************************/
 package org.oscm.app.sample.controller;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.HashMap;
 
 import org.junit.BeforeClass;
@@ -105,25 +107,89 @@ public class EmailTest {
       //then
       assertHTMLConfirmationLink(result);
   }
-
-  private String getConfirmationLink() {
-      return "https://fujitsu.com/global/notify?sid=1&controllerid=ess.sample&_resume=yes";
-  }
   
-  private String getExpectedHTMLConfirmationLink() {
-      return "<a href=https://fujitsu.com/global/notify?sid=1&controllerid=ess.sample&_resume=yes>";
-  }
+    @Test
+    public void testSampleSubject() {
+        // given
+        givenCSSIsNotUsed();
+        Email e = getEmail();
+        String instanceId = "1";
+        Status currentState = Status.CREATION_STEP2;
 
-  private void setAppControllerID() {
-      HashMap<String, Setting> params = ps.getParameters();
-      params.put("APP_CONTROLLER_ID", new Setting("APP_CONTROLLER_ID", "ess.sample"));
-  }
+        // when
+        String subject = e.getSubject(instanceId, currentState);
+
+        // then
+        assertSampleSubject(subject);
+    }
+
+    @Test
+    public void testConfiguredSubject() {
+        // given
+        givenCSSIsNotUsed();
+        setMailSubject();
+        Email e = getEmail();
+        String instanceId = "1";
+        Status currentState = Status.MANUAL_CREATION;
+        
+        // when
+        String subject = e.getSubject(instanceId, currentState);
+ 
+        // then
+        assertConfiguredSubject(subject);
+    }
+    
+    @Test
+    public void testSampleText() {
+        // given
+        givenCSSIsNotUsed();
+        setSampleEmailText();
+        Email e = getEmail();
+        String instanceId = "1";
+        Status currentState = Status.CREATION_STEP2;
+
+        // when
+        String text = e.getText(instanceId, currentState);
+
+        // then
+        assertSampleText(text);
+    }
+    
+    @Test
+    public void testConfiguredText() {
+        // given
+        givenCSSIsNotUsed();
+        setSampleEmailText();
+        Email e = getEmail();
+        String instanceId = "1";
+        Status currentState = Status.MANUAL_CREATION;
+
+        // when
+        String text = e.getText(instanceId, currentState);
+
+        // then
+        assertConfiguredText(text);
+    }
+    
+    private void assertConfiguredText(String text) {
+        assertEquals("Some message", text);
+    }
+
+    private void assertSampleText(String text) {
+        assertEquals(
+                "The sample instance '1' is currently being provisioned."
+                        + " Current status: CREATION_STEP2.\n\n Some message",
+                text);
+    }
+
+    private void assertConfiguredSubject(String subject) {
+        assertEquals("This is a test subject", subject);
+    }
+    
+    private void assertSampleSubject(String subject) {
+        assertEquals("Sample instance '1' is currently being provisioned.", subject);
+    }
   
-  private void setAppBaseUrl() {
-      HashMap<String, Setting> params = ps.getParameters();
-      params.put("APP_BASE_URL", new Setting("APP_BASE_URL", "https://fujitsu.com/global"));
-  }
-
     private void assertNoPassword(String body) {
         Assert.assertFalse(body.contains("PWD"));
     }
@@ -171,6 +237,35 @@ public class EmailTest {
         e.mainText = "Das ist eine Test Email";
         System.out.println(e.getBody());
         return e;
+    }
+    
+    private String getConfirmationLink() {
+        return "https://fujitsu.com/global/notify?sid=1&controllerid=ess.sample&_resume=yes";
+    }
+    
+    private String getExpectedHTMLConfirmationLink() {
+        return "<a href=https://fujitsu.com/global/notify?sid=1&controllerid=ess.sample&_resume=yes>";
+    }
+
+    private void setAppControllerID() {
+        HashMap<String, Setting> params = ps.getParameters();
+        params.put("APP_CONTROLLER_ID", new Setting("APP_CONTROLLER_ID", "ess.sample"));
+    }
+    
+    private void setAppBaseUrl() {
+        HashMap<String, Setting> params = ps.getParameters();
+        params.put("APP_BASE_URL", new Setting("APP_BASE_URL", "https://fujitsu.com/global"));
+    }
+    
+    private void setMailSubject() {
+        HashMap<String, Setting> params = ps.getParameters();
+        params.put("EMAIL_SUBJECT", new Setting("EMAIL_SUBJECT", "This is a test subject"));
+    }
+
+    private void setSampleEmailText() {
+        HashMap<String, Setting> params = ps.getParameters();
+        params.put("PARAM_MESSAGETEXT",
+                new Setting("PARAM_MESSAGETEXT", "Some message"));
     }
 
 }

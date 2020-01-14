@@ -49,7 +49,6 @@ public class DispatcherTest {
   private void initMocks() throws Exception {
       doNothing().when(platformService).unlockServiceInstance(any(), any(), any());
       doReturn(true).when(platformService).lockServiceInstance(any(), any(), any());
-      doReturn("test message").when(dispatcher).getManualProvisioningText(any());
     }
     
     @Test
