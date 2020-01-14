@@ -160,6 +160,8 @@ public class EmailTest {
     public void testConfiguredText() {
         // given
         givenCSSIsNotUsed();
+        setAppBaseUrl();
+        setAppControllerID();
         setSampleEmailText();
         Email e = getEmail();
         String instanceId = "1";
