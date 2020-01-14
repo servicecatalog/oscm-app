@@ -8,6 +8,8 @@
 package org.oscm.app.sample.controller;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 
@@ -17,7 +19,6 @@ import org.oscm.app.v2_0.data.ProvisioningSettings;
 import org.oscm.app.v2_0.data.Setting;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
 
-import junit.framework.Assert;
 
 /**
  * @author goebel
@@ -191,28 +192,28 @@ public class EmailTest {
     }
   
     private void assertNoPassword(String body) {
-        Assert.assertFalse(body.contains("PWD"));
+        assertFalse(body.contains("PWD"));
     }
     
     private void assertHTMLConfirmationLink(String result) {
-        Assert.assertEquals(getExpectedHTMLConfirmationLink(), result);
+        assertEquals(getHTMLConfirmationLink(), result);
     }
 
     private void assertConfirmationLink(String result) {
-        Assert.assertEquals(getConfirmationLink(), result);
+        assertEquals(getConfirmationLink(), result);
     }
     
     private void assertHTMLType(Email e) {
-        Assert.assertTrue(e.getBody().contains("<html>"));
-        Assert.assertTrue(e.getBody().contains("meta content=\"text/html"));
-        Assert.assertEquals("text/html;charset=UTF-8", e.getContentType());
+        assertTrue(e.getBody().contains("<html>"));
+        assertTrue(e.getBody().contains("meta content=\"text/html"));
+        assertEquals("text/html;charset=UTF-8", e.getContentType());
 
     }
 
     private void assertTextType(Email e) {
-        Assert.assertFalse(e.getBody().contains("<html>"));
-        Assert.assertFalse(e.getBody().contains("text/html"));
-        Assert.assertEquals("text/plain; charset=UTF-8", e.getContentType());
+        assertFalse(e.getBody().contains("<html>"));
+        assertFalse(e.getBody().contains("text/html"));
+        assertEquals("text/plain; charset=UTF-8", e.getContentType());
     }
 
     private void givenCSSIsUsed() {
@@ -243,7 +244,7 @@ public class EmailTest {
         return "https://fujitsu.com/global/notify?sid=1&controllerid=ess.sample&_resume=yes";
     }
     
-    private String getExpectedHTMLConfirmationLink() {
+    private String getHTMLConfirmationLink() {
         return "<a href=https://fujitsu.com/global/notify?sid=1&controllerid=ess.sample&_resume=yes>";
     }
 

@@ -239,14 +239,10 @@ public class SampleController implements APPlatformController {
             ProvisioningSettings settings, Properties properties)
             throws APPlatformException {
 
-        InstanceStatus result = null;
-        if (instanceId == null || settings == null || properties == null) {
-            return result;
-        }
-        
+        InstanceStatus result = new InstanceStatus();
         PropertyHandler propertyHandler = new PropertyHandler(settings);
+        
         if (Status.WAITING_FOR_ACTIVATION.equals(propertyHandler.getState())) {
-            result = new InstanceStatus();
             result.setRunWithTimer(true);
             propertyHandler.setState(Status.FINSIHING_MANUAL_PROVISIONING);
             result.setChangedParameters(settings.getParameters());

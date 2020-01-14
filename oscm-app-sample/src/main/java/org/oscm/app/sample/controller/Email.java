@@ -83,7 +83,7 @@ public abstract class Email {
                     .append('&').append("_resume").append('=')
                     .append("yes");
         } catch (UnsupportedEncodingException e) {
-            throw new APPlatformException("Failed to create event link.", e);
+            throw new RuntimeException("Failed to create confirmation link.", e);
         }
         return eventLink.toString();
     }
