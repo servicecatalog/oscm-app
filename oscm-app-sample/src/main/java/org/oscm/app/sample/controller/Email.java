@@ -73,7 +73,7 @@ public abstract class Email {
     protected String createConfirmationLink(String instanceId) throws APPlatformException {
         StringBuilder eventLink = new StringBuilder();
         try {
-            eventLink.append(parameters.get("APP_BASE_URL").getValue()).append("/")
+            eventLink.append(parameters.get("APP_BASE_URL_FOR_NOTIFICATION").getValue()).append("/")
                     .append("notify").append("?").append("sid=")
                     .append(URLEncoder.encode(instanceId, "UTF-8")).append('&')
                     .append("controllerid=")

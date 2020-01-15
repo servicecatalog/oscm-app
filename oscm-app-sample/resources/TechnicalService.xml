@@ -34,9 +34,9 @@
       default="">
       <LocalizedDescription locale="en">IAAS password</LocalizedDescription>
     </ParameterDefinition>
-    <ParameterDefinition id="APP_BASE_URL" configurable="true" mandatory="false" valueType="STRING"
+    <ParameterDefinition id="APP_BASE_URL_FOR_NOTIFICATION" configurable="true" mandatory="false" valueType="STRING"
       default="">
-      <LocalizedDescription locale="en">The APP base URL</LocalizedDescription>
+      <LocalizedDescription locale="en">The APP base URL for notification. The URL is only required if manual provisioning is used</LocalizedDescription>
     </ParameterDefinition>
     <ParameterDefinition id="EMAIL_SUBJECT" configurable="true" mandatory="false" valueType="STRING"
       default="">

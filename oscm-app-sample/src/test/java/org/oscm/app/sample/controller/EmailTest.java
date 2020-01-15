@@ -257,7 +257,7 @@ public class EmailTest {
     
     private void setAppBaseUrl() {
         HashMap<String, Setting> params = ps.getParameters();
-        params.put("APP_BASE_URL", new Setting("APP_BASE_URL", "https://fujitsu.com/global"));
+        params.put("APP_BASE_URL_FOR_NOTIFICATION", new Setting("APP_BASE_URL_FOR_NOTIFICATION", "https://fujitsu.com/global"));
     }
     
     private void setMailSubject() {

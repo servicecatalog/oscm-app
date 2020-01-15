@@ -81,7 +81,7 @@ public class PropertyHandler {
      * The key of the property for specifying the APP base URL 
      * used to create the event link to notify the instance.
      */
-    public static final String APP_BASE_URL = "APP_BASE_URL";
+    public static final String APP_BASE_URL = "APP_BASE_URL_FOR_NOTIFICATION";
     
     /**
      * The key of the property for specifying the email subject,
