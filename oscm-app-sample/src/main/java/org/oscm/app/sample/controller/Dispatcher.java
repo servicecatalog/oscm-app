@@ -11,6 +11,8 @@
 
 package org.oscm.app.sample.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,7 +43,8 @@ import org.slf4j.LoggerFactory;
  */
 public class Dispatcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Dispatcher.class);
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(Dispatcher.class);
 
     // The ID of the application instance
     private String instanceId;
@@ -51,6 +54,7 @@ public class Dispatcher {
 
     // An APPlatformService instance which provides for email communication
     private APPlatformService platformService;
+
 
     /**
      * Constructs a new dispatcher.
@@ -120,16 +124,36 @@ public class Dispatcher {
         case CREATION_STEP1:
             platformService.lockServiceInstance("ess.sample", instanceId,
                     paramHandler.getTPAuthentication());
-            newStatus = Status.CREATION_STEP2;
+            
+            if (null == paramHandler.getAppBaseUrl()
+                    || paramHandler.getAppBaseUrl().isEmpty()) {
+                newStatus = Status.CREATION_STEP2;
+            } else
+                newStatus = Status.MANUAL_CREATION;
             break;
 
         case CREATION_STEP2:
             platformService.unlockServiceInstance("ess.sample", instanceId,
                     paramHandler.getTPAuthentication());
             newStatus = Status.FINISHED;
-            sendMail(instanceId, currentState);
+            sendMail(instanceId,currentState);
             break;
 
+        case MANUAL_CREATION:
+            platformService.unlockServiceInstance("ess.sample", instanceId,
+                    paramHandler.getTPAuthentication());
+            sendMail(instanceId, currentState);
+            newStatus = Status.WAITING_FOR_ACTIVATION;
+            break;
+            
+        case WAITING_FOR_ACTIVATION:
+            //do nothing, just wait until the status changes
+            break;
+        
+        case FINSIHING_MANUAL_PROVISIONING:
+            newStatus = Status.FINISHED;
+            break;
+            
         case UPDATING:
             newStatus = Status.FINISHED;
             sendMail(instanceId, currentState);
@@ -173,10 +197,14 @@ public class Dispatcher {
         if (result.isReady()) {
             result.setAccessInfo("Access information for instance " + instanceId);
         }
-
+        
+        if(Status.WAITING_FOR_ACTIVATION.equals(paramHandler.getState())){
+            result.setRunWithTimer(false);
+        }
+        
         return result;
     }
-
+    
     /**
      * Sends an email with the contents and to the recipient specified in the
      * technical service definition and includes all parameters and attributes.
@@ -188,18 +216,17 @@ public class Dispatcher {
      * @throws APPlatformException
      *             - if an error occurred on mail delivery
      */
-    private void sendMail(String instanceId, Status currentState) throws APPlatformException {
+    protected void sendMail(String instanceId, Status currentState)
+            throws APPlatformException {
         // Create mail subject and contents
-        String subject = Messages.get(Messages.DEFAULT_LOCALE, "mail.subject",
-                new Object[] { instanceId });
-
+        
         Email mail = Email.get(paramHandler.getSettings());
-
-        String text = Messages.get(Messages.DEFAULT_LOCALE, "mail.text",
-                new Object[] { instanceId, paramHandler.getMessage(), currentState.toString() });
+        String subject = mail.getSubject(instanceId, currentState);
+        String text = mail.getText(instanceId, currentState);
 
         // Send to configured recipients
-        mail.send(Collections.singletonList(paramHandler.getEMail()), subject, text);
+        mail.send(Collections.singletonList(paramHandler.getEMail()), subject,
+                text);
     }
 
 }

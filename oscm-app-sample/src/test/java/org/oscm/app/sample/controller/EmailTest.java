@@ -7,14 +7,18 @@
  *******************************************************************************/
 package org.oscm.app.sample.controller;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashMap;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
 import org.oscm.app.v2_0.data.Setting;
+import org.oscm.app.v2_0.exceptions.APPlatformException;
 
-import junit.framework.Assert;
 
 /**
  * @author goebel
@@ -75,23 +79,143 @@ public class EmailTest {
 
         assertNoPassword(body);
     }
+    
+  @Test
+  public void testCreateConfirmationLink() throws APPlatformException {
+      //given
+      givenCSSIsNotUsed();
+      setAppBaseUrl();
+      setAppControllerID();
+      Email e = getEmail();
+      //when
+      String result = e.createConfirmationLink("1");
+      
+      //then
+      assertConfirmationLink(result);
+  }
+  
+  @Test
+  public void testCreateConfirmationLinkHTML() throws APPlatformException {
+      //given
+      givenCSSIsUsed();
+      setAppBaseUrl();
+      setAppControllerID();
+      Email e = getEmail();
+      
+      //when
+      String result = e.createConfirmationLink("1");
+      
+      //then
+      assertHTMLConfirmationLink(result);
+  }
+  
+    @Test
+    public void testSampleSubject() {
+        // given
+        givenCSSIsNotUsed();
+        Email e = getEmail();
+        String instanceId = "1";
+        Status currentState = Status.CREATION_STEP2;
 
-    private void assertNoPassword(String body) {
-        Assert.assertFalse(body.contains("PWD"));
+        // when
+        String subject = e.getSubject(instanceId, currentState);
 
+        // then
+        assertSampleSubject(subject);
     }
 
+    @Test
+    public void testConfiguredSubject() {
+        // given
+        givenCSSIsNotUsed();
+        setMailSubject();
+        Email e = getEmail();
+        String instanceId = "1";
+        Status currentState = Status.MANUAL_CREATION;
+        
+        // when
+        String subject = e.getSubject(instanceId, currentState);
+ 
+        // then
+        assertConfiguredSubject(subject);
+    }
+    
+    @Test
+    public void testSampleText() {
+        // given
+        givenCSSIsNotUsed();
+        setSampleEmailText();
+        Email e = getEmail();
+        String instanceId = "1";
+        Status currentState = Status.CREATION_STEP2;
+
+        // when
+        String text = e.getText(instanceId, currentState);
+
+        // then
+        assertSampleText(text);
+    }
+    
+    @Test
+    public void testConfiguredText() {
+        // given
+        givenCSSIsNotUsed();
+        setAppBaseUrl();
+        setAppControllerID();
+        setSampleEmailText();
+        Email e = getEmail();
+        String instanceId = "1";
+        Status currentState = Status.MANUAL_CREATION;
+
+        // when
+        String text = e.getText(instanceId, currentState);
+
+        // then
+        assertConfiguredText(text);
+    }
+    
+    private void assertConfiguredText(String text) {
+        assertEquals("Some message", text);
+    }
+
+    private void assertSampleText(String text) {
+        assertEquals(
+                "The sample instance '1' is currently being provisioned."
+                        + " Current status: CREATION_STEP2.\n\n Some message",
+                text);
+    }
+
+    private void assertConfiguredSubject(String subject) {
+        assertEquals("This is a test subject", subject);
+    }
+    
+    private void assertSampleSubject(String subject) {
+        assertEquals("Sample instance '1' is currently being provisioned.", subject);
+    }
+  
+    private void assertNoPassword(String body) {
+        assertFalse(body.contains("PWD"));
+    }
+    
+    private void assertHTMLConfirmationLink(String result) {
+        assertEquals(getHTMLConfirmationLink(), result);
+    }
+
+    private void assertConfirmationLink(String result) {
+        assertEquals(getConfirmationLink(), result);
+    }
+    
     private void assertHTMLType(Email e) {
-        Assert.assertTrue(e.getBody().contains("<html>"));
-        Assert.assertTrue(e.getBody().contains("meta content=\"text/html"));
-        Assert.assertEquals("text/html;charset=UTF-8", e.getContentType());
+        assertTrue(e.getBody().contains("<html>"));
+        assertTrue(e.getBody().contains("meta content=\"text/html"));
+        assertEquals("text/html;charset=UTF-8", e.getContentType());
 
     }
 
     private void assertTextType(Email e) {
-        Assert.assertFalse(e.getBody().contains("<html>"));
-        Assert.assertFalse(e.getBody().contains("text/html"));
-        Assert.assertEquals("text/plain; charset=UTF-8", e.getContentType());
+        assertFalse(e.getBody().contains("<html>"));
+        assertFalse(e.getBody().contains("text/html"));
+        assertEquals("text/plain; charset=UTF-8", e.getContentType());
     }
 
     private void givenCSSIsUsed() {
@@ -116,6 +240,35 @@ public class EmailTest {
         e.mainText = "Das ist eine Test Email";
         System.out.println(e.getBody());
         return e;
+    }
+    
+    private String getConfirmationLink() {
+        return "https://fujitsu.com/global/notify?sid=1&controllerid=ess.sample&_resume=yes";
+    }
+    
+    private String getHTMLConfirmationLink() {
+        return "<a href=https://fujitsu.com/global/notify?sid=1&controllerid=ess.sample&_resume=yes>";
+    }
+
+    private void setAppControllerID() {
+        HashMap<String, Setting> params = ps.getParameters();
+        params.put("APP_CONTROLLER_ID", new Setting("APP_CONTROLLER_ID", "ess.sample"));
+    }
+    
+    private void setAppBaseUrl() {
+        HashMap<String, Setting> params = ps.getParameters();
+        params.put("APP_BASE_URL_FOR_NOTIFICATION", new Setting("APP_BASE_URL_FOR_NOTIFICATION", "https://fujitsu.com/global"));
+    }
+    
+    private void setMailSubject() {
+        HashMap<String, Setting> params = ps.getParameters();
+        params.put("EMAIL_SUBJECT", new Setting("EMAIL_SUBJECT", "This is a test subject"));
+    }
+
+    private void setSampleEmailText() {
+        HashMap<String, Setting> params = ps.getParameters();
+        params.put("PARAM_MESSAGETEXT",
+                new Setting("PARAM_MESSAGETEXT", "Some message"));
     }
 
 }

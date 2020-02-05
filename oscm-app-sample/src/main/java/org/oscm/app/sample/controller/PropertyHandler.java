@@ -76,7 +76,19 @@ public class PropertyHandler {
      * used for service calls to Catalog Manager.
      */
     public static final String BSS_USER_PWD = "APP_BSS_USER_PWD";
-
+    
+    /**
+     * The key of the property for specifying the APP base URL 
+     * used to create the event link to notify the instance.
+     */
+    public static final String APP_BASE_URL = "APP_BASE_URL_FOR_NOTIFICATION";
+    
+    /**
+     * The key of the property for specifying the email subject,
+     * if a customized email subject is configured. 
+     */    
+    public static final String EMAIL_SUBJECT = "EMAIL_SUBJECT";
+        
     /**
      * Default constructor.
      * 
@@ -125,6 +137,27 @@ public class PropertyHandler {
     public String getPassword() {
         return getValue(TECPARAM_PWD, settings.getParameters());
     }
+    
+    /**
+     * Returns the APP base URL.
+     * 
+     * @return the APP base URL as a string
+     */
+    public String getAppBaseUrl() {
+        return getValue(APP_BASE_URL, settings.getParameters());
+    }
+    
+    /**
+     * Returns the subject of the email.
+     * The subject is not mandatory, it´s just to customize the email.
+     * 
+     * @return the email subject
+     */
+    public String getEmailSubject() {
+        return getValue(EMAIL_SUBJECT, settings.getParameters());
+    }
+    
+    
 
     /**
      * Returns the internal status of the current provisioning operation as set

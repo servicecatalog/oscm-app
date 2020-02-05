@@ -10,6 +10,8 @@ package org.oscm.app.sample.controller;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,6 +29,7 @@ import javax.naming.InitialContext;
 
 import org.oscm.app.sample.controller.email.HTMLEmail;
 import org.oscm.app.sample.controller.email.TextEmail;
+import org.oscm.app.sample.i18n.Messages;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
 import org.oscm.app.v2_0.data.Setting;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
@@ -36,6 +39,7 @@ import org.oscm.app.v2_0.exceptions.APPlatformException;
  */
 public abstract class Email {
 
+    final static String CONFIRMATION_LINK_PATTERN = "${CONFIRMATION_LINK}";
     final static String CSS_STYLE = "CSSSTYLE";
     private HashMap<String, Setting> attributes;
     private HashMap<String, Setting> parameters;
@@ -64,6 +68,24 @@ public abstract class Email {
         static boolean isInternal(String key) {
             return isPassword(key) || internals.contains(key);
         }
+    }
+    
+    protected String createConfirmationLink(String instanceId) throws APPlatformException {
+        StringBuilder eventLink = new StringBuilder();
+        try {
+            eventLink.append(parameters.get("APP_BASE_URL_FOR_NOTIFICATION").getValue()).append("/")
+                    .append("notify").append("?").append("sid=")
+                    .append(URLEncoder.encode(instanceId, "UTF-8")).append('&')
+                    .append("controllerid=")
+                    .append(URLEncoder.encode(
+                            parameters.get("APP_CONTROLLER_ID").getValue(),
+                            "UTF-8"))
+                    .append('&').append("_resume").append('=')
+                    .append("yes");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Failed to create confirmation link.", e);
+        }
+        return eventLink.toString();
     }
 
     protected Email(ProvisioningSettings ps) {
@@ -123,6 +145,45 @@ public abstract class Email {
         } catch (Exception e) {
             throw new APPlatformException("Failed to send email.", e);
         }
+    }
+    
+    protected String getSubject(String instanceId, Status currentState) {
+        String subject = "";
+        if (Status.MANUAL_CREATION == currentState) {
+            Setting set = parameters.get("EMAIL_SUBJECT");
+            if (set != null && !set.getValue().isEmpty()) {
+                subject = set.getValue();
+            }
+        } else {
+            subject = Messages.get(Messages.DEFAULT_LOCALE, "mail.subject",
+                    new Object[] { instanceId });
+        }
+        return subject;
+    }
+    
+    protected String getText(String instanceId, Status currentState) {
+        String text = "";
+        if (Status.MANUAL_CREATION == currentState) {
+            Setting set = parameters.get("PARAM_MESSAGETEXT");
+            if (set != null && !set.getValue().isEmpty()) {
+                text = set.getValue();
+                try {
+                    text = text.replace(CONFIRMATION_LINK_PATTERN, createConfirmationLink(instanceId));
+                } catch (APPlatformException e) {
+                    text = getDefaultMessage(instanceId, currentState);
+                }
+            }
+        } else {
+            text = getDefaultMessage(instanceId, currentState);
+        }
+        return text;
+    }
+
+    private String getDefaultMessage(String instanceId, Status currentState) {
+        return Messages.get(Messages.DEFAULT_LOCALE, "mail.text",
+                new Object[] { instanceId,
+                        parameters.get("PARAM_MESSAGETEXT").getValue(),
+                        currentState.toString() });
     }
 
     private List<InternetAddress> getAddresses(List<String> recipients) throws APPlatformException {

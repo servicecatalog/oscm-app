@@ -51,8 +51,23 @@ public enum Status {
     CREATION_STEP2,
 
     /**
-     * The application instance is currently being modified.
+     * The application instance is currently being handled in a manual process.
      */
+    MANUAL_CREATION,
+    
+    /**
+     * The application instance is currently waiting for the manual activation
+     */
+    WAITING_FOR_ACTIVATION,
+    
+    /**
+     * The application instance is currently finishing the manual provisioning
+     */
+    FINSIHING_MANUAL_PROVISIONING,
+    
+    /**
+     * The application instance is currently being modified.
+     */    
     UPDATING,
 
     /**

@@ -216,7 +216,6 @@ public class SampleController implements APPlatformController {
         Dispatcher dp = new Dispatcher(platformService, instanceId,
                 paramHandler);
         InstanceStatus status = dp.dispatch();
-
         return status;
     }
 
@@ -239,7 +238,26 @@ public class SampleController implements APPlatformController {
     public InstanceStatus notifyInstance(String instanceId,
             ProvisioningSettings settings, Properties properties)
             throws APPlatformException {
-        return null;
+
+        InstanceStatus result = new InstanceStatus();
+        PropertyHandler propertyHandler = new PropertyHandler(settings);
+        
+        if (Status.WAITING_FOR_ACTIVATION.equals(propertyHandler.getState())) {
+            result.setRunWithTimer(true);
+            propertyHandler.setState(Status.FINSIHING_MANUAL_PROVISIONING);
+            result.setChangedParameters(settings.getParameters());
+            result.setChangedAttributes(settings.getAttributes());
+            LOGGER.debug(
+                    "finished manual provisioning => changing instance status to finished");
+        } else {
+            APPlatformException pe = new APPlatformException(
+                    "finished provisioning but instance is in state "
+                            + propertyHandler.getState()
+                            + " => nothing changed");
+            LOGGER.warn(pe.getMessage());
+            throw pe;
+        }
+        return result;
     }
 
     /**
