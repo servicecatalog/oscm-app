@@ -55,9 +55,6 @@ public class Dispatcher {
     // An APPlatformService instance which provides for email communication
     private APPlatformService platformService;
 
-    private static final String EVENT_KEY_NOTIFY = "notify";
-    private static final String EVENT_KEY_RESUME = "_resume";
-    private static final String EVENT_VALUE_YES = "yes";
 
     /**
      * Constructs a new dispatcher.
@@ -208,37 +205,6 @@ public class Dispatcher {
         return result;
     }
     
-    private String getSampleText(Status currentState) {
-        return Messages.get(Messages.DEFAULT_LOCALE, "mail.text",
-                new Object[] { instanceId, paramHandler.getMessage(),
-                        currentState.toString() });
-    }
-
-    protected String getManualProvisioningText(String eventLink) {
-        return Messages.get(Messages.DEFAULT_LOCALE,
-                "mail.text.manual.provisioning",
-                new Object[] { paramHandler.getMessage(), eventLink});
-    }
-
-    protected String getEventLink() {
-        StringBuffer eventLink = new StringBuffer();
-        try {
-            eventLink.append(paramHandler.getAppBaseUrl()).append("/")
-                    .append(EVENT_KEY_NOTIFY).append("?").append("sid=")
-                    .append(URLEncoder.encode(instanceId, "UTF-8")).append('&')
-                    .append("controllerid=")
-                    .append(URLEncoder.encode(
-                            paramHandler.getSettings().getParameters()
-                                    .get("APP_CONTROLLER_ID").getValue(),
-                            "UTF-8"))
-                    .append('&').append(EVENT_KEY_RESUME).append('=')
-                    .append(EVENT_VALUE_YES);
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.error("Failed to create event link", e);
-        }
-        return eventLink.toString();
-    }
-
     /**
      * Sends an email with the contents and to the recipient specified in the
      * technical service definition and includes all parameters and attributes.
@@ -253,16 +219,10 @@ public class Dispatcher {
     protected void sendMail(String instanceId, Status currentState)
             throws APPlatformException {
         // Create mail subject and contents
-        String subject = Messages.get(Messages.DEFAULT_LOCALE, "mail.subject",
-                new Object[] { instanceId });
         
-        String text;
         Email mail = Email.get(paramHandler.getSettings());
-        if(Status.MANUAL_CREATION == paramHandler.getState()) {
-            text = getManualProvisioningText(mail.createConfirmationLink(instanceId));
-        } else {
-            text = getSampleText(currentState);
-        }
+        String subject = mail.getSubject(instanceId, currentState);
+        String text = mail.getText(instanceId, currentState);
 
         // Send to configured recipients
         mail.send(Collections.singletonList(paramHandler.getEMail()), subject,

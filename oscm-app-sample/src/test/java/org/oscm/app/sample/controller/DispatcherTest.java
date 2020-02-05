@@ -49,7 +49,6 @@ public class DispatcherTest {
   private void initMocks() throws Exception {
       doNothing().when(platformService).unlockServiceInstance(any(), any(), any());
       doReturn(true).when(platformService).lockServiceInstance(any(), any(), any());
-      doReturn("test message").when(dispatcher).getManualProvisioningText(any());
     }
     
     @Test
@@ -119,7 +118,7 @@ public class DispatcherTest {
     }
 
     private void setAppBaseUrl() {
-        paramHandler.getSettings().getParameters().put("APP_BASE_URL", new Setting("APP_BASE_URL", "https://fujitsu.com/global"));
+        paramHandler.getSettings().getParameters().put("APP_BASE_URL_FOR_NOTIFICATION", new Setting("APP_BASE_URL_FOR_NOTIFICATION", "https://fujitsu.com/global"));
     }
     
 
