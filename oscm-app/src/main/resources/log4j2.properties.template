@@ -1,0 +1,26 @@
+# TEMPLATE FILE for the log4j configuration of the Asynchronous Provisioning Platform.
+
+appender.console.type = Console
+appender.console.name = STDOUT
+appender.console.layout.type = PatternLayout
+appender.console.layout.pattern = %d [%t] - %-5p - %m%n
+
+appender.rolling.type = RollingFile
+appender.rolling.name = CoreRollingAppender
+appender.rolling.fileName = /opt/apache-tomee/logs/app-core.log
+appender.rolling.filePattern = /opt/apache-tomee/logs/app-core-%i.log.gz
+appender.rolling.layout.type = PatternLayout
+appender.rolling.layout.pattern = [%d{MM/dd HH:mm:ss}] [%t] %-5p %m%n
+appender.rolling.policies.type = Policies
+appender.rolling.policies.size.type = SizeBasedTriggeringPolicy
+appender.rolling.policies.size.size=10MB
+appender.rolling.strategy.type = DefaultRolloverStrategy
+appender.rolling.strategy.max = 5
+
+logger.rolling.name = org.oscm.app
+logger.rolling.level = info
+logger.rolling.additivity = false
+logger.rolling.appenderRef.rolling.ref = CoreRollingAppender
+
+rootLogger.level = info
+rootLogger.appenderRef.stdout.ref = STDOUT

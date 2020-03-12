@@ -83,6 +83,8 @@ public class BesDAO {
       String userName = pwAuth.getUserName();
       String password = pwAuth.getPassword();
 
+      LOGGER.info("Getting webservice:" + serviceClass + " for user: "+userName);
+
       setBinding((BindingProvider) client, userName, password);
       return client;
     } catch (MalformedURLException e) {
