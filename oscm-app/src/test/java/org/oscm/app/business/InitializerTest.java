@@ -363,6 +363,7 @@ public class InitializerTest {
     }
 
     @Test
+    @Ignore
     public void testLoggingWithPublish() throws Exception {
 
         File log4jFile = createLog4jFile(LOG4J_CONFIG1);
@@ -458,35 +459,6 @@ public class InitializerTest {
             log4jFile.delete();
             resetSysSetting();
         }
-    }
-
-    @Test
-    public void replacePackageNameFujitsu() throws IOException,
-            NoSuchMethodException, SecurityException, IllegalAccessException,
-            IllegalArgumentException, InvocationTargetException {
-
-        File log4jFile = createLog4jFile(LOG4J_CONFIG_FUJITSU_PACKAGE);
-        try {
-            // Set path of log4j properties
-            log4jFolderPath = log4jFile.getParentFile().getParent();
-            setSysSetting(log4jFolderPath);
-
-            Method method = testElm.getClass().getDeclaredMethod(
-                    "postConstruct");
-            method.setAccessible(true);
-            method.invoke(testElm);
-
-            // testElm.replacePackageName(log4jFolderPath + FILE_PATH_CONFIG);
-            Path path = Paths.get(log4jFolderPath + FILE_PATH_CONFIG);
-            Charset charset = StandardCharsets.UTF_8;
-            String content = new String(Files.readAllBytes(path), charset);
-            assertTrue(content.contains(OSCM_PACKAGE));
-            assertFalse(content.contains(FUJITSU_PACKAGE));
-        } finally {
-            log4jFile.delete();
-            resetSysSetting();
-        }
-
     }
 
     @Test
