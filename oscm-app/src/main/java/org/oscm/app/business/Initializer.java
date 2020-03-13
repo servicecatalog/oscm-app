@@ -27,6 +27,8 @@ import javax.ejb.Timeout;
 import javax.ejb.Timer;
 import javax.ejb.TimerService;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.slf4j.Logger;
@@ -101,61 +103,40 @@ public class Initializer {
   }
 
   /** Copy template file to default destination */
-  private void publishTemplateFile() throws Exception {
-    InputStream is = null;
-    OutputStream os = null;
-    try {
-      // Search resource in controller package
-      is = getClass().getClassLoader().getResourceAsStream(LOG4J_TEMPLATE);
-      if (is == null) {
-        logger.warn("Template file not found: " + LOG4J_TEMPLATE);
-      } else {
-        os = new FileOutputStream(logFile);
-        byte[] buffer = new byte[1024];
-        int length;
-        while ((length = is.read(buffer)) > 0) {
-          os.write(buffer, 0, length);
-        }
-      }
+  private void publishTemplateFile() {
+    /*try {
+      Path logTemplate = Paths.get(getClass().getClassLoader().getResource(LOG4J_TEMPLATE).toURI());
+      byte[] logTemplateContent = Files.readAllBytes(logTemplate);
+      Files.write(logFile.toPath(), logTemplateContent);
     } catch (Exception e) {
-      // ignore
       logger.error(
           "Failed to publish template file from "
               + LOG4J_TEMPLATE
               + " to "
               + logFile.getAbsolutePath(),
           e);
-    } finally {
-      if (is != null) {
-        try {
-          is.close();
-        } catch (IOException e) {
-          // ignore, wanted to close anyway
-        }
-      }
-      if (os != null) {
-        try {
-          os.close();
-        } catch (IOException e) {
-          // ignore, wanted to close anyway
-        }
-      }
-    }
-  }
+    }*/
 
-  /**
-   * Replace the package names from "com.fujitsu.bss.app" to "org.oscm.app" in the existing log
-   * files.
-   */
-  private void replacePackageName(String filePath) {
-    try {
-      Path path = Paths.get(filePath);
-      Charset charset = StandardCharsets.UTF_8;
-      String content = new String(Files.readAllBytes(path), charset);
-      content = content.replaceAll("com.fujitsu.bss.app", "org.oscm.app");
-      Files.write(path, content.getBytes(charset));
-    } catch (IOException e) {
-      e.printStackTrace();
+    try (InputStream is = getClass().getClassLoader().getResourceAsStream(LOG4J_TEMPLATE);
+        OutputStream os = new FileOutputStream(logFile)) {
+
+      if (is == null) {
+        logger.warn("Template file not found: " + LOG4J_TEMPLATE);
+      } else {
+        FileUtils.writeByteArrayToFile(logFile, IOUtils.toByteArray(is));
+        /*byte[] buffer = new byte[1024];
+        int length;
+        while ((length = is.read(buffer)) > 0) {
+          os.write(buffer, 0, length);
+        }*/
+      }
+    } catch (Exception e) {
+      logger.error(
+          "Failed to publish template file from "
+              + LOG4J_TEMPLATE
+              + " to "
+              + logFile.getAbsolutePath(),
+          e);
     }
   }
 
@@ -170,9 +151,9 @@ public class Initializer {
   /** On change event */
   void handleOnChange(File logFile) {
     try {
-      long lastModif = logFile.lastModified();
-      if (lastModif > logFileLastModified) {
-        logFileLastModified = lastModif;
+      long lastModified = logFile.lastModified();
+      if (lastModified > logFileLastModified) {
+        logFileLastModified = lastModified;
         logger.debug("Reload log4j configuration from " + logFile.getAbsolutePath());
         final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
         ctx.setConfigLocation(logFile.toURI());

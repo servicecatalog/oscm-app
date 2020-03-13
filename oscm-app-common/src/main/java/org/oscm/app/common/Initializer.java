@@ -105,27 +105,21 @@ public class Initializer {
 
   /** Copy template file to default destination */
   private void publishTemplateFile() throws Exception {
-    InputStream is = null;
-    try {
-      // Search resource in controller package
-      is = controllerAccess.getClass().getClassLoader().getResourceAsStream(LOG4J_TEMPLATE);
+
+    try (InputStream is =
+        controllerAccess.getClass().getClassLoader().getResourceAsStream(LOG4J_TEMPLATE)) {
       if (is == null) {
         LOGGER.warn("Template file not found: " + LOG4J_TEMPLATE);
       } else if (logFile.getParentFile().exists()) {
         FileUtils.writeByteArrayToFile(logFile, IOUtils.toByteArray(is));
       }
     } catch (Exception e) {
-      // ignore
       LOGGER.error(
           "Failed to publish template file from "
               + LOG4J_TEMPLATE
               + " to "
               + logFile.getAbsolutePath(),
           e);
-    } finally {
-      if (is != null) {
-        is.close();
-      }
     }
   }
 
