@@ -7,7 +7,13 @@
  *******************************************************************************/
 package org.oscm.app.dao;
 
-import java.util.List;
+import org.oscm.app.business.exceptions.ServiceInstanceNotFoundException;
+import org.oscm.app.domain.InstanceParameter;
+import org.oscm.app.domain.ProvisioningStatus;
+import org.oscm.app.domain.ServiceInstance;
+import org.oscm.string.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
@@ -17,15 +23,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-
-import org.oscm.logging.Log4jLogger;
-import org.oscm.logging.LoggerFactory;
-import org.oscm.string.Strings;
-import org.oscm.app.business.exceptions.ServiceInstanceNotFoundException;
-import org.oscm.app.domain.InstanceParameter;
-import org.oscm.app.domain.ProvisioningStatus;
-import org.oscm.app.domain.ServiceInstance;
-import org.oscm.types.enumtypes.LogMessageIdentifier;
+import java.util.List;
 
 @Stateless
 @LocalBean
@@ -33,8 +31,7 @@ public class ServiceInstanceDAO {
 
     @PersistenceContext(name = "persistence/em", unitName = "oscm-app")
     public EntityManager em;
-    private static final Log4jLogger LOGGER = LoggerFactory
-            .getLogger(ServiceInstanceDAO.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceInstanceDAO.class);
 
     public ServiceInstance getInstanceById(String instanceId)
             throws ServiceInstanceNotFoundException {
@@ -116,8 +113,7 @@ public class ServiceInstanceDAO {
         try {
             instance = (ServiceInstance) query.getSingleResult();
         } catch (NoResultException e) {
-            LOGGER.logError(Log4jLogger.SYSTEM_LOG, e,
-                    LogMessageIdentifier.ERROR);
+            LOGGER.error("Instance not found", e);
         }
         return instance;
     }

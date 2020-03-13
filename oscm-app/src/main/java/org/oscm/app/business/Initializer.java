@@ -7,32 +7,19 @@
  *******************************************************************************/
 package org.oscm.app.business;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collection;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
-import javax.ejb.Timeout;
-import javax.ejb.Timer;
-import javax.ejb.TimerService;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.ejb.*;
+import java.io.File;
+import java.io.InputStream;
+import java.util.Collection;
 
 import static org.oscm.app.common.Constants.APPLICATION_SERVER_HOME_CONSTANT;
 
@@ -104,31 +91,12 @@ public class Initializer {
 
   /** Copy template file to default destination */
   private void publishTemplateFile() {
-    /*try {
-      Path logTemplate = Paths.get(getClass().getClassLoader().getResource(LOG4J_TEMPLATE).toURI());
-      byte[] logTemplateContent = Files.readAllBytes(logTemplate);
-      Files.write(logFile.toPath(), logTemplateContent);
-    } catch (Exception e) {
-      logger.error(
-          "Failed to publish template file from "
-              + LOG4J_TEMPLATE
-              + " to "
-              + logFile.getAbsolutePath(),
-          e);
-    }*/
-
-    try (InputStream is = getClass().getClassLoader().getResourceAsStream(LOG4J_TEMPLATE);
-        OutputStream os = new FileOutputStream(logFile)) {
-
+    try (InputStream is = getClass().getClassLoader().getResourceAsStream(LOG4J_TEMPLATE)) {
       if (is == null) {
         logger.warn("Template file not found: " + LOG4J_TEMPLATE);
-      } else {
+      }
+      else if (logFile.getParentFile().exists()) {
         FileUtils.writeByteArrayToFile(logFile, IOUtils.toByteArray(is));
-        /*byte[] buffer = new byte[1024];
-        int length;
-        while ((length = is.read(buffer)) > 0) {
-          os.write(buffer, 0, length);
-        }*/
       }
     } catch (Exception e) {
       logger.error(
