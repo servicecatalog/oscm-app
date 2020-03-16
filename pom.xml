@@ -28,7 +28,6 @@
         <module>oscm-app-vmware-ear</module>
         <module>oscm-app-sample</module>
         <module>oscm-app-sample-ear</module>
-        <module>oscm-app-sample-ui</module>
     </modules>
 
     <properties>

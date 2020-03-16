@@ -39,6 +39,10 @@
           <artifactId>geronimo-javamail_1.4_mail</artifactId>
           <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
