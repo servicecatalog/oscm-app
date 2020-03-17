@@ -260,7 +260,7 @@
             <dependency>
                 <groupId>com.github.servicecatalog.oscm-commons</groupId>
                 <artifactId>oscm-common</artifactId>
-                <version>log4j_update-SNAPSHOT</version>
+                <version>master-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

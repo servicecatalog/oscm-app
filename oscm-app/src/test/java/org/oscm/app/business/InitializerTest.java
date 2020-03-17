@@ -239,7 +239,6 @@ public class InitializerTest {
   }
 
   @Test
-  // @Ignore
   public void testLoggingWithPublish() throws Exception {
 
     File log4jFile = createLog4jFile(LOG4J_CONFIG);
