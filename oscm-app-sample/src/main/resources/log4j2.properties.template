@@ -18,7 +18,7 @@ appender.rolling.strategy.type = DefaultRolloverStrategy
 appender.rolling.strategy.max = 5
 
 logger.rolling.name = org.oscm.app.sample
-logger.rolling.level = debug
+logger.rolling.level = info
 logger.rolling.additivity = false
 logger.rolling.appenderRef.rolling.ref = SampleRollingAppender
 
