@@ -47,11 +47,6 @@
             <groupId>com.github.servicecatalog.oscm-commons</groupId>
             <artifactId>oscm-common</artifactId>
         </dependency>
-        <!--check if necessary-->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
     </dependencies>
 
     <build>

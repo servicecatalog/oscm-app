@@ -8,16 +8,15 @@
 
 package org.oscm.app.domain;
 
+import org.oscm.app.v2_0.intf.APPlatformController;
+import org.oscm.string.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.*;
 import java.io.*;
 import java.util.Properties;
 
-import javax.persistence.*;
-
-import org.oscm.app.v2_0.intf.APPlatformController;
-import org.oscm.logging.Log4jLogger;
-import org.oscm.logging.LoggerFactory;
-import org.oscm.string.Strings;
-import org.oscm.types.enumtypes.LogMessageIdentifier;
 
 /**
  * Represents an operation for a service instance.
@@ -32,8 +31,8 @@ import org.oscm.types.enumtypes.LogMessageIdentifier;
         @NamedQuery(name = "Operation.getOperationByInstanceId", query = "SELECT op FROM Operation op WHERE op.serviceInstance.instanceId = :id AND op.forQueue = false"),
         @NamedQuery(name = "Operation.removeForKey", query = "DELETE FROM Operation op WHERE op.tkey =:key") })
 public class Operation {
-    private static final Log4jLogger LOGGER = LoggerFactory
-            .getLogger(Operation.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Operation.class);
 
     /**
      * The technical key of the entity.
@@ -171,8 +170,7 @@ public class Operation {
             properties.storeToXML(out, null, "UTF-8");
             xmlString = out.toString();
         } catch (IOException e) {
-            LOGGER.logError(Log4jLogger.SYSTEM_LOG, e,
-                    LogMessageIdentifier.ERROR);
+            LOGGER.error("Converting to xml failed",  e);
         }
         return xmlString;
     }
@@ -182,8 +180,7 @@ public class Operation {
         try (InputStream in = new ByteArrayInputStream(xmlString.getBytes())) {
             properties.loadFromXML(in);
         } catch (IOException e) {
-            LOGGER.logError(Log4jLogger.SYSTEM_LOG, e,
-                    LogMessageIdentifier.ERROR);
+            LOGGER.error("Converting to properties failed",  e);
         }
         return properties;
     }
