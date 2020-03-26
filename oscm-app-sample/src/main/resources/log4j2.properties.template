@@ -1,4 +1,4 @@
-# TEMPLATE FILE for the log4j configuration of the OpenStack controller.
+# TEMPLATE FILE for the log4j configuration of the Sample controller.
 
 appender.console.type = Console
 appender.console.name = STDOUT
