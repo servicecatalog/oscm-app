@@ -242,14 +242,13 @@
                 </h:form>
                 </c:when>
 			    <c:otherwise>
-	                <div class="heading_data_3_class">
-	                    <div class="heading_data_3_bg_class">
-	                        <h4>
-	                            <h:outputText
-	                                    value="#{msg['ui.config.part.vsphereapi.empty']}"/>
-	                        </h4>
-	                    </div>
-	                </div>
+				  <h:panelGroup>
+				    <dl class="rich-messages box warning">
+				      <dt>
+				        <h:outputText style="color: red" value="#{msg['ui.config.part.vsphereapi.empty']}"/>
+				      </dt>
+				    </dl>
+				  </h:panelGroup>
                 </c:otherwise>
                 </c:choose>
             </div>
