@@ -110,7 +110,7 @@
                 </div>
             </div>
             <div style="margin-top: 5px;">
-                <a4j:outputPanel styleClass="jqSelect" layout="block">
+                <a4j:outputPanel styleClass="jqSelect" layout="block" rendered="#{not empty targetLocationBean.selectedVCenter}">
                     <h:selectOneMenu
                             value="#{targetLocationBean.currentVCenter}"
                             onclick="javascript:AdmUtils.storeValue(this);"
