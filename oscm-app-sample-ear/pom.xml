@@ -22,12 +22,6 @@
         </dependency>
         <dependency>
             <groupId>org.oscm</groupId>
-            <artifactId>oscm-app-sample-ui</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <type>war</type>
-        </dependency>
-        <dependency>
-            <groupId>org.oscm</groupId>
             <artifactId>oscm-app-common</artifactId>
             <version>1.0-SNAPSHOT</version>
             <type>war</type>
@@ -47,11 +41,6 @@
             <groupId>com.github.servicecatalog.oscm-commons</groupId>
             <artifactId>oscm-common</artifactId>
         </dependency>
-        <!--check if necessary-->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
@@ -69,14 +58,8 @@
                         </ejbModule>
                         <webModule>
                             <groupId>org.oscm</groupId>
-                            <artifactId>oscm-app-sample-ui</artifactId>
-                            <contextRoot>oscm-app-sample</contextRoot>
-                            <bundleFileName>oscm-app-sample.war</bundleFileName>
-                        </webModule>
-                        <webModule>
-                            <groupId>org.oscm</groupId>
                             <artifactId>oscm-app-common</artifactId>
-                            <contextRoot>oscm-app-sample-common</contextRoot>
+                            <contextRoot>oscm-app-sample</contextRoot>
                             <bundleFileName>oscm-app-common.war</bundleFileName>
                         </webModule>
                     </modules>

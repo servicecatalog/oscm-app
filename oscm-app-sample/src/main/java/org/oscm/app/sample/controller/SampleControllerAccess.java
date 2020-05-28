@@ -31,6 +31,10 @@ public class SampleControllerAccess implements ControllerAccess {
     @Override
     public List<String> getControllerParameterKeys() {
         LinkedList<String> result = new LinkedList<>();
+        result.add(PropertyHandler.TECPARAM_USER);
+        result.add(PropertyHandler.TECPARAM_PWD);
+        result.add(PropertyHandler.TECPARAM_EMAIL);
+        result.add(PropertyHandler.TECPARAM_MESSAGETEXT);
         return result;
     }
 }
