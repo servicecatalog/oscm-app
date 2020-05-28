@@ -7,6 +7,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:a4j="http://richfaces.org/a4j"
       xmlns:adm="http://www.fujitsu.com/global/services/software/interstage"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
       xmlns:rich="http://richfaces.org/rich">
 
 
@@ -96,6 +97,7 @@
                   styleClass="statusPanel #{targetLocationBean.statusClass}"
                   rendered="#{targetLocationBean.status != null}"/>
 
+    
     <div class="nested_heading_data_class">
         <h:form>
             <div class="heading_data_4_class">
@@ -108,7 +110,7 @@
                 </div>
             </div>
             <div style="margin-top: 5px;">
-                <a4j:outputPanel styleClass="jqSelect" layout="block">
+                <a4j:outputPanel styleClass="jqSelect" layout="block" rendered="#{not empty targetLocationBean.selectedVCenter}">
                     <h:selectOneMenu
                             value="#{targetLocationBean.currentVCenter}"
                             onclick="javascript:AdmUtils.storeValue(this);"
@@ -125,8 +127,12 @@
                 </a4j:outputPanel>
             </div>
         </h:form>
+        
+        
         <div id="accordion_area_vcenter">
             <div class="box_area_class">
+            <c:choose>
+            <c:when test="#{not empty targetLocationBean.selectedVCenter}">
                 <!--▼ Heading data 3 ▼-->
                 <div class="heading_data_3_class">
                     <div class="heading_data_3_bg_class">
@@ -136,7 +142,6 @@
                         </h4>
                     </div>
                 </div>
-                
                 <ui:include id="clusterInclude" src="cluster.xhtml">
 			        		  <ui:param name="dialogId" value="clusterDetails" />
 			        	</ui:include>
@@ -235,8 +240,19 @@
                                 action="#{targetLocationBean.save}"/>
                     </a4j:outputPanel>
                 </h:form>
+                </c:when>
+			    <c:otherwise>
+				  <h:panelGroup>
+				    <dl class="rich-messages box warning">
+				      <dt>
+				        <h:outputText style="color: red" value="#{msg['ui.config.part.vsphereapi.empty']}"/>
+				      </dt>
+				    </dl>
+				  </h:panelGroup>
+                </c:otherwise>
+                </c:choose>
             </div>
-
+			
             <div class="box_area_class">
                 <div class="heading_data_3_class">
                     <div class="heading_data_3_bg_class">
