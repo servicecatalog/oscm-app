@@ -28,6 +28,8 @@
         <module>oscm-app-vmware-ear</module>
         <module>oscm-app-sample</module>
         <module>oscm-app-sample-ear</module>
+        <module>oscm-app-approval-ear</module>
+        <module>oscm-app-approval</module>
     </modules>
 
     <properties>
