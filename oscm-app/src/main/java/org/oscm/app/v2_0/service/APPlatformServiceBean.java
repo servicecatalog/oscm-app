@@ -231,12 +231,12 @@ public class APPlatformServiceBean implements APPlatformService {
         try {
           excl = filter.test(instance.getAttributeMap());
         } catch (BadResultException e) {
-
+          LOGGER.error("Unexpected error.", e);
         }
         try {
           excl |= filter.test(instance.getParameterMap());
         } catch (BadResultException e) {
-
+          LOGGER.error("Unexpected error.", e);
         }
       }
       if (!excl) result.add(instance.getInstanceId());
