@@ -1,26 +1,35 @@
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
- *  Copyright FUJITSU LIMITED 2018
+ * <p>Copyright FUJITSU LIMITED 2018
  *
- *  Creation Date: 16.08.2012
+ * <p>Creation Date: 16.08.2012
  *
- *******************************************************************************/
+ * <p>*****************************************************************************
+ */
 package org.oscm.app.v2_0.service;
 
-import org.apache.commons.codec.binary.Base64;
-import org.oscm.app.business.APPlatformControllerFactory;
-import org.oscm.app.business.exceptions.BadResultException;
-import org.oscm.app.business.exceptions.ServiceInstanceNotFoundException;
-import org.oscm.app.dao.ServiceInstanceDAO;
-import org.oscm.app.domain.PlatformConfigurationKey;
-import org.oscm.app.domain.ServiceInstance;
-import org.oscm.app.v2_0.data.*;
-import org.oscm.app.v2_0.exceptions.*;
-import org.oscm.app.v2_0.intf.APPlatformController;
-import org.oscm.app.v2_0.intf.APPlatformService;
-import org.oscm.vo.VOUserDetails;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -29,14 +38,29 @@ import javax.crypto.NoSuchPaddingException;
 import javax.ejb.EJB;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.security.*;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.util.*;
+
+import org.apache.commons.codec.binary.Base64;
+import org.oscm.app.business.APPlatformControllerFactory;
+import org.oscm.app.business.exceptions.BadResultException;
+import org.oscm.app.business.exceptions.ServiceInstanceNotFoundException;
+import org.oscm.app.dao.ServiceInstanceDAO;
+import org.oscm.app.domain.PlatformConfigurationKey;
+import org.oscm.app.domain.ServiceInstance;
+import org.oscm.app.v2_0.data.ControllerSettings;
+import org.oscm.app.v2_0.data.PasswordAuthentication;
+import org.oscm.app.v2_0.data.ProvisioningSettings;
+import org.oscm.app.v2_0.data.Setting;
+import org.oscm.app.v2_0.data.User;
+import org.oscm.app.v2_0.exceptions.APPlatformException;
+import org.oscm.app.v2_0.exceptions.ConfigurationException;
+import org.oscm.app.v2_0.exceptions.ControllerLookupException;
+import org.oscm.app.v2_0.exceptions.ObjectNotFoundException;
+import org.oscm.app.v2_0.exceptions.SuspendException;
+import org.oscm.app.v2_0.intf.APPlatformController;
+import org.oscm.app.v2_0.intf.APPlatformService;
+import org.oscm.vo.VOUserDetails;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** @author Dirk Bernsau */
 @Stateless(name = "org.oscm.app.v2_0.intf.APPlatformService")
@@ -108,7 +132,7 @@ public class APPlatformServiceBean implements APPlatformService {
       mailService.sendMail(mailAddresses, subject, text);
     } catch (Exception e) {
       LOGGER.warn("Controller cannot send mail for instance processing.", e);
-		throw new SuspendException("Controller cannot send mail for instance processing.", e);
+      throw new SuspendException("Controller cannot send mail for instance processing.", e);
     }
   }
 
@@ -188,6 +212,34 @@ public class APPlatformServiceBean implements APPlatformService {
     List<ServiceInstance> instances = instanceDAO.getInstancesForController(controllerId);
     for (ServiceInstance instance : instances) {
       result.add(instance.getInstanceId());
+    }
+    return result;
+  }
+
+  @Override
+  public Collection<String> listServiceInstances(
+      String controllerId,
+      Predicate<Map<String, Setting>> filter,
+      PasswordAuthentication authentication)
+      throws APPlatformException {
+    Collection<String> result = new ArrayList<>();
+    List<ServiceInstance> instances = instanceDAO.getInstancesForController(controllerId);
+
+    for (ServiceInstance instance : instances) {
+      boolean excl = false;
+      if (filter != null) {
+        try {
+          excl = filter.test(instance.getAttributeMap());
+        } catch (BadResultException e) {
+
+        }
+        try {
+          excl |= filter.test(instance.getParameterMap());
+        } catch (BadResultException e) {
+
+        }
+      }
+      if (!excl) result.add(instance.getInstanceId());
     }
     return result;
   }
@@ -350,7 +402,8 @@ public class APPlatformServiceBean implements APPlatformService {
         }
       }
 
-      controllers.stream()
+      controllers
+          .stream()
           .filter(id -> !PROXY_CONTROLLER_ID.equals(id))
           .forEach(
               id -> {
@@ -397,6 +450,7 @@ public class APPlatformServiceBean implements APPlatformService {
       }
 
       byte[] decodedPassword = Base64.decodeBase64(encryptedPassword.getBytes("UTF-8"));
+      @SuppressWarnings("null")
       Cipher c2 = Cipher.getInstance(privateKey.getAlgorithm());
       c2.init(Cipher.DECRYPT_MODE, privateKey);
       byte[] decryptedAsBytes = c2.doFinal(decodedPassword);

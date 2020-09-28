@@ -9,22 +9,32 @@
  */
 package org.oscm.app.approval.controller;
 
-import org.oscm.app.approval.data.State;
-import org.oscm.app.v2_0.APPlatformServiceFactory;
-import org.oscm.app.v2_0.data.*;
-import org.oscm.app.v2_0.exceptions.APPlatformException;
-import org.oscm.app.v2_0.intf.APPlatformController;
-import org.oscm.app.v2_0.intf.APPlatformService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.List;
+import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import java.util.List;
-import java.util.Properties;
+import javax.inject.Inject;
+
+import org.oscm.app.approval.data.State;
+import org.oscm.app.v2_0.APPlatformServiceFactory;
+import org.oscm.app.v2_0.data.ControllerSettings;
+import org.oscm.app.v2_0.data.InstanceDescription;
+import org.oscm.app.v2_0.data.InstanceStatus;
+import org.oscm.app.v2_0.data.InstanceStatusUsers;
+import org.oscm.app.v2_0.data.LocalizedText;
+import org.oscm.app.v2_0.data.OperationParameter;
+import org.oscm.app.v2_0.data.ProvisioningSettings;
+import org.oscm.app.v2_0.data.ServiceUser;
+import org.oscm.app.v2_0.exceptions.APPlatformException;
+import org.oscm.app.v2_0.intf.APPlatformController;
+import org.oscm.app.v2_0.intf.APPlatformService;
+import org.oscm.app.v2_0.intf.ControllerAccess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Stateless(mappedName = "bss/app/controller/ess.approval")
 @Remote(APPlatformController.class)
@@ -33,6 +43,8 @@ public class ApprovalController implements APPlatformController {
   private static final Logger LOGGER = LoggerFactory.getLogger(ApprovalController.class);
   public static final String ID = "ess.approval";
   private APPlatformService platformService;
+
+  ApprovalControllerAccess controllerAccess;
 
   @PostConstruct
   public void initialize() {
@@ -47,15 +59,29 @@ public class ApprovalController implements APPlatformController {
 
   @Override
   @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
-  public InstanceDescription createInstance(ProvisioningSettings settings) {
+  public InstanceDescription createInstance(ProvisioningSettings settings)
+      throws APPlatformException {
     PropertyHandler paramHandler = new PropertyHandler(settings);
     paramHandler.setState(State.CREATION_REQUESTED);
-
+    
+    String customerId = settings.getOrganizationId();
+    checkIfAlreadyExisting(customerId);
+    
     InstanceDescription id = new InstanceDescription();
     id.setInstanceId("Instance_" + System.currentTimeMillis());
     id.setChangedParameters(settings.getParameters());
     id.setChangedAttributes(settings.getAttributes());
+
     return id;
+  }
+
+  private void checkIfAlreadyExisting(String customerOrgId) throws APPlatformException {
+    Object data = new ApprovalInstanceAccess().getCustomerSettings(customerOrgId);
+    if (data != null)
+      throw new APPlatformException(
+          String.format(
+              "An approval service is already subscribed for the customer organization ID %s.",
+              customerOrgId));
   }
 
   @Override
@@ -166,5 +192,14 @@ public class ApprovalController implements APPlatformController {
   }
 
   @Override
-  public void setControllerSettings(ControllerSettings controllerSettings) {}
+  public void setControllerSettings(ControllerSettings settings) {
+    if (controllerAccess != null) {
+      controllerAccess.storeSettings(settings);
+    }
+  }
+
+  @Inject
+  public void setControllerAccess(final ControllerAccess access) {
+    this.controllerAccess = (ApprovalControllerAccess) access;
+  }
 }

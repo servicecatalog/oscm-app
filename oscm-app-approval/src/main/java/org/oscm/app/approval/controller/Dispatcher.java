@@ -11,7 +11,6 @@ package org.oscm.app.approval.controller;
 
 import org.oscm.app.approval.data.State;
 import org.oscm.app.v2_0.data.InstanceStatus;
-import org.oscm.app.v2_0.exceptions.APPlatformException;
 import org.oscm.app.v2_0.intf.APPlatformService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +75,7 @@ public class Dispatcher {
     // When provisioning is done, provide access information that can be
     // shown to the subscriber.
     if (result.isReady()) {
+        
       result.setAccessInfo("Access information for instance " + instanceId);
     }
 
