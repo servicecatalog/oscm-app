@@ -1,11 +1,12 @@
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
- *  Copyright FUJITSU LIMITED 2018
+ * <p>Copyright FUJITSU LIMITED 2018
  *
- *  Creation Date: 2016-05-24
+ * <p>Creation Date: 2016-05-24
  *
- *******************************************************************************/
-
+ * <p>*****************************************************************************
+ */
 package org.oscm.app.vmware.business;
 
 import static org.junit.Assert.assertEquals;
@@ -29,433 +30,574 @@ import org.oscm.app.v2_0.exceptions.APPlatformException;
 import org.oscm.app.vmware.i18n.Messages;
 import org.oscm.app.vmware.persistence.DataAccessService;
 
-/**
- * @author Dirk Bernsau
- * 
- */
+/** @author Dirk Bernsau */
 public class VMwarePropertyHandlerTest {
 
-    private HashMap<String, Setting> parameters;
-    private HashMap<String, Setting> configSettings;
-    private ProvisioningSettings settings;
-    private VMPropertyHandler propertyHandler = new VMPropertyHandler(settings);
-    private DataAccessService das;
+  private HashMap<String, Setting> parameters;
+  private HashMap<String, Setting> configSettings;
+  private ProvisioningSettings settings;
+  private VMPropertyHandler propertyHandler = new VMPropertyHandler(settings);
+  private DataAccessService das;
 
-    @Before
-    public void before() {
-        parameters = new HashMap<>();
-        configSettings = new HashMap<>();
-        settings = new ProvisioningSettings(parameters, configSettings,
-                Messages.DEFAULT_LOCALE);
-        propertyHandler = spy(new VMPropertyHandler(settings));
+  @Before
+  public void before() {
+    parameters = new HashMap<>();
+    configSettings = new HashMap<>();
+    settings = new ProvisioningSettings(parameters, configSettings, Messages.DEFAULT_LOCALE);
+    propertyHandler = spy(new VMPropertyHandler(settings));
 
-        das = mock(DataAccessService.class);
-        doReturn(das).when(propertyHandler).getDataAccessService();
+    das = mock(DataAccessService.class);
+    doReturn(das).when(propertyHandler).getDataAccessService();
+  }
+
+  @Test
+  public void testNetworkParameter() {
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC1_NETWORK_SETTINGS,
+            new Setting(VMPropertyHandler.TS_NIC1_NETWORK_SETTINGS, "DHCP"));
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC2_NETWORK_SETTINGS,
+            new Setting(VMPropertyHandler.TS_NIC2_NETWORK_SETTINGS, "DHCP"));
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC3_NETWORK_SETTINGS,
+            new Setting(VMPropertyHandler.TS_NIC3_NETWORK_SETTINGS, "DHCP"));
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC4_NETWORK_SETTINGS,
+            new Setting(VMPropertyHandler.TS_NIC4_NETWORK_SETTINGS, "DHCP"));
+
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC1_GATEWAY,
+            new Setting(VMPropertyHandler.TS_NIC1_GATEWAY, "127.0.0.1"));
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC2_GATEWAY,
+            new Setting(VMPropertyHandler.TS_NIC2_GATEWAY, "127.0.0.2"));
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC3_GATEWAY,
+            new Setting(VMPropertyHandler.TS_NIC3_GATEWAY, "127.0.0.3"));
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC4_GATEWAY,
+            new Setting(VMPropertyHandler.TS_NIC4_GATEWAY, "127.0.0.4"));
+
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC1_IP_ADDRESS,
+            new Setting(VMPropertyHandler.TS_NIC1_IP_ADDRESS, "127.1.0.1"));
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC2_IP_ADDRESS,
+            new Setting(VMPropertyHandler.TS_NIC2_IP_ADDRESS, "127.1.0.2"));
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC3_IP_ADDRESS,
+            new Setting(VMPropertyHandler.TS_NIC3_IP_ADDRESS, "127.1.0.3"));
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC4_IP_ADDRESS,
+            new Setting(VMPropertyHandler.TS_NIC4_IP_ADDRESS, "127.1.0.4"));
+
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC1_DNS_SERVER,
+            new Setting(VMPropertyHandler.TS_NIC1_DNS_SERVER, "127.2.0.1"));
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC2_DNS_SERVER,
+            new Setting(VMPropertyHandler.TS_NIC2_DNS_SERVER, "127.2.0.2"));
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC3_DNS_SERVER,
+            new Setting(VMPropertyHandler.TS_NIC3_DNS_SERVER, "127.2.0.3"));
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC4_DNS_SERVER,
+            new Setting(VMPropertyHandler.TS_NIC4_DNS_SERVER, "127.2.0.4"));
+
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC1_DNS_SUFFIX,
+            new Setting(VMPropertyHandler.TS_NIC1_DNS_SUFFIX, "suffix1"));
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC2_DNS_SUFFIX,
+            new Setting(VMPropertyHandler.TS_NIC2_DNS_SUFFIX, "suffix2"));
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC3_DNS_SUFFIX,
+            new Setting(VMPropertyHandler.TS_NIC3_DNS_SUFFIX, "suffix3"));
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC4_DNS_SUFFIX,
+            new Setting(VMPropertyHandler.TS_NIC4_DNS_SUFFIX, "suffix4"));
+
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC1_SUBNET_MASK,
+            new Setting(VMPropertyHandler.TS_NIC1_SUBNET_MASK, "255.255.1.0"));
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC2_SUBNET_MASK,
+            new Setting(VMPropertyHandler.TS_NIC2_SUBNET_MASK, "255.255.2.0"));
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC3_SUBNET_MASK,
+            new Setting(VMPropertyHandler.TS_NIC3_SUBNET_MASK, "255.255.3.0"));
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC4_SUBNET_MASK,
+            new Setting(VMPropertyHandler.TS_NIC4_SUBNET_MASK, "255.255.4.0"));
+
+    for (int i = 1; i < 5; i++) {
+      propertyHandler.isAdapterConfiguredByDhcp(i);
+      propertyHandler.getGateway(i);
+      propertyHandler.getIpAddress(i);
+      propertyHandler.getDNSServer(i);
+      propertyHandler.getDNSSuffix(i);
+      propertyHandler.getSubnetMask(i);
     }
 
-    @Test
-    public void testNetworkParameter() {
-        settings.getParameters()
-                .put(VMPropertyHandler.TS_NIC1_NETWORK_SETTINGS,
-                        new Setting(VMPropertyHandler.TS_NIC1_NETWORK_SETTINGS,
-                                "DHCP"));
-        settings.getParameters()
-                .put(VMPropertyHandler.TS_NIC2_NETWORK_SETTINGS,
-                        new Setting(VMPropertyHandler.TS_NIC2_NETWORK_SETTINGS,
-                                "DHCP"));
-        settings.getParameters()
-                .put(VMPropertyHandler.TS_NIC3_NETWORK_SETTINGS,
-                        new Setting(VMPropertyHandler.TS_NIC3_NETWORK_SETTINGS,
-                                "DHCP"));
-        settings.getParameters()
-                .put(VMPropertyHandler.TS_NIC4_NETWORK_SETTINGS,
-                        new Setting(VMPropertyHandler.TS_NIC4_NETWORK_SETTINGS,
-                                "DHCP"));
-
-        settings.getParameters().put(VMPropertyHandler.TS_NIC1_GATEWAY,
-                new Setting(VMPropertyHandler.TS_NIC1_GATEWAY, "127.0.0.1"));
-        settings.getParameters().put(VMPropertyHandler.TS_NIC2_GATEWAY,
-                new Setting(VMPropertyHandler.TS_NIC2_GATEWAY, "127.0.0.2"));
-        settings.getParameters().put(VMPropertyHandler.TS_NIC3_GATEWAY,
-                new Setting(VMPropertyHandler.TS_NIC3_GATEWAY, "127.0.0.3"));
-        settings.getParameters().put(VMPropertyHandler.TS_NIC4_GATEWAY,
-                new Setting(VMPropertyHandler.TS_NIC4_GATEWAY, "127.0.0.4"));
-
-        settings.getParameters().put(VMPropertyHandler.TS_NIC1_IP_ADDRESS,
-                new Setting(VMPropertyHandler.TS_NIC1_IP_ADDRESS, "127.1.0.1"));
-        settings.getParameters().put(VMPropertyHandler.TS_NIC2_IP_ADDRESS,
-                new Setting(VMPropertyHandler.TS_NIC2_IP_ADDRESS, "127.1.0.2"));
-        settings.getParameters().put(VMPropertyHandler.TS_NIC3_IP_ADDRESS,
-                new Setting(VMPropertyHandler.TS_NIC3_IP_ADDRESS, "127.1.0.3"));
-        settings.getParameters().put(VMPropertyHandler.TS_NIC4_IP_ADDRESS,
-                new Setting(VMPropertyHandler.TS_NIC4_IP_ADDRESS, "127.1.0.4"));
-
-        settings.getParameters().put(VMPropertyHandler.TS_NIC1_DNS_SERVER,
-                new Setting(VMPropertyHandler.TS_NIC1_DNS_SERVER, "127.2.0.1"));
-        settings.getParameters().put(VMPropertyHandler.TS_NIC2_DNS_SERVER,
-                new Setting(VMPropertyHandler.TS_NIC2_DNS_SERVER, "127.2.0.2"));
-        settings.getParameters().put(VMPropertyHandler.TS_NIC3_DNS_SERVER,
-                new Setting(VMPropertyHandler.TS_NIC3_DNS_SERVER, "127.2.0.3"));
-        settings.getParameters().put(VMPropertyHandler.TS_NIC4_DNS_SERVER,
-                new Setting(VMPropertyHandler.TS_NIC4_DNS_SERVER, "127.2.0.4"));
-
-        settings.getParameters().put(VMPropertyHandler.TS_NIC1_DNS_SUFFIX,
-                new Setting(VMPropertyHandler.TS_NIC1_DNS_SUFFIX, "suffix1"));
-        settings.getParameters().put(VMPropertyHandler.TS_NIC2_DNS_SUFFIX,
-                new Setting(VMPropertyHandler.TS_NIC2_DNS_SUFFIX, "suffix2"));
-        settings.getParameters().put(VMPropertyHandler.TS_NIC3_DNS_SUFFIX,
-                new Setting(VMPropertyHandler.TS_NIC3_DNS_SUFFIX, "suffix3"));
-        settings.getParameters().put(VMPropertyHandler.TS_NIC4_DNS_SUFFIX,
-                new Setting(VMPropertyHandler.TS_NIC4_DNS_SUFFIX, "suffix4"));
-
-        settings.getParameters().put(
-                VMPropertyHandler.TS_NIC1_SUBNET_MASK,
-                new Setting(VMPropertyHandler.TS_NIC1_SUBNET_MASK,
-                        "255.255.1.0"));
-        settings.getParameters().put(
-                VMPropertyHandler.TS_NIC2_SUBNET_MASK,
-                new Setting(VMPropertyHandler.TS_NIC2_SUBNET_MASK,
-                        "255.255.2.0"));
-        settings.getParameters().put(
-                VMPropertyHandler.TS_NIC3_SUBNET_MASK,
-                new Setting(VMPropertyHandler.TS_NIC3_SUBNET_MASK,
-                        "255.255.3.0"));
-        settings.getParameters().put(
-                VMPropertyHandler.TS_NIC4_SUBNET_MASK,
-                new Setting(VMPropertyHandler.TS_NIC4_SUBNET_MASK,
-                        "255.255.4.0"));
-
-        for (int i = 1; i < 5; i++) {
-            propertyHandler.isAdapterConfiguredByDhcp(i);
-            propertyHandler.getGateway(i);
-            propertyHandler.getIpAddress(i);
-            propertyHandler.getDNSServer(i);
-            propertyHandler.getDNSSuffix(i);
-            propertyHandler.getSubnetMask(i);
-        }
-
-        try {
-            propertyHandler.isAdapterConfiguredByDhcp(5);
-        } catch (IllegalArgumentException e) {
-            assertTrue("NIC identifier 5 is out of range. Valid range is [1-4]."
-                    .equals(e.getMessage()));
-        }
-
-        try {
-            propertyHandler.getGateway(5);
-        } catch (IllegalArgumentException e) {
-            assertTrue("NIC identifier 5 is out of range. Valid range is [1-4]."
-                    .equals(e.getMessage()));
-        }
-
-        try {
-            propertyHandler.getIpAddress(5);
-        } catch (IllegalArgumentException e) {
-            assertTrue("NIC identifier 5 is out of range. Valid range is [1-4]."
-                    .equals(e.getMessage()));
-        }
-
-        try {
-            propertyHandler.getDNSServer(5);
-        } catch (IllegalArgumentException e) {
-            assertTrue("NIC identifier 5 is out of range. Valid range is [1-4]."
-                    .equals(e.getMessage()));
-        }
-
-        try {
-            propertyHandler.getDNSSuffix(5);
-        } catch (IllegalArgumentException e) {
-            assertTrue("NIC identifier 5 is out of range. Valid range is [1-4]."
-                    .equals(e.getMessage()));
-        }
-
-        try {
-            propertyHandler.getSubnetMask(5);
-        } catch (IllegalArgumentException e) {
-            assertTrue("NIC identifier 5 is out of range. Valid range is [1-4]."
-                    .equals(e.getMessage()));
-        }
+    try {
+      propertyHandler.isAdapterConfiguredByDhcp(5);
+    } catch (IllegalArgumentException e) {
+      assertTrue("NIC identifier 5 is out of range. Valid range is [1-4].".equals(e.getMessage()));
     }
 
-    @Test
-    public void getConfigDiskSpaceMB_sizeParameter() throws Exception {
-        // given
-        settings.getParameters().put(VMPropertyHandler.TS_DISK_SIZE,
-                new Setting(VMPropertyHandler.TS_DISK_SIZE, "17"));
-
-        // when
-        double diskSize = propertyHandler.getConfigDiskSpaceMB();
-
-        // then
-        assertTrue(diskSize == (17.0 * 1024));
+    try {
+      propertyHandler.getGateway(5);
+    } catch (IllegalArgumentException e) {
+      assertTrue("NIC identifier 5 is out of range. Valid range is [1-4].".equals(e.getMessage()));
     }
 
-    @Test
-    public void getConfigDiskSpaceMB_parameterMissing() throws Exception {
-        // given
-
-        // when
-        double diskSize = propertyHandler.getConfigDiskSpaceMB();
-
-        // then
-        assertTrue(diskSize == .0);
+    try {
+      propertyHandler.getIpAddress(5);
+    } catch (IllegalArgumentException e) {
+      assertTrue("NIC identifier 5 is out of range. Valid range is [1-4].".equals(e.getMessage()));
     }
 
-    @Test(expected = APPlatformException.class)
-    public void getConfigDiskSpaceMB_parameterInvalid() throws Exception {
-        // given
-        settings.getParameters().put(VMPropertyHandler.TS_DISK_SIZE,
-                new Setting(VMPropertyHandler.TS_DISK_SIZE, "12abc"));
-
-        // when
-        propertyHandler.getConfigDiskSpaceMB();
+    try {
+      propertyHandler.getDNSServer(5);
+    } catch (IllegalArgumentException e) {
+      assertTrue("NIC identifier 5 is out of range. Valid range is [1-4].".equals(e.getMessage()));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void getNetworkAdapter_0() {
-        // given
-        parameters.put(VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER, "adapter 1"));
-        parameters.put(VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER, "adapter 2"));
-        parameters.put(VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER, "adapter 3"));
-        parameters.put(VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER, "adapter 4"));
-
-        // when
-        propertyHandler.getNetworkAdapter(0);
+    try {
+      propertyHandler.getDNSSuffix(5);
+    } catch (IllegalArgumentException e) {
+      assertTrue("NIC identifier 5 is out of range. Valid range is [1-4].".equals(e.getMessage()));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void getNetworkAdapter_greater_4() {
-        // given
-        parameters.put(VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER, "adapter 1"));
-        parameters.put(VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER, "adapter 2"));
-        parameters.put(VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER, "adapter 3"));
-        parameters.put(VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER, "adapter 4"));
-
-        // when
-        propertyHandler.getNetworkAdapter(5);
+    try {
+      propertyHandler.getSubnetMask(5);
+    } catch (IllegalArgumentException e) {
+      assertTrue("NIC identifier 5 is out of range. Valid range is [1-4].".equals(e.getMessage()));
     }
+  }
 
-    @Test
-    public void getNetworkAdapter_1() {
-        // given
-        parameters.put(VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER, "adapter 1"));
-        parameters.put(VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER, "adapter 2"));
-        parameters.put(VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER, "adapter 3"));
-        parameters.put(VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER, "adapter 4"));
+  @Test
+  public void getVsphereAttributes_withParameter() {
+    // given
+    settings
+        .getParameters()
+        .put("VSPHERE_ATTRIBUTE_BACKUP", new Setting("VSPHERE_ATTRIBUTE_BACKUP", "true"));
 
-        // when
-        String adapter = propertyHandler.getNetworkAdapter(1);
+    // when
+    HashMap<String, String> attributes = propertyHandler.getVsphereAttributes();
 
-        // then
-        assertEquals("adapter 1", adapter);
-    }
+    // then
+    assertEquals("true", attributes.get("BACKUP"));
+  }
 
-    @Test
-    public void getNetworkAdapter_2() {
-        // given
-        parameters.put(VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER, "adapter 1"));
-        parameters.put(VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER, "adapter 2"));
-        parameters.put(VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER, "adapter 3"));
-        parameters.put(VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER, "adapter 4"));
+  @Test
+  public void getVsphereAttributes_withCustomAttributes() {
+    // given
+    settings
+        .getCustomAttributes()
+        .put("VSPHERE_ATTRIBUTE_BACKUP", new Setting("VSPHERE_ATTRIBUTE_BACKUP", "true"));
 
-        // when
-        String adapter = propertyHandler.getNetworkAdapter(2);
+    // when
+    HashMap<String, String> attributes = propertyHandler.getVsphereAttributes();
 
-        // then
-        assertEquals("adapter 2", adapter);
-    }
+    // then
+    assertEquals("true", attributes.get("BACKUP"));
+  }
 
-    @Test
-    public void getNetworkAdapter_3() {
-        // given
-        parameters.put(VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER, "adapter 1"));
-        parameters.put(VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER, "adapter 2"));
-        parameters.put(VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER, "adapter 3"));
-        parameters.put(VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER, "adapter 4"));
+  @Test
+  public void getVsphereAttributes_withCustomAttributesAndParameter() {
+    // given
+    settings
+        .getCustomAttributes()
+        .put("VSPHERE_ATTRIBUTE_BACKUP", new Setting("VSPHERE_ATTRIBUTE_BACKUP", "false"));
 
-        // when
-        String adapter = propertyHandler.getNetworkAdapter(3);
+    settings
+        .getCustomAttributes()
+        .put("VSPHERE_ATTRIBUTE_BACKUP", new Setting("VSPHERE_ATTRIBUTE_BACKUP", "true"));
 
-        // then
-        assertEquals("adapter 3", adapter);
-    }
+    // when
+    HashMap<String, String> attributes = propertyHandler.getVsphereAttributes();
 
-    @Test
-    public void getNetworkAdapter_4() {
-        // given
-        parameters.put(VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER, "adapter 1"));
-        parameters.put(VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER, "adapter 2"));
-        parameters.put(VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER, "adapter 3"));
-        parameters.put(VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER, new Setting(
-                VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER, "adapter 4"));
+    // then
+    assertEquals("true", attributes.get("BACKUP"));
+  }
 
-        // when
-        String adapter = propertyHandler.getNetworkAdapter(4);
+  @Test
+  public void getConfigDiskSpaceMB_sizeParameter() throws Exception {
+    // given
+    settings
+        .getParameters()
+        .put(VMPropertyHandler.TS_DISK_SIZE, new Setting(VMPropertyHandler.TS_DISK_SIZE, "17"));
 
-        // then
-        assertEquals("adapter 4", adapter);
-    }
+    // when
+    double diskSize = propertyHandler.getConfigDiskSpaceMB();
 
-    @Test
-    public void releaseManuallyDefinedIPAddresses() throws Exception {
-        // given
-        parameters.put(VMPropertyHandler.TS_NUMBER_OF_NICS, new Setting(
-                VMPropertyHandler.TS_NUMBER_OF_NICS, "1"));
-        doReturn(Boolean.TRUE).when(propertyHandler)
-                .isAdapterConfiguredByDatabase(1);
-        doReturn("ipaddress").when(propertyHandler).getIpAddress(anyInt());
-        doReturn("site").when(propertyHandler).getTargetVCenterServer();
-        doReturn("datacenter").when(propertyHandler).getTargetDatacenter();
-        doReturn("cluster").when(propertyHandler).getTargetCluster();
-        doReturn("vlan").when(propertyHandler).getVLAN(anyInt());
+    // then
+    assertTrue(diskSize == (17.0 * 1024));
+  }
 
-        // when
-        propertyHandler.releaseManuallyDefinedIPAddresses();
+  @Test
+  public void getConfigDiskSpaceMB_parameterMissing() throws Exception {
+    // given
 
-        // then
-        verify(das, times(1)).releaseIPAddress(eq("site"), eq("datacenter"),
-                eq("cluster"), eq("vlan"), eq("ipaddress"));
-    }
+    // when
+    double diskSize = propertyHandler.getConfigDiskSpaceMB();
 
-    @Test(expected = IllegalArgumentException.class)
-    public void getIpAddress_NIC0() {
-        // given
-        parameters.put(VMPropertyHandler.TS_NIC1_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC1_IP_ADDRESS, "ip address 1"));
-        parameters.put(VMPropertyHandler.TS_NIC2_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC2_IP_ADDRESS, "ip address 2"));
-        parameters.put(VMPropertyHandler.TS_NIC3_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC3_IP_ADDRESS, "ip address 3"));
-        parameters.put(VMPropertyHandler.TS_NIC4_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC4_IP_ADDRESS, "ip address 4"));
+    // then
+    assertTrue(diskSize == .0);
+  }
 
-        // when
-        propertyHandler.getIpAddress(0);
-    }
+  @Test(expected = APPlatformException.class)
+  public void getConfigDiskSpaceMB_parameterInvalid() throws Exception {
+    // given
+    settings
+        .getParameters()
+        .put(VMPropertyHandler.TS_DISK_SIZE, new Setting(VMPropertyHandler.TS_DISK_SIZE, "12abc"));
 
-    @Test
-    public void getIpAddress_NIC1() {
-        // given
-        parameters.put(VMPropertyHandler.TS_NIC1_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC1_IP_ADDRESS, "ip address 1"));
-        parameters.put(VMPropertyHandler.TS_NIC2_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC2_IP_ADDRESS, "ip address 2"));
-        parameters.put(VMPropertyHandler.TS_NIC3_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC3_IP_ADDRESS, "ip address 3"));
-        parameters.put(VMPropertyHandler.TS_NIC4_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC4_IP_ADDRESS, "ip address 4"));
+    // when
+    propertyHandler.getConfigDiskSpaceMB();
+  }
 
-        // when
-        String ipAddress = propertyHandler.getIpAddress(1);
+  @Test(expected = IllegalArgumentException.class)
+  public void getNetworkAdapter_0() {
+    // given
+    parameters.put(
+        VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER, "adapter 1"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER, "adapter 2"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER, "adapter 3"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER, "adapter 4"));
 
-        // then
-        assertEquals("ip address 1", ipAddress);
-    }
+    // when
+    propertyHandler.getNetworkAdapter(0);
+  }
 
-    @Test
-    public void getIpAddress_NIC1_undefined() {
-        // given
+  @Test(expected = IllegalArgumentException.class)
+  public void getNetworkAdapter_greater_4() {
+    // given
+    parameters.put(
+        VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER, "adapter 1"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER, "adapter 2"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER, "adapter 3"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER, "adapter 4"));
 
-        // when
-        String ipAddress = propertyHandler.getIpAddress(1);
+    // when
+    propertyHandler.getNetworkAdapter(5);
+  }
 
-        // then
-        assertNull(ipAddress);
-    }
+  @Test
+  public void getNetworkAdapter_1() {
+    // given
+    parameters.put(
+        VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER, "adapter 1"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER, "adapter 2"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER, "adapter 3"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER, "adapter 4"));
 
-    @Test
-    public void getIpAddress_NIC2() {
-        // given
-        parameters.put(VMPropertyHandler.TS_NIC1_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC1_IP_ADDRESS, "ip address 1"));
-        parameters.put(VMPropertyHandler.TS_NIC2_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC2_IP_ADDRESS, "ip address 2"));
-        parameters.put(VMPropertyHandler.TS_NIC3_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC3_IP_ADDRESS, "ip address 3"));
-        parameters.put(VMPropertyHandler.TS_NIC4_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC4_IP_ADDRESS, "ip address 4"));
+    // when
+    String adapter = propertyHandler.getNetworkAdapter(1);
 
-        // when
-        String ipAddress = propertyHandler.getIpAddress(2);
+    // then
+    assertEquals("adapter 1", adapter);
+  }
 
-        // then
-        assertEquals("ip address 2", ipAddress);
-    }
+  @Test
+  public void getNetworkAdapter_2() {
+    // given
+    parameters.put(
+        VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER, "adapter 1"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER, "adapter 2"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER, "adapter 3"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER, "adapter 4"));
 
-    @Test
-    public void getIpAddress_NIC3() {
-        // given
-        parameters.put(VMPropertyHandler.TS_NIC1_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC1_IP_ADDRESS, "ip address 1"));
-        parameters.put(VMPropertyHandler.TS_NIC2_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC2_IP_ADDRESS, "ip address 2"));
-        parameters.put(VMPropertyHandler.TS_NIC3_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC3_IP_ADDRESS, "ip address 3"));
-        parameters.put(VMPropertyHandler.TS_NIC4_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC4_IP_ADDRESS, "ip address 4"));
+    // when
+    String adapter = propertyHandler.getNetworkAdapter(2);
 
-        // when
-        String ipAddress = propertyHandler.getIpAddress(3);
+    // then
+    assertEquals("adapter 2", adapter);
+  }
 
-        // then
-        assertEquals("ip address 3", ipAddress);
-    }
+  @Test
+  public void getNetworkAdapter_3() {
+    // given
+    parameters.put(
+        VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER, "adapter 1"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER, "adapter 2"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER, "adapter 3"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER, "adapter 4"));
 
-    @Test
-    public void getIpAddress_NIC4() {
-        // given
-        parameters.put(VMPropertyHandler.TS_NIC1_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC1_IP_ADDRESS, "ip address 1"));
-        parameters.put(VMPropertyHandler.TS_NIC2_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC2_IP_ADDRESS, "ip address 2"));
-        parameters.put(VMPropertyHandler.TS_NIC3_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC3_IP_ADDRESS, "ip address 3"));
-        parameters.put(VMPropertyHandler.TS_NIC4_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC4_IP_ADDRESS, "ip address 4"));
+    // when
+    String adapter = propertyHandler.getNetworkAdapter(3);
 
-        // when
-        String ipAddress = propertyHandler.getIpAddress(4);
+    // then
+    assertEquals("adapter 3", adapter);
+  }
 
-        // then
-        assertEquals("ip address 4", ipAddress);
-    }
+  @Test
+  public void getNetworkAdapter_4() {
+    // given
+    parameters.put(
+        VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC1_NETWORK_ADAPTER, "adapter 1"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC2_NETWORK_ADAPTER, "adapter 2"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC3_NETWORK_ADAPTER, "adapter 3"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER,
+        new Setting(VMPropertyHandler.TS_NIC4_NETWORK_ADAPTER, "adapter 4"));
 
-    @Test(expected = IllegalArgumentException.class)
-    public void getIpAddress_greater_4() {
-        // given
-        parameters.put(VMPropertyHandler.TS_NIC1_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC1_IP_ADDRESS, "ip address 1"));
-        parameters.put(VMPropertyHandler.TS_NIC2_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC2_IP_ADDRESS, "ip address 2"));
-        parameters.put(VMPropertyHandler.TS_NIC3_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC3_IP_ADDRESS, "ip address 3"));
-        parameters.put(VMPropertyHandler.TS_NIC4_IP_ADDRESS, new Setting(
-                VMPropertyHandler.TS_NIC4_IP_ADDRESS, "ip address 4"));
+    // when
+    String adapter = propertyHandler.getNetworkAdapter(4);
 
-        // when
-        propertyHandler.getIpAddress(5);
-    }
+    // then
+    assertEquals("adapter 4", adapter);
+  }
+
+  @Test
+  public void releaseManuallyDefinedIPAddresses() throws Exception {
+    // given
+    parameters.put(
+        VMPropertyHandler.TS_NUMBER_OF_NICS, new Setting(VMPropertyHandler.TS_NUMBER_OF_NICS, "1"));
+    doReturn(Boolean.TRUE).when(propertyHandler).isAdapterConfiguredByDatabase(1);
+    doReturn("ipaddress").when(propertyHandler).getIpAddress(anyInt());
+    doReturn("site").when(propertyHandler).getTargetVCenterServer();
+    doReturn("datacenter").when(propertyHandler).getTargetDatacenter();
+    doReturn("cluster").when(propertyHandler).getTargetCluster();
+    doReturn("vlan").when(propertyHandler).getVLAN(anyInt());
+
+    // when
+    propertyHandler.releaseManuallyDefinedIPAddresses();
+
+    // then
+    verify(das, times(1))
+        .releaseIPAddress(eq("site"), eq("datacenter"), eq("cluster"), eq("vlan"), eq("ipaddress"));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void getIpAddress_NIC0() {
+    // given
+    parameters.put(
+        VMPropertyHandler.TS_NIC1_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC1_IP_ADDRESS, "ip address 1"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC2_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC2_IP_ADDRESS, "ip address 2"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC3_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC3_IP_ADDRESS, "ip address 3"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC4_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC4_IP_ADDRESS, "ip address 4"));
+
+    // when
+    propertyHandler.getIpAddress(0);
+  }
+
+  @Test
+  public void getIpAddress_NIC1() {
+    // given
+    parameters.put(
+        VMPropertyHandler.TS_NIC1_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC1_IP_ADDRESS, "ip address 1"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC2_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC2_IP_ADDRESS, "ip address 2"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC3_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC3_IP_ADDRESS, "ip address 3"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC4_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC4_IP_ADDRESS, "ip address 4"));
+
+    // when
+    String ipAddress = propertyHandler.getIpAddress(1);
+
+    // then
+    assertEquals("ip address 1", ipAddress);
+  }
+
+  @Test
+  public void getIpAddress_NIC1_undefined() {
+    // given
+
+    // when
+    String ipAddress = propertyHandler.getIpAddress(1);
+
+    // then
+    assertNull(ipAddress);
+  }
+
+  @Test
+  public void getIpAddress_NIC2() {
+    // given
+    parameters.put(
+        VMPropertyHandler.TS_NIC1_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC1_IP_ADDRESS, "ip address 1"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC2_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC2_IP_ADDRESS, "ip address 2"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC3_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC3_IP_ADDRESS, "ip address 3"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC4_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC4_IP_ADDRESS, "ip address 4"));
+
+    // when
+    String ipAddress = propertyHandler.getIpAddress(2);
+
+    // then
+    assertEquals("ip address 2", ipAddress);
+  }
+
+  @Test
+  public void getIpAddress_NIC3() {
+    // given
+    parameters.put(
+        VMPropertyHandler.TS_NIC1_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC1_IP_ADDRESS, "ip address 1"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC2_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC2_IP_ADDRESS, "ip address 2"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC3_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC3_IP_ADDRESS, "ip address 3"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC4_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC4_IP_ADDRESS, "ip address 4"));
+
+    // when
+    String ipAddress = propertyHandler.getIpAddress(3);
+
+    // then
+    assertEquals("ip address 3", ipAddress);
+  }
+
+  @Test
+  public void getIpAddress_NIC4() {
+    // given
+    parameters.put(
+        VMPropertyHandler.TS_NIC1_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC1_IP_ADDRESS, "ip address 1"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC2_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC2_IP_ADDRESS, "ip address 2"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC3_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC3_IP_ADDRESS, "ip address 3"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC4_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC4_IP_ADDRESS, "ip address 4"));
+
+    // when
+    String ipAddress = propertyHandler.getIpAddress(4);
+
+    // then
+    assertEquals("ip address 4", ipAddress);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void getIpAddress_greater_4() {
+    // given
+    parameters.put(
+        VMPropertyHandler.TS_NIC1_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC1_IP_ADDRESS, "ip address 1"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC2_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC2_IP_ADDRESS, "ip address 2"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC3_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC3_IP_ADDRESS, "ip address 3"));
+    parameters.put(
+        VMPropertyHandler.TS_NIC4_IP_ADDRESS,
+        new Setting(VMPropertyHandler.TS_NIC4_IP_ADDRESS, "ip address 4"));
+
+    // when
+    propertyHandler.getIpAddress(5);
+  }
 }
