@@ -9,6 +9,13 @@
  */
 package org.oscm.app.approval.controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+
 import org.oscm.app.approval.data.Server;
 import org.oscm.app.v2_0.APPlatformServiceFactory;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
@@ -17,14 +24,6 @@ import org.oscm.app.v2_0.exceptions.APPlatformException;
 import org.oscm.app.v2_0.intf.APPlatformService;
 import org.oscm.app.v2_0.intf.InstanceAccess;
 import org.oscm.app.v2_0.intf.ServerInformation;
-
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
 
 public class ApprovalInstanceAccess implements InstanceAccess {
 
@@ -37,26 +36,22 @@ public class ApprovalInstanceAccess implements InstanceAccess {
   }
 
   public ClientData getCustomerSettings(String clientOrganizationId) throws APPlatformException {
-    ClientData[] data = new ClientData[1];
-    data[0] = new ClientData(clientOrganizationId);
+    ClientData data = new ClientData(clientOrganizationId);
 
-    Predicate<Map<String, Setting>> filter =
-        new Predicate<Map<String, Setting>>() {
-
-          @Override
-          public boolean test(Map<String, Setting> t) {
-            boolean include = t.containsKey(data[0].PARAM_APPROVER_ORG_ID);
-            if (include) {
-              data[0].set(t);
-            }
-            return include;
+    platformService.listServiceInstances(
+        ApprovalController.ID,
+        (Map<String, Setting> t) -> {
+          boolean include = t.containsKey(data.PARAM_APPROVER_ORG_ID);
+          if (include) {
+            data.set(t);
           }
-        };
+          return include;
+        },
+        null);
 
-    Collection<String> instances = platformService.listServiceInstances(ApprovalController.ID, filter, null);
-    
-    if (data[0].isSet()) return data[0];
-
+    if (data.isSet()) {
+        return data;
+    }
     return null;
   }
 
@@ -94,9 +89,7 @@ public class ApprovalInstanceAccess implements InstanceAccess {
     return null;
   }
 
-  /**
-   * Client data for approval trigger callback.
-   */
+  /** Client data for approval trigger callback. */
   public class ClientData {
     String clientOrganizationId = "";
 
