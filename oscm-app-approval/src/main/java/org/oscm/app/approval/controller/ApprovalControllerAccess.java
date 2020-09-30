@@ -22,7 +22,7 @@ import java.util.List;
 
 import javax.ejb.Singleton;
 
-@Singleton(mappedName = "bss/controlleraccess/ess.approval")
+@Singleton(mappedName = "bss/app/controlleraccess/ess.approval")
 public class ApprovalControllerAccess implements ControllerAccess {
 
   private static final long serialVersionUID = 2872054079271208066L;
