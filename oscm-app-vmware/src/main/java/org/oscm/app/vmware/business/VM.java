@@ -10,9 +10,9 @@
 package org.oscm.app.vmware.business;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vmware.vim25.CustomFieldDef;
-import com.vmware.vim25.CustomFieldValue;
 import com.vmware.vim25.GuestInfo;
 import com.vmware.vim25.GuestNicInfo;
 import com.vmware.vim25.InvalidStateFaultMsg;
@@ -106,7 +105,6 @@ public class VM extends Template {
   public List<String> getSnashotsAsList() {
     List<String> snapshots = new ArrayList<String>();
     if (virtualMachineSnapshotInfo != null) {
-      virtualMachineSnapshotInfo.getCurrentSnapshot();
       List<VirtualMachineSnapshotTree> snap = virtualMachineSnapshotInfo.getRootSnapshotList();
       snapshots.addAll(getSnapshots(snap, new ArrayList<String>(), ""));
     }
@@ -128,16 +126,7 @@ public class VM extends Template {
     return virtualMachineSummary.getQuickStats().getGuestMemoryUsage();
   }
 
-  public List<CustomFieldValue> getCostumValues() throws Exception {
-    List<CustomFieldDef> field =
-        (List<CustomFieldDef>)
-            vmw.getServiceUtil().getDynamicProperty(customFieldsManager, "field");
-    List<CustomFieldValue> customfields = virtualMachineSummary.getCustomValue();
-    return customfields;
-  }
-
-  public void setCostumValue(HashMap<String, String> settings) {
-
+  public void setCostumValue(Map<String, String> settings) {
     List<CustomFieldDef> fields;
     try {
       fields =
@@ -379,15 +368,24 @@ public class VM extends Template {
     comment = updateComment(comment, annotation);
     vmConfigSpec.setAnnotation(comment);
 
-    DiskManager diskManager = new DiskManager(vmw, paramHandler);
+    DiskManager diskManager = createDiskManager(paramHandler);
     diskManager.reconfigureDisks(vmConfigSpec, vmInstance);
 
-    NetworkManager.configureNetworkAdapter(vmw, vmConfigSpec, paramHandler, vmInstance);
+    cunfigureNetworkAdapter(paramHandler, vmConfigSpec);
 
     logger.debug("Call vSphere API: reconfigVMTask()");
     ManagedObjectReference reconfigureTask = service.reconfigVMTask(vmInstance, vmConfigSpec);
 
     return (TaskInfo) vmw.getServiceUtil().getDynamicProperty(reconfigureTask, "info");
+  }
+
+  protected void cunfigureNetworkAdapter(
+      VMPropertyHandler paramHandler, VirtualMachineConfigSpec vmConfigSpec) throws Exception {
+    NetworkManager.configureNetworkAdapter(vmw, vmConfigSpec, paramHandler, vmInstance);
+  }
+
+  protected DiskManager createDiskManager(VMPropertyHandler paramHandler) {
+    return new DiskManager(vmw, paramHandler);
   }
 
   public TaskInfo updateCommentField(String comment) throws Exception {
@@ -434,7 +432,7 @@ public class VM extends Template {
     return (TaskInfo) vmw.getServiceUtil().getDynamicProperty(startTask, "info");
   }
 
-  private boolean arePortgroupsAvailable(VMPropertyHandler properties) {
+  boolean arePortgroupsAvailable(VMPropertyHandler properties) {
     int numberOfNICs =
         Integer.parseInt(properties.getServiceSetting(VMPropertyHandler.TS_NUMBER_OF_NICS));
     for (int i = 1; i <= numberOfNICs; i++) {
@@ -487,11 +485,11 @@ public class VM extends Template {
     return VMwareGuestSystemStatus.GUEST_NOTREADY;
   }
 
-  private boolean guestIsReady() {
+  boolean guestIsReady() {
     return (isGuestSystemRunning() && areGuestToolsRunning());
   }
 
-  private String createLogForGetState(
+  String createLogForGetState(
       boolean validHostname,
       VMPropertyHandler configuration,
       boolean isConnected,
@@ -633,7 +631,7 @@ public class VM extends Template {
     return accessInfo;
   }
 
-  private int getDataDiskKey() throws Exception {
+  protected int getDataDiskKey() throws Exception {
     List<VirtualDevice> devices = configSpec.getHardware().getDevice();
     int countDisks = 0;
     int key = -1;
@@ -650,7 +648,7 @@ public class VM extends Template {
     return key;
   }
 
-  private String getDiskSizeInGB(int disk) throws Exception {
+  protected String getDiskSizeInGB(int disk) throws Exception {
     String size = "";
     List<VirtualDevice> devices = configSpec.getHardware().getDevice();
     int countDisks = 0;
