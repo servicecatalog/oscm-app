@@ -9,20 +9,11 @@
  */
 package org.oscm.app.vmware.business.statemachine;
 
-import com.vmware.vim25.LocalizableMessage;
-import com.vmware.vim25.ManagedObjectReference;
-import com.vmware.vim25.TaskFilterSpec;
-import com.vmware.vim25.TaskInfo;
-import com.vmware.vim25.TaskInfoState;
-import com.vmware.vim25.TaskReason;
-import com.vmware.vim25.TaskReasonAlarm;
-import com.vmware.vim25.TaskReasonSchedule;
-import com.vmware.vim25.TaskReasonSystem;
-import com.vmware.vim25.TaskReasonUser;
-import com.vmware.vim25.VimPortType;
 import java.text.MessageFormat;
 import java.util.List;
+
 import javax.xml.datatype.XMLGregorianCalendar;
+
 import org.oscm.app.v2_0.APPlatformServiceFactory;
 import org.oscm.app.v2_0.data.InstanceStatus;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
@@ -36,6 +27,18 @@ import org.oscm.app.vmware.remote.vmware.VMClientPool;
 import org.oscm.app.vmware.remote.vmware.VMwareClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.vmware.vim25.LocalizableMessage;
+import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.TaskFilterSpec;
+import com.vmware.vim25.TaskInfo;
+import com.vmware.vim25.TaskInfoState;
+import com.vmware.vim25.TaskReason;
+import com.vmware.vim25.TaskReasonAlarm;
+import com.vmware.vim25.TaskReasonSchedule;
+import com.vmware.vim25.TaskReasonSystem;
+import com.vmware.vim25.TaskReasonUser;
+import com.vmware.vim25.VimPortType;
 
 public class Actions {
 
@@ -67,6 +70,7 @@ public class Actions {
     try {
       vmClient = VMClientPool.getInstance().getPool().borrowObject(vcenter);
       VM vm = new VM(vmClient, ph.getInstanceName());
+      vm.setCostumValues(ph.getVsphereAttributes());
       TaskInfo tInfo = vm.reconfigureVirtualMachine(ph);
       ph.setTask(tInfo);
       return EVENT_CONFIGURING;

@@ -12,6 +12,7 @@ package org.oscm.app.vmware.business;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,6 +23,7 @@ import org.oscm.app.vmware.remote.vmware.VMwareClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vmware.vim25.CustomFieldDef;
 import com.vmware.vim25.GuestInfo;
 import com.vmware.vim25.GuestNicInfo;
 import com.vmware.vim25.InvalidStateFaultMsg;
@@ -41,12 +43,13 @@ import com.vmware.vim25.VirtualMachineSummary;
 
 public class VM extends Template {
 
-  private static final Logger LOG = LoggerFactory.getLogger(VM.class);
+  private static final Logger logger = LoggerFactory.getLogger(VM.class);
 
   private static final String GUEST_STATE_RUNNING = "running";
   private static final String TOOLS_RUNNING_STATE = "guestToolsRunning";
 
   private ManagedObjectReference vmInstance;
+  private ManagedObjectReference customFieldsManager;
   private VirtualMachineConfigInfo configSpec;
   private ManagedObjectReference folder;
   private GuestInfo guestInfo;
@@ -57,8 +60,8 @@ public class VM extends Template {
   public VM(VMwareClient vmw, String instanceName) throws Exception {
     this.vmw = vmw;
     this.instanceName = instanceName;
-
     vmInstance = vmw.getServiceUtil().getDecendentMoRef(null, "VirtualMachine", instanceName);
+    customFieldsManager = vmw.getConnection().getServiceContent().getCustomFieldsManager();
     configSpec =
         (VirtualMachineConfigInfo) vmw.getServiceUtil().getDynamicProperty(vmInstance, "config");
     folder = (ManagedObjectReference) vmw.getServiceUtil().getDynamicProperty(vmInstance, "parent");
@@ -68,10 +71,9 @@ public class VM extends Template {
     virtualMachineSnapshotInfo =
         (VirtualMachineSnapshotInfo)
             vmw.getServiceUtil().getDynamicProperty(vmInstance, "snapshot");
-    
 
     if (vmInstance == null || configSpec == null || folder == null || guestInfo == null) {
-      LOG.warn("failed to retrieve VM");
+      logger.warn("failed to retrieve VM");
       throw new Exception(
           "VM " + instanceName + " does not exist or failed to retrieve information.");
     }
@@ -79,7 +81,7 @@ public class VM extends Template {
 
   public String createVmUrl(VMPropertyHandler ph)
       throws InvalidStateFaultMsg, RuntimeFaultFaultMsg {
-      
+
     StringBuilder url = new StringBuilder();
     url.append("https://");
     url.append(ph.getTargetVCenterServer());
@@ -103,7 +105,6 @@ public class VM extends Template {
   public List<String> getSnashotsAsList() {
     List<String> snapshots = new ArrayList<String>();
     if (virtualMachineSnapshotInfo != null) {
-      virtualMachineSnapshotInfo.getCurrentSnapshot();
       List<VirtualMachineSnapshotTree> snap = virtualMachineSnapshotInfo.getRootSnapshotList();
       snapshots.addAll(getSnapshots(snap, new ArrayList<String>(), ""));
     }
@@ -123,6 +124,25 @@ public class VM extends Template {
 
   public Integer getGuestMemoryUsage() {
     return virtualMachineSummary.getQuickStats().getGuestMemoryUsage();
+  }
+
+  public void setCostumValues(Map<String, String> settings) {
+    List<CustomFieldDef> fields;
+    try {
+      fields =
+          (List<CustomFieldDef>)
+              vmw.getServiceUtil().getDynamicProperty(customFieldsManager, "field");
+
+      for (CustomFieldDef field : fields) {
+        if (settings.containsKey(field.getName())) {
+          vmw.getConnection()
+              .getService()
+              .setCustomValue(vmInstance, field.getName(), settings.get(field.getName()));
+        }
+      }
+    } catch (Exception e) {
+      logger.warn("Failed to set costum value for vm " + vmInstance, e);
+    }
   }
 
   public Integer getOverallCpuUsage() {
@@ -157,7 +177,7 @@ public class VM extends Template {
             || guestid.startsWith("suse")
             || guestid.startsWith("ubuntu");
 
-    LOG.debug(
+    logger.debug(
         "instanceName: "
             + instanceName
             + " isLinux: "
@@ -171,7 +191,7 @@ public class VM extends Template {
   }
 
   public void updateServiceParameter(VMPropertyHandler paramHandler) throws Exception {
-    LOG.debug("instanceName: " + instanceName);
+    logger.debug("instanceName: " + instanceName);
     int key = getDataDiskKey();
     if (key != -1) {
       paramHandler.setDataDiskKey(1, key);
@@ -229,9 +249,9 @@ public class VM extends Template {
     boolean isRunning = false;
     if (vmRuntimeInfo != null) {
       isRunning = !VirtualMachinePowerState.POWERED_OFF.equals(vmRuntimeInfo.getPowerState());
-      LOG.debug(Boolean.toString(isRunning));
+      logger.debug(Boolean.toString(isRunning));
     } else {
-      LOG.warn("Failed to retrieve runtime information from VM " + instanceName);
+      logger.warn("Failed to retrieve runtime information from VM " + instanceName);
     }
 
     return isRunning;
@@ -244,12 +264,12 @@ public class VM extends Template {
     if (vmRuntimeInfo != null) {
       return VirtualMachinePowerState.POWERED_OFF.equals(vmRuntimeInfo.getPowerState());
     }
-    LOG.warn("Failed to retrieve runtime information from VM " + instanceName);
+    logger.warn("Failed to retrieve runtime information from VM " + instanceName);
     return false;
   }
 
   public TaskInfo start() throws Exception {
-    LOG.debug("instanceName: " + instanceName);
+    logger.debug("instanceName: " + instanceName);
     ManagedObjectReference startTask =
         vmw.getConnection().getService().powerOnVMTask(vmInstance, null);
 
@@ -258,17 +278,17 @@ public class VM extends Template {
   }
 
   public TaskInfo stop(boolean forceStop) throws Exception {
-    LOG.debug("instanceName: " + instanceName + " forceStop: " + forceStop);
+    logger.debug("instanceName: " + instanceName + " forceStop: " + forceStop);
     TaskInfo tInfo = null;
 
     if (forceStop) {
-      LOG.debug("Call vSphere API: powerOffVMTask() instanceName: " + instanceName);
+      logger.debug("Call vSphere API: powerOffVMTask() instanceName: " + instanceName);
       ManagedObjectReference stopTask = vmw.getConnection().getService().powerOffVMTask(vmInstance);
       tInfo = (TaskInfo) vmw.getServiceUtil().getDynamicProperty(stopTask, "info");
     } else {
 
       if (isRunning()) {
-        LOG.debug("Call vSphere API: shutdownGuest() instanceName: " + instanceName);
+        logger.debug("Call vSphere API: shutdownGuest() instanceName: " + instanceName);
         vmw.getConnection().getService().shutdownGuest(vmInstance);
       }
     }
@@ -280,41 +300,38 @@ public class VM extends Template {
     return folder;
   }
 
-    public void runScript(VMPropertyHandler paramHandler) throws Exception {
-        LOG.debug("instanceName: " + instanceName);
-        String scriptURL = paramHandler
-                .getServiceSetting(VMPropertyHandler.TS_SCRIPT_URL);
-        Script script = Script.getInstance();
-        if (scriptURL != null) {
-            try {
-                script.initScript(paramHandler, detectOs());
-                script.execute(vmw, vmInstance);
-            } catch (Exception e) {
-                script.setScriptExecuting(false);
-                throw e;
-            }
-        }
+  public void runScript(VMPropertyHandler paramHandler) throws Exception {
+    logger.debug("instanceName: " + instanceName);
+    String scriptURL = paramHandler.getServiceSetting(VMPropertyHandler.TS_SCRIPT_URL);
+    Script script = Script.getInstance();
+    if (scriptURL != null) {
+      try {
+        script.initScript(paramHandler, detectOs());
+        script.execute(vmw, vmInstance);
+      } catch (Exception e) {
+        script.setScriptExecuting(false);
+        throw e;
+      }
     }
+  }
 
-    public void updateLinuxVMPassword(VMPropertyHandler paramHandler)
-            throws Exception {
-        LOG.debug("instanceName: " + instanceName);
+  public void updateLinuxVMPassword(VMPropertyHandler paramHandler) throws Exception {
+    logger.debug("instanceName: " + instanceName);
 
-        String password = paramHandler
-                .getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD);
-        String updateScript = VMScript.updateLinuxVMRootPassword(password);
-        Script script = Script.getInstance();
-        if (updateScript != null) {
-            script.initScript(paramHandler, detectOs(), updateScript);
-            script.execute(vmw, vmInstance);
-        }
+    String password = paramHandler.getServiceSetting(VMPropertyHandler.TS_LINUX_ROOT_PWD);
+    String updateScript = VMScript.updateLinuxVMRootPassword(password);
+    Script script = Script.getInstance();
+    if (updateScript != null) {
+      script.initScript(paramHandler, detectOs(), updateScript);
+      script.execute(vmw, vmInstance);
     }
+  }
 
-    public boolean isScriptExecuting() {
-        Script script = Script.getInstance();
-        return script.isScriptExecuting();
-    }
-    
+  public boolean isScriptExecuting() {
+    Script script = Script.getInstance();
+    return script.isScriptExecuting();
+  }
+
   public int getNumberOfNICs() throws Exception {
     return NetworkManager.getNumberOfNICs(vmw, vmInstance);
   }
@@ -328,7 +345,7 @@ public class VM extends Template {
    * created and must be stopped to reconfigure the hardware.
    */
   public TaskInfo reconfigureVirtualMachine(VMPropertyHandler paramHandler) throws Exception {
-    LOG.debug("instanceName: " + instanceName);
+    logger.debug("instanceName: " + instanceName);
 
     VimPortType service = vmw.getConnection().getService();
     VirtualMachineConfigSpec vmConfigSpec = new VirtualMachineConfigSpec();
@@ -351,25 +368,34 @@ public class VM extends Template {
     comment = updateComment(comment, annotation);
     vmConfigSpec.setAnnotation(comment);
 
-    DiskManager diskManager = new DiskManager(vmw, paramHandler);
+    DiskManager diskManager = createDiskManager(paramHandler);
     diskManager.reconfigureDisks(vmConfigSpec, vmInstance);
 
-    NetworkManager.configureNetworkAdapter(vmw, vmConfigSpec, paramHandler, vmInstance);
+    configureNetworkAdapter(paramHandler, vmConfigSpec);
 
-    LOG.debug("Call vSphere API: reconfigVMTask()");
+    logger.debug("Call vSphere API: reconfigVMTask()");
     ManagedObjectReference reconfigureTask = service.reconfigVMTask(vmInstance, vmConfigSpec);
 
     return (TaskInfo) vmw.getServiceUtil().getDynamicProperty(reconfigureTask, "info");
   }
 
+  protected void configureNetworkAdapter(
+      VMPropertyHandler paramHandler, VirtualMachineConfigSpec vmConfigSpec) throws Exception {
+    NetworkManager.configureNetworkAdapter(vmw, vmConfigSpec, paramHandler, vmInstance);
+  }
+
+  protected DiskManager createDiskManager(VMPropertyHandler paramHandler) {
+    return new DiskManager(vmw, paramHandler);
+  }
+
   public TaskInfo updateCommentField(String comment) throws Exception {
-    LOG.debug("instanceName: " + instanceName + " comment: " + comment);
+    logger.debug("instanceName: " + instanceName + " comment: " + comment);
     VimPortType service = vmw.getConnection().getService();
     VirtualMachineConfigSpec vmConfigSpec = new VirtualMachineConfigSpec();
     String annotation = vmConfigSpec.getAnnotation();
     comment = updateComment(comment, annotation);
     vmConfigSpec.setAnnotation(comment);
-    LOG.debug("Call vSphere API: reconfigVMTask()");
+    logger.debug("Call vSphere API: reconfigVMTask()");
     ManagedObjectReference reconfigureTask = service.reconfigVMTask(vmInstance, vmConfigSpec);
 
     return (TaskInfo) vmw.getServiceUtil().getDynamicProperty(reconfigureTask, "info");
@@ -400,13 +426,13 @@ public class VM extends Template {
    * @param instanceId id of the instance
    */
   public TaskInfo delete() throws Exception {
-    LOG.debug("Call vSphere API: destroyTask() instanceName: " + instanceName);
+    logger.debug("Call vSphere API: destroyTask() instanceName: " + instanceName);
     ManagedObjectReference startTask = vmw.getConnection().getService().destroyTask(vmInstance);
 
     return (TaskInfo) vmw.getServiceUtil().getDynamicProperty(startTask, "info");
   }
 
-  private boolean arePortgroupsAvailable(VMPropertyHandler properties) {
+  boolean arePortgroupsAvailable(VMPropertyHandler properties) {
     int numberOfNICs =
         Integer.parseInt(properties.getServiceSetting(VMPropertyHandler.TS_NUMBER_OF_NICS));
     for (int i = 1; i <= numberOfNICs; i++) {
@@ -423,7 +449,7 @@ public class VM extends Template {
     boolean validHostname = isValidHostname();
     boolean validIp = isValidIp(properties);
 
-    LOG.debug(
+    logger.debug(
         String.format(
             "getState networkCardsConnected=%s validHostname=%s, validIp=%s",
             String.valueOf(networkCardsConnected),
@@ -440,11 +466,11 @@ public class VM extends Template {
       boolean secondStart = validHostname && validIp && guestIsReady() && networkCardsConnected;
 
       if (firstStart || secondStart) {
-        LOG.debug("firstStart: " + firstStart + " secondStart: " + secondStart);
+        logger.debug("firstStart: " + firstStart + " secondStart: " + secondStart);
         return VMwareGuestSystemStatus.GUEST_READY;
       }
 
-      LOG.debug(createLogForGetState(validHostname, properties, networkCardsConnected, validIp));
+      logger.debug(createLogForGetState(validHostname, properties, networkCardsConnected, validIp));
       return VMwareGuestSystemStatus.GUEST_NOTREADY;
     }
 
@@ -455,15 +481,15 @@ public class VM extends Template {
       return VMwareGuestSystemStatus.GUEST_READY;
     }
 
-    LOG.debug(createLogForGetState(validHostname, properties, networkCardsConnected, validIp));
+    logger.debug(createLogForGetState(validHostname, properties, networkCardsConnected, validIp));
     return VMwareGuestSystemStatus.GUEST_NOTREADY;
   }
 
-  private boolean guestIsReady() {
+  boolean guestIsReady() {
     return (isGuestSystemRunning() && areGuestToolsRunning());
   }
 
-  private String createLogForGetState(
+  String createLogForGetState(
       boolean validHostname,
       VMPropertyHandler configuration,
       boolean isConnected,
@@ -529,13 +555,13 @@ public class VM extends Template {
       }
 
       if (configuration.isAdapterConfiguredManually(i)) {
-        LOG.debug(String.format("Manual configured IP %s", configuration.getIpAddress(i)));
+        logger.debug(String.format("Manual configured IP %s", configuration.getIpAddress(i)));
         if (!containsIpAddress(info, configuration.getIpAddress(i))) {
           return false;
         }
       } else {
         if (!ipAddressExists(info)) {
-          LOG.debug(String.format("GuestInfo for network %s has no IPs", info.getNetwork()));
+          logger.debug(String.format("GuestInfo for network %s has no IPs", info.getNetwork()));
           return false;
         }
       }
@@ -546,21 +572,21 @@ public class VM extends Template {
 
   GuestNicInfo getNicInfo(VMPropertyHandler configuration, int i) {
     if (configuration.getNetworkAdapter(i).isEmpty()) {
-      LOG.debug(String.format("No network adapter %s", i));
+      logger.debug(String.format("No network adapter %s", i));
       return null;
     }
 
-    LOG.debug(String.format("NIC adapter %s", configuration.getNetworkAdapter(i)));
+    logger.debug(String.format("NIC adapter %s", configuration.getNetworkAdapter(i)));
 
     for (GuestNicInfo info : guestInfo.getNet()) {
       boolean dhcp = configuration.isAdapterConfiguredByDhcp(i);
-      LOG.debug(
+      logger.debug(
           String.format("GuestInfo IP %s dhcp=%s", info.getIpAddress(), String.valueOf(dhcp)));
       if (dhcp) {
         return info;
       }
 
-      LOG.debug(String.format("GuestNicInfo.getNetwork = %s", info.getNetwork()));
+      logger.debug(String.format("GuestNicInfo.getNetwork = %s", info.getNetwork()));
       if (configuration.getNetworkAdapter(i).equals(info.getNetwork())) {
         return info;
       }
@@ -600,12 +626,12 @@ public class VM extends Template {
 
     VMwareAccessInfo accInfo = new VMwareAccessInfo(paramHandler);
     String accessInfo = accInfo.generateAccessInfo(guestInfo);
-    LOG.debug(
+    logger.debug(
         "Generated access information for service instance '" + instanceName + "':\n" + accessInfo);
     return accessInfo;
   }
 
-  private int getDataDiskKey() throws Exception {
+  protected int getDataDiskKey() throws Exception {
     List<VirtualDevice> devices = configSpec.getHardware().getDevice();
     int countDisks = 0;
     int key = -1;
@@ -622,7 +648,7 @@ public class VM extends Template {
     return key;
   }
 
-  private String getDiskSizeInGB(int disk) throws Exception {
+  protected String getDiskSizeInGB(int disk) throws Exception {
     String size = "";
     List<VirtualDevice> devices = configSpec.getHardware().getDevice();
     int countDisks = 0;
@@ -665,7 +691,7 @@ public class VM extends Template {
     ManagedObjectReference dataCenterRef =
         vmw.getServiceUtil().getDecendentMoRef(null, "Datacenter", datacenter);
     if (dataCenterRef == null) {
-      LOG.error("Datacenter not found. dataCenter: " + datacenter);
+      logger.error("Datacenter not found. dataCenter: " + datacenter);
       throw new APPlatformException(
           Messages.get(
               paramHandler.getLocale(), "error_invalid_datacenter", new Object[] {datacenter}));
@@ -675,7 +701,7 @@ public class VM extends Template {
     ManagedObjectReference hostRef =
         vmw.getServiceUtil().getDecendentMoRef(dataCenterRef, "HostSystem", hostName);
     if (hostRef == null) {
-      LOG.error("Target host " + hostName + " not found");
+      logger.error("Target host " + hostName + " not found");
       throw new APPlatformException(Messages.getAll("error_invalid_host", new Object[] {hostName}));
     }
 

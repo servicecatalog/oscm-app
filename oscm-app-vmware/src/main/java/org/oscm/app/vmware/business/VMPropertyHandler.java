@@ -9,17 +9,16 @@
  */
 package org.oscm.app.vmware.business;
 
-import com.vmware.vim25.LocalizableMessage;
-import com.vmware.vim25.TaskInfo;
-import com.vmware.vim25.TaskInfoState;
-
 import java.net.MalformedURLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.oscm.app.v2_0.BSSWebServiceFactory;
@@ -44,6 +43,10 @@ import org.oscm.app.vmware.persistence.VMwareNetwork;
 import org.oscm.app.vmware.remote.bes.Credentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.vmware.vim25.LocalizableMessage;
+import com.vmware.vim25.TaskInfo;
+import com.vmware.vim25.TaskInfoState;
 
 /** Class to read and return the VMware specific properties. */
 public class VMPropertyHandler {
@@ -356,25 +359,29 @@ public class VMPropertyHandler {
   public static final String TS_VSPHERE_CONSOLE_PORT = "VSPHERE_CONSOLE_PORT";
 
   public static final String TS_IPPOOL_FOR_PORTGROUP = "IPPOOL_FOR_PORTGROUP";
-  
+
   public static final String INSTANCE_ID = "INSTANCE_ID";
-  
+
   /**
    * Boolean service parameter.
+   *
    * <ul>
-   * <li>True: Billing events will be generated for this tenant subscription
-   * <li>False: Service is free of charge. No billing events will be generated
-   * <ul>
+   *   <li>True: Billing events will be generated for this tenant subscription
+   *   <li>False: Service is free of charge. No billing events will be generated
+   *       <ul>
    */
   public static final String IS_CHARGING = "IS_CHARGING";
-  
+
   public static final String LAST_USAGE_FETCH = "LAST_USAGE_FETCH";
-  
+
   /**
-   * To create a billing event the technical service id is required and will
-   * be stored as service parameter.
+   * To create a billing event the technical service id is required and will be stored as service
+   * parameter.
    */
   public static final String TECHNICAL_SERVICE_ID = "TECHNICAL_SERVICE_ID";
+
+  /** Prefix for vSphere attributes. This prefix has to be followed by the vSphere attribute name */
+  public static final String VSPHERE_ATTRIBUTE = "VSPHERE_ATTRIBUTE_";
 
   public VMPropertyHandler(ProvisioningSettings settings) {
     this.settings = settings;
@@ -389,6 +396,24 @@ public class VMPropertyHandler {
       settings.getParameters().put(key, new Setting(key, value));
     } else {
       logger.warn("Setting not set because null value. key:" + key);
+    }
+  }
+
+  public HashMap<String, String> getVsphereAttributes() {
+    HashMap<String, String> mp = new HashMap<String, String>();
+
+    for (Entry<String, Setting> entry : settings.getParameters().entrySet()) {
+      setAttributeValue(mp, entry);
+    }
+    for (Entry<String, Setting> entry : settings.getCustomAttributes().entrySet()) {
+      setAttributeValue(mp, entry);
+    }
+    return mp;
+  }
+
+  private void setAttributeValue(HashMap<String, String> mp, Entry<String, Setting> entry) {
+    if (entry.getKey().startsWith(VSPHERE_ATTRIBUTE)) {
+      mp.put(entry.getKey().replace(VSPHERE_ATTRIBUTE, ""), entry.getValue().getValue());
     }
   }
 
@@ -1618,9 +1643,9 @@ public class VMPropertyHandler {
   public String getServiceSetting(String key) {
     return getValue(key, settings.getParameters());
   }
-  
+
   public void setServiceSetting(String key, String value) {
-     setValue(key, value, settings.getParameters());
+    setValue(key, value, settings.getParameters());
   }
 
   public void useMock(DataAccessService das) {
@@ -1634,19 +1659,18 @@ public class VMPropertyHandler {
       return new DataAccessService(getLocale());
     }
   }
-  
+
   public String getInstanceId() {
-      return getValue(INSTANCE_ID, settings.getParameters());
+    return getValue(INSTANCE_ID, settings.getParameters());
   }
 
   public void setInstanceId(String value) {
-      setValue(INSTANCE_ID, value, settings.getParameters());
+    setValue(INSTANCE_ID, value, settings.getParameters());
   }
-  
+
   public boolean isCharging() {
-      Setting setting = settings.getParameters().get(IS_CHARGING);
-      return setting == null ? false
-              : Boolean.parseBoolean(setting.getValue());
+    Setting setting = settings.getParameters().get(IS_CHARGING);
+    return setting == null ? false : Boolean.parseBoolean(setting.getValue());
   }
 
   private String getValue(String key, Map<String, Setting> source) {
@@ -1657,37 +1681,31 @@ public class VMPropertyHandler {
   private void setValue(String key, String value, Map<String, Setting> target) {
     target.put(key, new Setting(key, value));
   }
-  
+
   public String getTechnicalServiceId() {
-      return getValue(TECHNICAL_SERVICE_ID, settings.getParameters());
+    return getValue(TECHNICAL_SERVICE_ID, settings.getParameters());
   }
 
   public void setTechnicalServiceId(String value) {
-      setValue(TECHNICAL_SERVICE_ID, value, settings.getParameters());
+    setValue(TECHNICAL_SERVICE_ID, value, settings.getParameters());
   }
-  
-  /**
-   * Returns service interfaces for BSS web service calls.
-   */
+
+  /** Returns service interfaces for BSS web service calls. */
   public <T> T getWebService(Class<T> serviceClass)
-          throws ConfigurationException, MalformedURLException {
-      return BSSWebServiceFactory.getBSSWebService(serviceClass,
-              settings.getAuthentication());
+      throws ConfigurationException, MalformedURLException {
+    return BSSWebServiceFactory.getBSSWebService(serviceClass, settings.getAuthentication());
   }
-  
-  /**
-   * Returns the instance or controller specific technology manager
-   * authentication.
-   */
+
+  /** Returns the instance or controller specific technology manager authentication. */
   public PasswordAuthentication getTPAuthentication() {
-      return settings.getAuthentication();
+    return settings.getAuthentication();
   }
-  
+
   public String getLastUsageFetch() {
-      return getValue(LAST_USAGE_FETCH, settings.getParameters());
+    return getValue(LAST_USAGE_FETCH, settings.getParameters());
   }
 
   public void setLastUsageFetch(String value) {
-      setValue(LAST_USAGE_FETCH, value, settings.getParameters());
+    setValue(LAST_USAGE_FETCH, value, settings.getParameters());
   }
 }
