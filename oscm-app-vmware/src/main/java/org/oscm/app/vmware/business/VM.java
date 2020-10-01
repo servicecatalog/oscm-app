@@ -126,7 +126,7 @@ public class VM extends Template {
     return virtualMachineSummary.getQuickStats().getGuestMemoryUsage();
   }
 
-  public void setCostumValue(Map<String, String> settings) {
+  public void setCostumValues(Map<String, String> settings) {
     List<CustomFieldDef> fields;
     try {
       fields =
@@ -141,7 +141,7 @@ public class VM extends Template {
         }
       }
     } catch (Exception e) {
-      logger.error("Failed to set costum value for vm " + vmInstance);
+      logger.warn("Failed to set costum value for vm " + vmInstance, e);
     }
   }
 
@@ -371,7 +371,7 @@ public class VM extends Template {
     DiskManager diskManager = createDiskManager(paramHandler);
     diskManager.reconfigureDisks(vmConfigSpec, vmInstance);
 
-    cunfigureNetworkAdapter(paramHandler, vmConfigSpec);
+    configureNetworkAdapter(paramHandler, vmConfigSpec);
 
     logger.debug("Call vSphere API: reconfigVMTask()");
     ManagedObjectReference reconfigureTask = service.reconfigVMTask(vmInstance, vmConfigSpec);
@@ -379,7 +379,7 @@ public class VM extends Template {
     return (TaskInfo) vmw.getServiceUtil().getDynamicProperty(reconfigureTask, "info");
   }
 
-  protected void cunfigureNetworkAdapter(
+  protected void configureNetworkAdapter(
       VMPropertyHandler paramHandler, VirtualMachineConfigSpec vmConfigSpec) throws Exception {
     NetworkManager.configureNetworkAdapter(vmw, vmConfigSpec, paramHandler, vmInstance);
   }

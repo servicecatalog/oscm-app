@@ -70,7 +70,7 @@ public class Actions {
     try {
       vmClient = VMClientPool.getInstance().getPool().borrowObject(vcenter);
       VM vm = new VM(vmClient, ph.getInstanceName());
-      vm.setCostumValue(ph.getVsphereAttributes());
+      vm.setCostumValues(ph.getVsphereAttributes());
       TaskInfo tInfo = vm.reconfigureVirtualMachine(ph);
       ph.setTask(tInfo);
       return EVENT_CONFIGURING;

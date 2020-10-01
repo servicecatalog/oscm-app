@@ -129,7 +129,7 @@ public class VMTest {
     doNothing().when(service).setCustomValue(any(), any(), any());
 
     // when
-    vm.setCostumValue(settings);
+    vm.setCostumValues(settings);
     // then
 
     verify(service, times(1)).setCustomValue(any(), any(), any());
@@ -342,7 +342,7 @@ public class VMTest {
     DiskManager manager = mock(DiskManager.class);
     doReturn(settings).when(ph).getSettings();
     doReturn(manager).when(vm).createDiskManager(ph);
-    doNothing().when(vm).cunfigureNetworkAdapter(any(), any());
+    doNothing().when(vm).configureNetworkAdapter(any(), any());
     doReturn("test").when(settings).getOrganizationName();
     doReturn("test").when(settings).getSubscriptionId();
 
