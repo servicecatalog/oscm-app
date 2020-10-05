@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -63,6 +64,7 @@ public class ApprovalInstanceAccessTest {
     doAnswer(answer).when(access.platformService).listServiceInstances(any(), any(), any());
   }
 
+  @Ignore
   @Test
   public void getCustomerSettings() throws APPlatformException {
     // given

@@ -216,7 +216,6 @@ public class APPlatformServiceBean implements APPlatformService {
     return result;
   }
 
-  @Override
   public Collection<String> listServiceInstances(
       String controllerId,
       Predicate<Map<String, Setting>> filter,
