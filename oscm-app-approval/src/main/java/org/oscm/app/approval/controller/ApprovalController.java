@@ -64,8 +64,8 @@ public class ApprovalController implements APPlatformController {
     PropertyHandler paramHandler = new PropertyHandler(settings);
     paramHandler.setState(State.CREATION_REQUESTED);
     
-    String customerId = settings.getOrganizationId();
-    checkIfAlreadyExisting(customerId);
+   
+    checkIfAlreadyExisting(settings.getOrganizationId());
     
     InstanceDescription id = new InstanceDescription();
     id.setInstanceId("Instance_" + System.currentTimeMillis());
@@ -75,13 +75,13 @@ public class ApprovalController implements APPlatformController {
     return id;
   }
 
-  private void checkIfAlreadyExisting(String customerOrgId) throws APPlatformException {
-    Object data = new ApprovalInstanceAccess().getCustomerSettings(customerOrgId);
+  private void checkIfAlreadyExisting(String org) throws APPlatformException {
+    Object data = new ApprovalInstanceAccess().getInstancesForOrganization(org);
     if (data != null)
       throw new APPlatformException(
           String.format(
-              "An approval service is already subscribed for the customer organization ID %s.",
-              customerOrgId));
+              "An approval service is already subscribed for the organization ID %s.",
+              org));
   }
 
   @Override

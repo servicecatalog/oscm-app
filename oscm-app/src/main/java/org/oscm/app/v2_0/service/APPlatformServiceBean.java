@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -217,29 +217,13 @@ public class APPlatformServiceBean implements APPlatformService {
   }
 
   public Collection<String> listServiceInstances(
-      String controllerId,
-      Predicate<Map<String, Setting>> filter,
-      PasswordAuthentication authentication)
+      String controllerId, String org, PasswordAuthentication authentication)
       throws APPlatformException {
-    Collection<String> result = new ArrayList<>();
-    List<ServiceInstance> instances = instanceDAO.getInstancesForController(controllerId);
-
-    for (ServiceInstance instance : instances) {
-      boolean excl = false;
-      if (filter != null) {
-        try {
-          excl = filter.test(instance.getAttributeMap());
-        } catch (BadResultException e) {
-          LOGGER.error("Unexpected error.", e);
-        }
-        try {
-          excl |= filter.test(instance.getParameterMap());
-        } catch (BadResultException e) {
-          LOGGER.error("Unexpected error.", e);
-        }
-      }
-      if (!excl) result.add(instance.getInstanceId());
-    }
+    List<String> result = new ArrayList<String>();
+    List<ServiceInstance> all = instanceDAO.getInstancesForController(controllerId);
+    List<ServiceInstance> allInOrg =
+        all.stream().filter(i -> i.getOrganizationId().equals(org)).collect(Collectors.toList());
+    allInOrg.stream().forEach(i -> result.add(i.getInstanceId()));
     return result;
   }
 
