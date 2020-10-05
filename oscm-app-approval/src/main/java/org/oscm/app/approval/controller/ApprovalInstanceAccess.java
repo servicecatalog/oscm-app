@@ -38,20 +38,20 @@ public class ApprovalInstanceAccess implements InstanceAccess {
   public ClientData getCustomerSettings(String clientOrganizationId) throws APPlatformException {
     ClientData data = new ClientData(clientOrganizationId);
 
-    platformService.listServiceInstances(
-        ApprovalController.ID,
-        (Map<String, Setting> t) -> {
-          boolean include = t.containsKey(data.PARAM_APPROVER_ORG_ID);
-          if (include) {
-            data.set(t);
-          }
-          return include;
-        },
-        null);
-
-    if (data.isSet()) {
-        return data;
-    }
+    //    platformService.listServiceInstances(
+    //        ApprovalController.ID,
+    //        (Map<String, Setting> t) -> {
+    //          boolean include = t.containsKey(data.PARAM_APPROVER_ORG_ID);
+    //          if (include) {
+    //            data.set(t);
+    //          }
+    //          return include;
+    //        },
+    //        null);
+    //
+    //    if (data.isSet()) {
+    //        return data;
+    //    }
     return null;
   }
 
