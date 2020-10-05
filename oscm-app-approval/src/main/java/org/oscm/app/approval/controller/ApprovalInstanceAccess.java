@@ -47,11 +47,11 @@ public class ApprovalInstanceAccess implements InstanceAccess {
 
   public Collection<String> getInstancesForOrganization(String supplierId)
       throws APPlatformException {
+
     return getPlatformService().listServiceInstances(ApprovalController.ID, supplierId, null);
   }
 
   public ClientData getCustomerSettings(String clientOrganizationId) throws APPlatformException {
-
     ClientData data = new ClientData(clientOrganizationId);
 
     Collection<String> instances =
@@ -147,6 +147,7 @@ public class ApprovalInstanceAccess implements InstanceAccess {
 
     public void set(ProvisioningSettings ps) {
       setApproverOrgId(ps.getAttributes().get(PARAM_APPROVER_ORG_ID));
+
       setOrgAdminUserId(ps.getCustomAttributes().get(PARAM_USER_ID));
       setOrgAdminUserKey(ps.getCustomAttributes().get(PARAM_USER_KEY));
       setOrgAdminUserPwd(ps.getCustomAttributes().get(PARAM_USER_PWD));
