@@ -47,15 +47,15 @@ public class ApprovalInstanceAccess implements InstanceAccess {
 
   public Collection<String> getInstancesForOrganization(String supplierId)
       throws APPlatformException {
-    return getPlatformService().listServiceInstances(ApprovalController.ID, supplierId, null); 
+    return getPlatformService().listServiceInstances(ApprovalController.ID, supplierId, null);
   }
 
-  public ClientData getCustomerSettings(String clientOrganizationId)
-      throws APPlatformException {
-   
+  public ClientData getCustomerSettings(String clientOrganizationId) throws APPlatformException {
+
     ClientData data = new ClientData(clientOrganizationId);
 
-    Collection<String> instances = getPlatformService().listServiceInstances(ApprovalController.ID, null);
+    Collection<String> instances =
+        getPlatformService().listServiceInstances(ApprovalController.ID, null);
 
     for (String instance : instances) {
       ProvisioningSettings ps =
@@ -136,18 +136,17 @@ public class ApprovalInstanceAccess implements InstanceAccess {
       PARAM_APPROVER_ORG_ID = String.format("APPROVER_ORG_ID_%s", clientOrganizationId);
     }
 
-    
     public boolean isSet() {
       boolean isSet = true;
       isSet &= null != getOrgAdminUserId();
       isSet &= null != getOrgAdminUserKey();
       isSet &= null != getOrgAdminUserPwd();
+      isSet &= null != getApproverOrgId();
       return isSet;
     }
 
     public void set(ProvisioningSettings ps) {
       setApproverOrgId(ps.getAttributes().get(PARAM_APPROVER_ORG_ID));
-
       setOrgAdminUserId(ps.getCustomAttributes().get(PARAM_USER_ID));
       setOrgAdminUserKey(ps.getCustomAttributes().get(PARAM_USER_KEY));
       setOrgAdminUserPwd(ps.getCustomAttributes().get(PARAM_USER_PWD));
@@ -183,6 +182,10 @@ public class ApprovalInstanceAccess implements InstanceAccess {
 
     void setApproverOrgId(Setting approverOrgId) {
       this.approverOrgId = approverOrgId;
+    }
+
+    public Setting getApproverOrgId() {
+      return this.approverOrgId;
     }
 
     Setting orgAdminUserId;
