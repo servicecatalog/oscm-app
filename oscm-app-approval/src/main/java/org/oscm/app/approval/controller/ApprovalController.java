@@ -9,6 +9,7 @@
  */
 package org.oscm.app.approval.controller;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
@@ -63,10 +64,9 @@ public class ApprovalController implements APPlatformController {
       throws APPlatformException {
     PropertyHandler paramHandler = new PropertyHandler(settings);
     paramHandler.setState(State.CREATION_REQUESTED);
-    
-   
+
     checkIfAlreadyExisting(settings.getOrganizationId());
-    
+
     InstanceDescription id = new InstanceDescription();
     id.setInstanceId("Instance_" + System.currentTimeMillis());
     id.setChangedParameters(settings.getParameters());
@@ -76,12 +76,11 @@ public class ApprovalController implements APPlatformController {
   }
 
   private void checkIfAlreadyExisting(String org) throws APPlatformException {
-    Object data = new ApprovalInstanceAccess().getInstancesForOrganization(org);
-    if (data != null)
+    Collection<String> data = new ApprovalInstanceAccess().getInstancesForOrganization(org);
+    if (data != null && data.size() > 0)
       throw new APPlatformException(
           String.format(
-              "An approval service is already subscribed for the organization ID %s.",
-              org));
+              "An approval service is already subscribed for the organization ID %s.", org));
   }
 
   @Override
