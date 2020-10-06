@@ -64,9 +64,9 @@ public class ApprovalController implements APPlatformController {
       throws APPlatformException {
     PropertyHandler paramHandler = new PropertyHandler(settings);
     paramHandler.setState(State.CREATION_REQUESTED);
-   
+
     checkIfAlreadyExisting(settings.getOrganizationId());
-    
+
 
     InstanceDescription id = new InstanceDescription();
     id.setInstanceId("Instance_" + System.currentTimeMillis());
