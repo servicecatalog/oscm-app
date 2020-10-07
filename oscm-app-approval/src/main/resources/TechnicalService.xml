@@ -8,7 +8,7 @@
     provisioningUrl="http://oscm-app:8880/oscm-app/webservices/oscm-app/oscm-app/org.oscm.app.v2_0.service.AsynchronousProvisioningProxy?wsdl" provisioningVersion="1.0"
     accessType="DIRECT" loginPath="Dynamically provided." baseUrl="">
 
-    <AccessInfo locale="en">The OSCM Approval Tool is available at https://{FQDN}:8881/approval.</AccessInfo>
+    <AccessInfo locale="en">Approval Service Access Info.</AccessInfo>
 
     <LocalizedDescription locale="en">Use this service to configure approval triggers for the subscriptions of your customers.</LocalizedDescription>
 
