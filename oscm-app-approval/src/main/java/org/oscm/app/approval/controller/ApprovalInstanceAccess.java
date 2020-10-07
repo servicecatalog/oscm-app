@@ -65,11 +65,7 @@ public class ApprovalInstanceAccess implements InstanceAccess {
         break;
       }
     }
-
-    if (data.isSet()) {
-      return data;
-    }
-    return null;
+    return data;
   }
 
   private Optional<String> getApprovers(ProvisioningSettings ps, String customerOrgId) {
