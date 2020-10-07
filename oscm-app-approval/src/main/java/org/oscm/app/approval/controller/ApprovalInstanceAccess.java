@@ -9,10 +9,13 @@
  */
 package org.oscm.app.approval.controller;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 
@@ -30,37 +33,60 @@ public class ApprovalInstanceAccess implements InstanceAccess {
   private static final long serialVersionUID = -7079269432576472393L;
   protected APPlatformService platformService;
 
+  APPlatformService getPlatformService() {
+    if (platformService == null) {
+      platformService = APPlatformServiceFactory.getInstance();
+    }
+    return platformService;
+  }
+
   @PostConstruct
   public void initialize() {
     platformService = APPlatformServiceFactory.getInstance();
   }
 
+  public Collection<String> getInstancesForOrganization(String supplierId)
+      throws APPlatformException {
+    return getPlatformService().listServiceInstances(ApprovalController.ID, supplierId, null);
+  }
+
   public ClientData getCustomerSettings(String clientOrganizationId) throws APPlatformException {
+
     ClientData data = new ClientData(clientOrganizationId);
 
-    //    platformService.listServiceInstances(
-    //        ApprovalController.ID,
-    //        (Map<String, Setting> t) -> {
-    //          boolean include = t.containsKey(data.PARAM_APPROVER_ORG_ID);
-    //          if (include) {
-    //            data.set(t);
-    //          }
-    //          return include;
-    //        },
-    //        null);
-    //
-    //    if (data.isSet()) {
-    //        return data;
-    //    }
+    Collection<String> instances =
+        getPlatformService().listServiceInstances(ApprovalController.ID, null);
+
+    for (String instance : instances) {
+      ProvisioningSettings ps =
+          getPlatformService().getServiceInstanceDetails(ApprovalController.ID, instance, null);
+      if (getApprovers(ps, clientOrganizationId).isPresent()) {
+        data.set(ps);
+        break;
+      }
+    }
+
+    if (data.isSet()) {
+      return data;
+    }
     return null;
+  }
+
+  private Optional<String> getApprovers(ProvisioningSettings ps, String customerOrgId) {
+    HashMap<String, Setting> attr = ps.getAttributes();
+    return attr.keySet()
+        .stream()
+        .filter(k -> k.startsWith("APPROVER_ORG_ID_" + customerOrgId))
+        .findAny();
   }
 
   @Override
   public List<? extends ServerInformation> getServerDetails(
       String instanceId, String subscriptionId, String organizationId) throws APPlatformException {
     ProvisioningSettings settings =
-        platformService.getServiceInstanceDetails(
-            ApprovalController.ID, instanceId, subscriptionId, organizationId);
+        getPlatformService()
+            .getServiceInstanceDetails(
+                ApprovalController.ID, instanceId, subscriptionId, organizationId);
     PropertyHandler ph = new PropertyHandler(settings);
 
     List<Server> servers = new ArrayList<>();
@@ -78,8 +104,9 @@ public class ApprovalInstanceAccess implements InstanceAccess {
   public String getAccessInfo(String instanceId, String subscriptionId, String organizationId)
       throws APPlatformException {
     ProvisioningSettings settings =
-        platformService.getServiceInstanceDetails(
-            ApprovalController.ID, instanceId, subscriptionId, organizationId);
+        getPlatformService()
+            .getServiceInstanceDetails(
+                ApprovalController.ID, instanceId, subscriptionId, organizationId);
 
     return settings.getServiceAccessInfo();
   }
@@ -90,7 +117,10 @@ public class ApprovalInstanceAccess implements InstanceAccess {
   }
 
   /** Client data for approval trigger callback. */
-  public class ClientData {
+  public class ClientData implements Serializable {
+
+    private static final long serialVersionUID = -2960629135717720907L;
+
     String clientOrganizationId = "";
 
     String PARAM_USER_KEY;
@@ -106,27 +136,20 @@ public class ApprovalInstanceAccess implements InstanceAccess {
       PARAM_APPROVER_ORG_ID = String.format("APPROVER_ORG_ID_%s", clientOrganizationId);
     }
 
-    public boolean exists(Map<String, Setting> map) {
-      boolean exists = true;
-      exists &= null != map.get(PARAM_APPROVER_ORG_ID);
-      exists &= null != map.get(PARAM_USER_ID);
-      exists &= null != map.get(PARAM_USER_KEY);
-      exists &= null != map.get(PARAM_USER_PWD);
-      return exists;
-    }
-
     public boolean isSet() {
       boolean isSet = true;
       isSet &= null != getOrgAdminUserId();
       isSet &= null != getOrgAdminUserKey();
       isSet &= null != getOrgAdminUserPwd();
+      isSet &= null != getApproverOrgId();
       return isSet;
     }
 
-    public void set(Map<String, Setting> map) {
-      setOrgAdminUserId(map.get(PARAM_USER_ID));
-      setOrgAdminUserKey(map.get(PARAM_USER_KEY));
-      setOrgAdminUserPwd(map.get(PARAM_USER_PWD));
+    public void set(ProvisioningSettings ps) {
+      setApproverOrgId(ps.getAttributes().get(PARAM_APPROVER_ORG_ID));
+      setOrgAdminUserId(ps.getCustomAttributes().get(PARAM_USER_ID));
+      setOrgAdminUserKey(ps.getCustomAttributes().get(PARAM_USER_KEY));
+      setOrgAdminUserPwd(ps.getCustomAttributes().get(PARAM_USER_PWD));
     }
 
     public String getClientOrganizationId() {
@@ -157,8 +180,17 @@ public class ApprovalInstanceAccess implements InstanceAccess {
       this.orgAdminUserPwd = orgAdminUserPwd;
     }
 
+    void setApproverOrgId(Setting approverOrgId) {
+      this.approverOrgId = approverOrgId;
+    }
+
+    public Setting getApproverOrgId() {
+      return this.approverOrgId;
+    }
+
     Setting orgAdminUserId;
     Setting orgAdminUserKey;
     Setting orgAdminUserPwd;
+    Setting approverOrgId;
   }
 }
