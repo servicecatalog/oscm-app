@@ -8,11 +8,32 @@
     provisioningUrl="http://oscm-app:8880/oscm-app/webservices/oscm-app/oscm-app/org.oscm.app.v2_0.service.AsynchronousProvisioningProxy?wsdl" provisioningVersion="1.0"
     accessType="DIRECT" loginPath="Dynamically provided." baseUrl="">
 
-    <AccessInfo locale="en">Description of how to access the application.</AccessInfo>
+    <AccessInfo locale="en">The OSCM Approval Tool is available at https://{FQDN}:8881/approval.</AccessInfo>
 
-    <LocalizedDescription locale="en">Approval tool APP implementation.</LocalizedDescription>
+    <LocalizedDescription locale="en">Use this service to configure approval triggers for the subscriptions of your customers.</LocalizedDescription>
 
     <LocalizedLicense locale="en" />
+
+    <ParameterDefinition id="APPROVER_ORG_ID_d4e7e9f4" configurable="false" mandatory="true" valueType="STRING"
+      default="959c9bf7">
+      <LocalizedDescription locale="en">The organization of the approver for the customer organization d4e7e9f4</LocalizedDescription>
+    </ParameterDefinition>
+   
+    <ParameterDefinition id="USER_PWD_d4e7e9f4" configurable="false" mandatory="true" valueType="PWD"
+      default="_crypt:customer">
+      <LocalizedDescription locale="en">The password credentials for the technical user in the customer organization d4e7e9f4. This user is needed for communication with the trigger web service and required to have the administrator role in the customer organization.</LocalizedDescription>
+    </ParameterDefinition>
+    
+    <ParameterDefinition id="USER_ID_d4e7e9f4" configurable="false" mandatory="true" valueType="STRING"
+      default="customer">
+      <LocalizedDescription locale="en">The user id for the technical user in the customer organization d4e7e9f4. This user is needed for communication with the trigger web service and is required to have the administrator role in the customer organization.</LocalizedDescription>
+    </ParameterDefinition>
+
+    
+    <ParameterDefinition id="USER_KEY_d4e7e9f4" configurable="false" mandatory="true" valueType="STRING"
+      default="10001">
+      <LocalizedDescription locale="en">The user key for the technical user in the customer organization d4e7e9f4. This user needed for communication with the trigger web service and required to have the administrator role in the customer organization.</LocalizedDescription>
+    </ParameterDefinition>
 
     <ParameterDefinition id="APP_CONTROLLER_ID" configurable="false" mandatory="true" valueType="STRING"
       default="ess.approval">
