@@ -69,8 +69,11 @@ public class ApprovalInstanceAccess implements InstanceAccess {
   }
 
   private Optional<String> getApprovers(ProvisioningSettings ps, String customerOrgId) {
-    HashMap<String, Setting> attr = ps.getAttributes();
-    return attr.keySet()
+    HashMap<String, Setting> map = new HashMap<String, Setting>();
+    map.putAll(ps.getParameters());
+    map.putAll(ps.getCustomAttributes());
+    
+    return map.keySet()
         .stream()
         .filter(k -> k.startsWith("APPROVER_ORG_ID_" + customerOrgId))
         .findAny();
@@ -142,10 +145,19 @@ public class ApprovalInstanceAccess implements InstanceAccess {
     }
 
     public void set(ProvisioningSettings ps) {
-      setApproverOrgId(ps.getAttributes().get(PARAM_APPROVER_ORG_ID));
-      setOrgAdminUserId(ps.getCustomAttributes().get(PARAM_USER_ID));
-      setOrgAdminUserKey(ps.getCustomAttributes().get(PARAM_USER_KEY));
-      setOrgAdminUserPwd(ps.getCustomAttributes().get(PARAM_USER_PWD));
+      setApproverOrgId(getSetting(ps, PARAM_APPROVER_ORG_ID));
+      setOrgAdminUserId(getSetting(ps, PARAM_USER_ID));
+      setOrgAdminUserKey(getSetting(ps, PARAM_USER_KEY));
+      setOrgAdminUserPwd(getSetting(ps, PARAM_USER_PWD));
+    }
+
+    private Setting getSetting(ProvisioningSettings ps, String key) {
+      Setting val = ps.getCustomAttributes().get(key);
+      if (val == null) {
+        val = ps.getAttributes().get(key);
+        if (val == null) val = ps.getParameters().get(key);
+      }
+      return val;
     }
 
     public String getClientOrganizationId() {
