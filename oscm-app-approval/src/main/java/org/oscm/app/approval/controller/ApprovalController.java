@@ -67,7 +67,6 @@ public class ApprovalController implements APPlatformController {
 
     checkIfAlreadyExisting(settings.getOrganizationId());
 
-
     InstanceDescription id = new InstanceDescription();
     id.setInstanceId("Instance_" + System.currentTimeMillis());
     id.setChangedParameters(settings.getParameters());
@@ -82,8 +81,7 @@ public class ApprovalController implements APPlatformController {
       throw new APPlatformException(
           String.format(
               "An approval service is already subscribed for the organization ID %s.", org));
-
-  }
+ }
 
   @Override
   @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)

@@ -47,7 +47,6 @@ public class ApprovalInstanceAccess implements InstanceAccess {
 
   public Collection<String> getInstancesForOrganization(String supplierId)
       throws APPlatformException {
-
     return getPlatformService().listServiceInstances(ApprovalController.ID, supplierId, null);
   }
 
