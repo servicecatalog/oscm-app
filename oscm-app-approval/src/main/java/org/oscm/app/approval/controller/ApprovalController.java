@@ -201,4 +201,9 @@ public class ApprovalController implements APPlatformController {
   public void setControllerAccess(final ControllerAccess access) {
     this.controllerAccess = (ApprovalControllerAccess) access;
   }
+  
+  
+  public ApprovalControllerAccess getControllerAccess() {
+    return this.controllerAccess;
+  }
 }

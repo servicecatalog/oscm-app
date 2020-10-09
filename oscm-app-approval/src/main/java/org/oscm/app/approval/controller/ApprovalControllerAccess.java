@@ -12,8 +12,7 @@ package org.oscm.app.approval.controller;
 import java.util.LinkedList;
 import java.util.List;
 
-
-import javax.ejb.Singleton;
+import javax.inject.Singleton;
 
 import org.oscm.app.v2_0.APPlatformServiceFactory;
 import org.oscm.app.v2_0.data.ControllerSettings;
@@ -23,7 +22,7 @@ import org.oscm.app.v2_0.intf.ControllerAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Singleton(mappedName = "bss/app/controlleraccess/ess.approval")
+@Singleton
 public class ApprovalControllerAccess implements ControllerAccess {
 
   private static final long serialVersionUID = 2872054079271208066L;
