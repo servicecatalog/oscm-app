@@ -9,25 +9,29 @@
  */
 package org.oscm.app.approval.controller;
 
-import java.util.LinkedList;
+import java.util.LinkedList
+;
 import java.util.List;
 
+import javax.ejb.Remote;
+import javax.ejb.Stateless;
 import javax.inject.Singleton;
 
-import org.oscm.app.approval.intf.ApprovalController;
+import org.oscm.app.approval.intf.ApprovalControllerAccess;
 import org.oscm.app.v2_0.APPlatformServiceFactory;
 import org.oscm.app.v2_0.data.ControllerSettings;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
 import org.oscm.app.v2_0.i18n.Messages;
-import org.oscm.app.v2_0.intf.ControllerAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-public class ApprovalControllerAccess implements ControllerAccess {
+@Stateless(mappedName = "bss/app/controllersettings/ess.approval")
+@Remote(ApprovalControllerAccess.class)
+public class ApprovalControllerAccessBean implements ApprovalControllerAccess {
 
   private static final long serialVersionUID = 2872054079271208066L;
-  private static final Logger LOGGER = LoggerFactory.getLogger(ApprovalControllerAccess.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ApprovalControllerAccessBean.class);
  
   private ControllerSettings settings;
  

@@ -11,13 +11,13 @@ package org.oscm.app.approval.intf;
 
 import javax.ejb.Remote;
 
-import org.oscm.app.approval.controller.ApprovalControllerAccess;
-import org.oscm.app.v2_0.intf.APPlatformController;
+import org.oscm.app.v2_0.data.ControllerSettings;
+import org.oscm.app.v2_0.intf.ControllerAccess;
 
 /** @author goebel */
 @Remote
-public interface ApprovalController extends APPlatformController {
+public interface ApprovalControllerAccess extends ControllerAccess {
   public static final String ID = "ess.approval";
   
-  public ApprovalControllerAccess getControllerAccess();
+  public ControllerSettings getSettings();
 }

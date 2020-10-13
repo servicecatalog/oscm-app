@@ -21,7 +21,6 @@ import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
 import org.oscm.app.approval.data.State;
-import org.oscm.app.approval.intf.ApprovalController;
 import org.oscm.app.v2_0.APPlatformServiceFactory;
 import org.oscm.app.v2_0.data.ControllerSettings;
 import org.oscm.app.v2_0.data.InstanceDescription;
@@ -32,20 +31,21 @@ import org.oscm.app.v2_0.data.OperationParameter;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
 import org.oscm.app.v2_0.data.ServiceUser;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
+import org.oscm.app.v2_0.intf.APPlatformController;
 import org.oscm.app.v2_0.intf.APPlatformService;
 import org.oscm.app.v2_0.intf.ControllerAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Stateless(mappedName = "bss/app/controller/ess.approval")
-@Remote(ApprovalController.class)
-public class ApprovalControllerBean implements ApprovalController {
-
+@Remote(APPlatformController.class)
+public class ApprovalController implements APPlatformController {
+  public static String ID = "ess.approval";
   private static final Logger LOGGER = LoggerFactory.getLogger(ApprovalController.class);
- 
+
   private APPlatformService platformService;
 
-  ApprovalControllerAccess controllerAccess;
+  ApprovalControllerAccessBean controllerAccess;
 
   @PostConstruct
   public void initialize() {
@@ -81,7 +81,7 @@ public class ApprovalControllerBean implements ApprovalController {
       throw new APPlatformException(
           String.format(
               "An approval service is already subscribed for the organization ID %s.", org));
- }
+  }
 
   @Override
   @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
@@ -199,11 +199,10 @@ public class ApprovalControllerBean implements ApprovalController {
 
   @Inject
   public void setControllerAccess(final ControllerAccess access) {
-    this.controllerAccess = (ApprovalControllerAccess) access;
+    this.controllerAccess = (ApprovalControllerAccessBean) access;
   }
-  
-  @Override
-  public ApprovalControllerAccess getControllerAccess() {
+
+  public ApprovalControllerAccessBean getControllerAccess() {
     return this.controllerAccess;
   }
 }

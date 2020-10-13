@@ -20,7 +20,6 @@ import java.util.Optional;
 import javax.annotation.PostConstruct;
 
 import org.oscm.app.approval.data.Server;
-import org.oscm.app.approval.intf.ApprovalController;
 import org.oscm.app.v2_0.APPlatformServiceFactory;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
 import org.oscm.app.v2_0.data.Setting;
@@ -86,7 +85,7 @@ public class ApprovalInstanceAccess implements InstanceAccess {
     ProvisioningSettings settings =
         getPlatformService()
             .getServiceInstanceDetails(
-                ApprovalController.ID, instanceId, subscriptionId, organizationId);
+                    ApprovalController.ID, instanceId, subscriptionId, organizationId);
     PropertyHandler ph = new PropertyHandler(settings);
 
     List<Server> servers = new ArrayList<>();
@@ -106,7 +105,7 @@ public class ApprovalInstanceAccess implements InstanceAccess {
     ProvisioningSettings settings =
         getPlatformService()
             .getServiceInstanceDetails(
-                ApprovalController.ID, instanceId, subscriptionId, organizationId);
+                    ApprovalController.ID, instanceId, subscriptionId, organizationId);
 
     return settings.getServiceAccessInfo();
   }
