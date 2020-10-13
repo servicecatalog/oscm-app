@@ -21,6 +21,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
 import org.oscm.app.approval.data.State;
+import org.oscm.app.approval.intf.ApprovalController;
 import org.oscm.app.v2_0.APPlatformServiceFactory;
 import org.oscm.app.v2_0.data.ControllerSettings;
 import org.oscm.app.v2_0.data.InstanceDescription;
@@ -31,18 +32,17 @@ import org.oscm.app.v2_0.data.OperationParameter;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
 import org.oscm.app.v2_0.data.ServiceUser;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
-import org.oscm.app.v2_0.intf.APPlatformController;
 import org.oscm.app.v2_0.intf.APPlatformService;
 import org.oscm.app.v2_0.intf.ControllerAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Stateless(mappedName = "bss/app/controller/ess.approval")
-@Remote(APPlatformController.class)
-public class ApprovalController implements APPlatformController {
+@Remote(ApprovalController.class)
+public class ApprovalControllerBean implements ApprovalController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ApprovalController.class);
-  public static final String ID = "ess.approval";
+ 
   private APPlatformService platformService;
 
   ApprovalControllerAccess controllerAccess;
@@ -202,6 +202,7 @@ public class ApprovalController implements APPlatformController {
     this.controllerAccess = (ApprovalControllerAccess) access;
   }
   
+  @Override
   public ApprovalControllerAccess getControllerAccess() {
     return this.controllerAccess;
   }

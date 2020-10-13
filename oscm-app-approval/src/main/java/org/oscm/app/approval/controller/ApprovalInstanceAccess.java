@@ -20,6 +20,7 @@ import java.util.Optional;
 import javax.annotation.PostConstruct;
 
 import org.oscm.app.approval.data.Server;
+import org.oscm.app.approval.intf.ApprovalController;
 import org.oscm.app.v2_0.APPlatformServiceFactory;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
 import org.oscm.app.v2_0.data.Setting;

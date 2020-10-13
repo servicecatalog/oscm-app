@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.inject.Singleton;
 
+import org.oscm.app.approval.intf.ApprovalController;
 import org.oscm.app.v2_0.APPlatformServiceFactory;
 import org.oscm.app.v2_0.data.ControllerSettings;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
