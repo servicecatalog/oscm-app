@@ -22,13 +22,14 @@ import org.oscm.app.v2_0.APPlatformServiceFactory;
 import org.oscm.app.v2_0.data.ControllerSettings;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
 import org.oscm.app.v2_0.i18n.Messages;
+import org.oscm.app.v2_0.intf.ControllerAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
 @Stateless(mappedName = "bss/app/controllersettings/ess.approval")
 @Remote(ApprovalControllerAccess.class)
-public class ApprovalControllerAccessBean implements ApprovalControllerAccess {
+public class ApprovalControllerAccessBean implements ControllerAccess {
 
   private static final long serialVersionUID = 2872054079271208066L;
   private static final Logger LOGGER = LoggerFactory.getLogger(ApprovalControllerAccessBean.class);
