@@ -12,11 +12,10 @@ package org.oscm.app.approval.intf;
 import javax.ejb.Remote;
 
 import org.oscm.app.v2_0.data.ControllerSettings;
-import org.oscm.app.v2_0.intf.ControllerAccess;
 
 /** @author goebel */
 @Remote
-public interface ApprovalControllerAccess extends ControllerAccess {
+public interface ApprovalControllerAccess  {
   public static final String ID = "ess.approval";
   
   public ControllerSettings getSettings();

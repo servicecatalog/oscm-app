@@ -9,12 +9,11 @@
  */
 package org.oscm.app.approval.controller;
 
-import java.util.LinkedList
-;
+import java.util.LinkedList;
 import java.util.List;
 
+import javax.ejb.EJB;
 import javax.ejb.Remote;
-import javax.ejb.Stateless;
 import javax.inject.Singleton;
 
 import org.oscm.app.approval.intf.ApprovalControllerAccess;
@@ -27,15 +26,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-@Stateless(mappedName = "bss/app/controllersettings/ess.approval")
+@EJB(mappedName = "bss/app/controllersettings/ess.approval")
 @Remote(ApprovalControllerAccess.class)
 public class ApprovalControllerAccessBean implements ControllerAccess {
 
   private static final long serialVersionUID = 2872054079271208066L;
   private static final Logger LOGGER = LoggerFactory.getLogger(ApprovalControllerAccessBean.class);
- 
+
   private ControllerSettings settings;
- 
+
   @Override
   public String getControllerId() {
     return ApprovalController.ID;
@@ -51,25 +50,20 @@ public class ApprovalControllerAccessBean implements ControllerAccess {
     LinkedList<String> result = new LinkedList<>();
     return result;
   }
-  
+
   public ControllerSettings getSettings() {
-      if (settings == null) {
-          try {
-              APPlatformServiceFactory.getInstance()
-                      .requestControllerSettings(getControllerId());
-              LOGGER.debug(
-                      "Settings were NULL. Requested from APP and got {}",
-                      settings);
-          } catch (APPlatformException e) {
-              LOGGER.error(
-                      "Error while ControllerAcces was requesting controller setting from APP",
-                      e);
-          }
+    if (settings == null) {
+      try {
+        APPlatformServiceFactory.getInstance().requestControllerSettings(getControllerId());
+        LOGGER.debug("Settings were NULL. Requested from APP and got {}", settings);
+      } catch (APPlatformException e) {
+        LOGGER.error("Error while ControllerAcces was requesting controller setting from APP", e);
       }
-      return settings;
+    }
+    return settings;
   }
-  
+
   public void storeSettings(ControllerSettings settings) {
-      this.settings = settings;
+    this.settings = settings;
   }
 }
