@@ -13,10 +13,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.ejb.EJB;
-import javax.ejb.Remote;
 import javax.inject.Singleton;
 
-import org.oscm.app.approval.intf.ApprovalControllerAccess;
 import org.oscm.app.v2_0.APPlatformServiceFactory;
 import org.oscm.app.v2_0.data.ControllerSettings;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
@@ -27,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 @Singleton
 @EJB(mappedName = "bss/app/controllersettings/ess.approval")
-@Remote(ApprovalControllerAccess.class)
 public class ApprovalControllerAccessBean implements ControllerAccess {
 
   private static final long serialVersionUID = 2872054079271208066L;
