@@ -10,7 +10,6 @@
 package org.oscm.app.approval.controller;
 
 import java.io.Serializable;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -142,6 +141,14 @@ public class ApprovalInstanceAccess implements InstanceAccess {
     return null;
   }
 
+  static boolean isPresent(Setting... settings) {
+    boolean is = true;
+    for (Setting s : settings) {
+      is &= (s!=null && s.getKey() != null && s.getValue() != null && s.getValue().length() > 0);
+    }
+    return is;
+  }
+
   /** Client data for approval trigger callback. */
   public class ClientData implements Serializable {
 
@@ -163,13 +170,8 @@ public class ApprovalInstanceAccess implements InstanceAccess {
     }
 
     public boolean isSet() {
-      boolean isSet = true;
-      isSet &= null != getOrgAdminUserId();
-      isSet &= null != getOrgAdminUserKey();
-      isSet &= null != getOrgAdminUserPwd();
-      isSet &= null != getApproverOrgId();
-      return isSet;
-    }
+      return isPresent(getOrgAdminUserId(),getOrgAdminUserId(),getOrgAdminUserPwd(), getApproverOrgId());
+     }
 
     public void set(ProvisioningSettings ps) {
       setApproverOrgId(getSetting(ps, PARAM_APPROVER_ORG_ID));
@@ -242,12 +244,17 @@ public class ApprovalInstanceAccess implements InstanceAccess {
 
     BasicSettings(ProvisioningSettings ps) {
       approvalUrl = ps.getConfigSettings().get("APPROVAL_URL");
+      wsdlUrl = ps.getConfigSettings().get("BSS_WEBSERVICE_WSDL_URL");
       ownerCredentials = ps.getAuthentication();
-      isSet = approvalUrl != null && ownerCredentials != null;
+      isSet = ownerCredentials != null && isPresent(approvalUrl, wsdlUrl); 
     }
 
     public PasswordAuthentication getOwnerCredentials() {
       return ownerCredentials;
+    }
+
+    public Setting getWsdlUrl() {
+      return wsdlUrl;
     }
 
     public Setting getApprovalURL() {
@@ -259,6 +266,8 @@ public class ApprovalInstanceAccess implements InstanceAccess {
     }
 
     Setting approvalUrl;
+    Setting wsdlUrl;
+
     PasswordAuthentication ownerCredentials;
   }
 }
