@@ -9,6 +9,13 @@
  */
 package org.oscm.app.vmware.business;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.oscm.app.vmware.remote.vmware.VMwareClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vmware.vim25.DistributedVirtualSwitchPortConnection;
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.NetworkSummary;
@@ -23,11 +30,6 @@ import com.vmware.vim25.VirtualEthernetCardNetworkBackingInfo;
 import com.vmware.vim25.VirtualMachineConfigInfo;
 import com.vmware.vim25.VirtualMachineConfigSpec;
 import com.vmware.vim25.VirtualMachineRuntimeInfo;
-import java.util.ArrayList;
-import java.util.List;
-import org.oscm.app.vmware.remote.vmware.VMwareClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class NetworkManager {
 
@@ -87,7 +89,7 @@ public class NetworkManager {
       ManagedObjectReference vmwInstance)
       throws Exception {
     logger.debug("");
- 
+
     VirtualMachineConfigInfo configInfo =
         (VirtualMachineConfigInfo) vmw.getServiceUtil().getDynamicProperty(vmwInstance, "config");
     List<VirtualEthernetCard> vmNics = getNetworkAdapter(configInfo);
@@ -108,33 +110,36 @@ public class NetworkManager {
     }
 
     for (int i = 1; i <= numberOfNICs; i++) {
-      
+
       VirtualEthernetCard vmNic = vmNics.get(i - 1);
       boolean connectNic = true;
       String newNetworkName = paramHandler.getNetworkAdapter(i);
-      
-      if(paramHandler.getPortGroup(i) != null && !paramHandler.getPortGroup(i).isEmpty()
-         && paramHandler.getSwitchUUID(i) != null && !paramHandler.getSwitchUUID(i).isEmpty()) {
-      PortgroupIpSettings pis = new PortgroupIpSettings(paramHandler, i);
-      
-      String newGroup = pis.getPortgroup().getUuid();
-      String switchUIID = pis.getDvs().getUuid();
 
-      logger.info(String.format("NIC%s_SWITCH_UUID: %s", String.valueOf(i), switchUIID));
-      logger.info(String.format("NIC%s_PORTGROUP: %s", String.valueOf(i), newGroup));
-      
-      if (switchUIID != null && switchUIID.length() > 0) {
-        if (newGroup == null || newGroup.length() == 0)
-          throw new Exception(
-              String.format(
-                  "Parameter NIC%s_PORTGROUP has to be specified for using the switch %s. Expecting generated UUID of the portgroup.",
-                  String.valueOf(i), switchUIID));
-        ManagedObjectReference group =
-            getPortGroupFromHost(vmw, vmwInstance, vmNic, switchUIID, newGroup);
+      if (paramHandler.getPortGroup(i) != null
+          && !paramHandler.getPortGroup(i).isEmpty()
+          && paramHandler.getSwitchUUID(i) != null
+          && !paramHandler.getSwitchUUID(i).isEmpty()) {
+        PortgroupIpSettings pis = createPortgroupIpSettings(paramHandler, i);
 
-        replaceNetworkAdapter(vmConfigSpec, vmNic, group, newGroup);
-        connectNic = false;
-      }} else {
+        String newGroup = pis.getPortgroup().getUuid();
+        String switchUIID = pis.getDvs().getUuid();
+
+        logger.info(String.format("NIC%s_SWITCH_UUID: %s", String.valueOf(i), switchUIID));
+        logger.info(String.format("NIC%s_PORTGROUP: %s", String.valueOf(i), newGroup));
+
+        if (switchUIID != null && switchUIID.length() > 0) {
+          if (newGroup == null || newGroup.length() == 0)
+            throw new Exception(
+                String.format(
+                    "Parameter NIC%s_PORTGROUP has to be specified for using the switch %s. Expecting generated UUID of the portgroup.",
+                    String.valueOf(i), switchUIID));
+          ManagedObjectReference group =
+              getPortGroupFromHost(vmw, vmwInstance, vmNic, switchUIID, newGroup);
+
+          replaceNetworkAdapter(vmConfigSpec, vmNic, group, newGroup);
+          connectNic = false;
+        }
+      } else {
 
         String vmNetworkName = getNetworkName(vmw, vmwInstance, i);
         if (newNetworkName != null
@@ -155,7 +160,12 @@ public class NetworkManager {
     }
   }
 
-  private static ManagedObjectReference getPortGroupFromHost(
+  protected static PortgroupIpSettings createPortgroupIpSettings(
+      VMPropertyHandler paramHandler, int i) {
+    return new PortgroupIpSettings(paramHandler, i);
+  }
+
+  protected static ManagedObjectReference getPortGroupFromHost(
       VMwareClient vmw,
       ManagedObjectReference vmwInstance,
       VirtualEthernetCard card,
@@ -206,7 +216,7 @@ public class NetworkManager {
     return portGrp;
   }
 
-  private static ManagedObjectReference getNetworkFromHost(
+  protected static ManagedObjectReference getNetworkFromHost(
       VMwareClient vmw,
       ManagedObjectReference vmwInstance,
       VirtualEthernetCard card,
@@ -242,23 +252,32 @@ public class NetworkManager {
     return netCard;
   }
 
-  private static VirtualDevice prepareDvNicDevice(
+  protected static VirtualDevice prepareDvNicDevice(
       VirtualEthernetCard vmNic, ManagedObjectReference group, String switchUuid) throws Exception {
     logger.debug(
         String.format(
             "prepareDvNicDevice switch: %s, portgroup: %s", switchUuid, group.getValue()));
-    VirtualEthernetCardNetworkBackingInfo nicBacking = new VirtualEthernetCardNetworkBackingInfo();
 
     final VirtualEthernetCardDistributedVirtualPortBackingInfo dvPortBacking =
-        new VirtualEthernetCardDistributedVirtualPortBackingInfo();
+        createVirtualEthernetCardDistributedVirtualPortBackingInfo();
     final DistributedVirtualSwitchPortConnection dvPortConnection =
-        new DistributedVirtualSwitchPortConnection();
+        createDistributedVirtualSwitchPortConnection();
 
     dvPortConnection.setSwitchUuid(switchUuid);
     dvPortConnection.setPortgroupKey(group.getValue());
     dvPortBacking.setPort(dvPortConnection);
     vmNic.setBacking(dvPortBacking);
     return vmNic;
+  }
+
+  private static DistributedVirtualSwitchPortConnection
+      createDistributedVirtualSwitchPortConnection() {
+    return new DistributedVirtualSwitchPortConnection();
+  }
+
+  private static VirtualEthernetCardDistributedVirtualPortBackingInfo
+      createVirtualEthernetCardDistributedVirtualPortBackingInfo() {
+    return new VirtualEthernetCardDistributedVirtualPortBackingInfo();
   }
 
   public static List<VirtualEthernetCard> getNetworkAdapter(VirtualMachineConfigInfo configInfo) {
@@ -296,8 +315,8 @@ public class NetworkManager {
                   .getSwitchUuid()));
 
       VirtualEthernetCardDistributedVirtualPortBackingInfo nicBacking =
-          new VirtualEthernetCardDistributedVirtualPortBackingInfo();
-      nicBacking.setPort(new DistributedVirtualSwitchPortConnection());
+          createVirtualEthernetCardDistributedVirtualPortBackingInfo();
+      nicBacking.setPort(createDistributedVirtualSwitchPortConnection());
       nicBacking
           .getPort()
           .setPortgroupKey(
@@ -324,7 +343,7 @@ public class NetworkManager {
     connectNIC(vmConfigSpec, oldNIC);
   }
 
-  private static void connectNIC(VirtualMachineConfigSpec vmConfigSpec, VirtualDevice oldNIC) {
+  protected static void connectNIC(VirtualMachineConfigSpec vmConfigSpec, VirtualDevice oldNIC) {
     logger.debug("Connecting nic" + oldNIC.getKey());
     VirtualDeviceConnectInfo info = new VirtualDeviceConnectInfo();
     info.setConnected(true);
