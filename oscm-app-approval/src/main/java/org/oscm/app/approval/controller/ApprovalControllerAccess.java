@@ -23,10 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-public class ApprovalControllerAccessBean implements ControllerAccess {
+public class ApprovalControllerAccess implements ControllerAccess {
 
   private static final long serialVersionUID = 2872054079271208066L;
-  private static final Logger LOGGER = LoggerFactory.getLogger(ApprovalControllerAccessBean.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ApprovalControllerAccess.class);
 
   private ControllerSettings settings;
 

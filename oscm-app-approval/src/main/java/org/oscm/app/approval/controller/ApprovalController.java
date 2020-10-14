@@ -40,12 +40,12 @@ import org.slf4j.LoggerFactory;
 @Stateless(mappedName = "bss/app/controller/ess.approval")
 @Remote(APPlatformController.class)
 public class ApprovalController implements APPlatformController {
-  public static String ID = "ess.approval";
-  private static final Logger LOGGER = LoggerFactory.getLogger(ApprovalController.class);
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(ApprovalController.class);
+  public static final String ID = "ess.approval";
   private APPlatformService platformService;
 
-  ApprovalControllerAccessBean controllerAccess;
+  ApprovalControllerAccess controllerAccess;
 
   @PostConstruct
   public void initialize() {
@@ -81,7 +81,7 @@ public class ApprovalController implements APPlatformController {
       throw new APPlatformException(
           String.format(
               "An approval service is already subscribed for the organization ID %s.", org));
-  }
+ }
 
   @Override
   @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
@@ -199,10 +199,6 @@ public class ApprovalController implements APPlatformController {
 
   @Inject
   public void setControllerAccess(final ControllerAccess access) {
-    this.controllerAccess = (ApprovalControllerAccessBean) access;
-  }
-
-  public ApprovalControllerAccessBean getControllerAccess() {
-    return this.controllerAccess;
+    this.controllerAccess = (ApprovalControllerAccess) access;
   }
 }
