@@ -10,6 +10,7 @@
 package org.oscm.app.approval.controller;
 
 import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,6 +22,7 @@ import javax.annotation.PostConstruct;
 
 import org.oscm.app.approval.data.Server;
 import org.oscm.app.v2_0.APPlatformServiceFactory;
+import org.oscm.app.v2_0.data.PasswordAuthentication;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
 import org.oscm.app.v2_0.data.Setting;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
@@ -68,15 +70,40 @@ public class ApprovalInstanceAccess implements InstanceAccess {
     return data;
   }
 
+  public BasicSettings getBasicSettings() throws APPlatformException {
+
+    BasicSettings basicSettings = new BasicSettings();
+
+    Collection<String> instances =
+        getPlatformService().listServiceInstances(ApprovalController.ID, null);
+
+    for (String instance : instances) {
+      ProvisioningSettings ps =
+          getPlatformService().getServiceInstanceDetails(ApprovalController.ID, instance, null);
+      if (anyApprover(ps).isPresent()) {
+        return new BasicSettings(ps);
+      }
+    }
+    return basicSettings;
+  }
+
   private Optional<String> getApprovers(ProvisioningSettings ps, String customerOrgId) {
     HashMap<String, Setting> map = new HashMap<String, Setting>();
     map.putAll(ps.getParameters());
     map.putAll(ps.getCustomAttributes());
-    
+
     return map.keySet()
         .stream()
         .filter(k -> k.startsWith("APPROVER_ORG_ID_" + customerOrgId))
         .findAny();
+  }
+
+  private Optional<String> anyApprover(ProvisioningSettings ps) {
+    HashMap<String, Setting> map = new HashMap<String, Setting>();
+    map.putAll(ps.getParameters());
+    map.putAll(ps.getCustomAttributes());
+
+    return map.keySet().stream().filter(k -> k.startsWith("APPROVER_ORG_ID_")).findAny();
   }
 
   @Override
@@ -85,7 +112,7 @@ public class ApprovalInstanceAccess implements InstanceAccess {
     ProvisioningSettings settings =
         getPlatformService()
             .getServiceInstanceDetails(
-                    ApprovalController.ID, instanceId, subscriptionId, organizationId);
+                ApprovalController.ID, instanceId, subscriptionId, organizationId);
     PropertyHandler ph = new PropertyHandler(settings);
 
     List<Server> servers = new ArrayList<>();
@@ -105,7 +132,7 @@ public class ApprovalInstanceAccess implements InstanceAccess {
     ProvisioningSettings settings =
         getPlatformService()
             .getServiceInstanceDetails(
-                    ApprovalController.ID, instanceId, subscriptionId, organizationId);
+                ApprovalController.ID, instanceId, subscriptionId, organizationId);
 
     return settings.getServiceAccessInfo();
   }
@@ -149,6 +176,10 @@ public class ApprovalInstanceAccess implements InstanceAccess {
       setOrgAdminUserId(getSetting(ps, PARAM_USER_ID));
       setOrgAdminUserKey(getSetting(ps, PARAM_USER_KEY));
       setOrgAdminUserPwd(getSetting(ps, PARAM_USER_PWD));
+    }
+
+    private Setting getConfigSetting(ProvisioningSettings ps, String key) {
+      return ps.getConfigSettings().get(key);
     }
 
     private Setting getSetting(ProvisioningSettings ps, String key) {
@@ -200,5 +231,34 @@ public class ApprovalInstanceAccess implements InstanceAccess {
     Setting orgAdminUserKey;
     Setting orgAdminUserPwd;
     Setting approverOrgId;
+  }
+
+  /** Client data for approval trigger callback. */
+  public class BasicSettings implements Serializable {
+    private static final long serialVersionUID = 9206647239461503333L;
+    boolean isSet = false;
+
+    BasicSettings() {}
+
+    BasicSettings(ProvisioningSettings ps) {
+      approvalUrl = ps.getConfigSettings().get("APPROVAL_URL");
+      ownerCredentials = ps.getAuthentication();
+      isSet = approvalUrl != null && ownerCredentials != null;
+    }
+
+    public PasswordAuthentication getOwnerCredentials() {
+      return ownerCredentials;
+    }
+
+    public Setting getApprovalURL() {
+      return approvalUrl;
+    }
+
+    public boolean isSet() {
+      return isSet;
+    }
+
+    Setting approvalUrl;
+    PasswordAuthentication ownerCredentials;
   }
 }
