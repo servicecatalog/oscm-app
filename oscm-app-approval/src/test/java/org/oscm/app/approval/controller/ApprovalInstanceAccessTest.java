@@ -110,8 +110,10 @@ public class ApprovalInstanceAccessTest {
   }
 
   void givenBasicSettings() throws Exception {
-    configSettings.put("APPROVAL_URL", new Setting("APPROVAL_URL", "http://oscm-app/approval"));
-    configSettings.put("BSS_WEBSERVICE_WSDL_URL", new Setting("BSS_WEBSERVICE_WSDL_URL", "http://oscm-core/trigger?wsdl"));
+    customAttributes.put("APPROVAL_URL", new Setting("APPROVAL_URL", "http://oscm-app/approval"));
+    customAttributes.put(
+        "BSS_WEBSERVICE_WSDL_URL",
+        new Setting("BSS_WEBSERVICE_WSDL_URL", "http://oscm-core/trigger?wsdl"));
     givenPasswordAutentication("admin", "adminpw");
   }
 
