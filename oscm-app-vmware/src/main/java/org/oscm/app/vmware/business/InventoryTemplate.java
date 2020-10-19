@@ -56,10 +56,11 @@ public class InventoryTemplate {
 
     String storageName = paramHandler.getServiceSetting(VMPropertyHandler.TS_TARGET_STORAGE);
     String hostName = paramHandler.getServiceSetting(VMPropertyHandler.TS_TARGET_HOST);
+    VMwareDatacenterInventory inventory = readDatacenterInventory(vmw, datacenter, cluster);
     if (hostName == null || hostName.trim().length() == 0) {
       logger.debug("target host not set. get host and storage from loadbalancer");
-      VMwareDatacenterInventory inventory = readDatacenterInventory(vmw, datacenter, cluster);
-      LoadBalancerConfiguration balancerConfig = new LoadBalancerConfiguration(xmlData, inventory);
+      LoadBalancerConfiguration balancerConfig =
+          createLoadBalancerConfiguration(xmlData, inventory);
       VMwareHost host = balancerConfig.getBalancer().next(paramHandler);
       hostName = host.getName();
       paramHandler.setSetting(VMPropertyHandler.TS_TARGET_HOST, hostName);
@@ -68,7 +69,6 @@ public class InventoryTemplate {
     } else {
       if (storageName == null || storageName.trim().length() == 0) {
         logger.debug("target storage not set. get host and storage from inventory");
-        VMwareDatacenterInventory inventory = readDatacenterInventory(vmw, datacenter, cluster);
         VMwareHost host = inventory.getHost(hostName);
         VMwareStorage storage = host.getNextStorage(paramHandler);
         storageName = storage.getName();
@@ -85,6 +85,11 @@ public class InventoryTemplate {
     relocSpec.setPool(vmPool);
     relocSpec.setHost(vmHost);
     return relocSpec;
+  }
+
+  protected LoadBalancerConfiguration createLoadBalancerConfiguration(
+      String xmlData, VMwareDatacenterInventory inventory) throws Exception {
+    return new LoadBalancerConfiguration(xmlData, inventory);
   }
 
   protected ManagedObjectReference getVMDatastore(
@@ -145,7 +150,7 @@ public class InventoryTemplate {
   }
 
   @SuppressWarnings("unchecked")
-  private VMwareDatacenterInventory readDatacenterInventory(
+  VMwareDatacenterInventory readDatacenterInventory(
       VMwareClient appUtil, String datacenter, String cluster) throws Exception {
     logger.debug("datacenter: " + datacenter + " cluster: " + cluster);
 
