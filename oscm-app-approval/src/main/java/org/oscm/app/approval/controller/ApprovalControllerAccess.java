@@ -27,9 +27,9 @@ public class ApprovalControllerAccess implements ControllerAccess {
 
   private static final long serialVersionUID = 2872054079271208066L;
   private static final Logger LOGGER = LoggerFactory.getLogger(ApprovalControllerAccess.class);
-  
+
   private ControllerSettings settings;
- 
+
   @Override
   public String getControllerId() {
     return ApprovalController.ID;
@@ -45,25 +45,20 @@ public class ApprovalControllerAccess implements ControllerAccess {
     LinkedList<String> result = new LinkedList<>();
     return result;
   }
-  
+
   public ControllerSettings getSettings() {
-      if (settings == null) {
-          try {
-              APPlatformServiceFactory.getInstance()
-                      .requestControllerSettings(getControllerId());
-              LOGGER.debug(
-                      "Settings were NULL. Requested from APP and got {}",
-                      settings);
-          } catch (APPlatformException e) {
-              LOGGER.error(
-                      "Error while ControllerAcces was requesting controller setting from APP",
-                      e);
-          }
+    if (settings == null) {
+      try {
+        APPlatformServiceFactory.getInstance().requestControllerSettings(getControllerId());
+        LOGGER.debug("Settings were NULL. Requested from APP and got {}", settings);
+      } catch (APPlatformException e) {
+        LOGGER.error("Error while ControllerAcces was requesting controller setting from APP", e);
       }
-      return settings;
+    }
+    return settings;
   }
-  
+
   public void storeSettings(ControllerSettings settings) {
-      this.settings = settings;
+    this.settings = settings;
   }
 }
