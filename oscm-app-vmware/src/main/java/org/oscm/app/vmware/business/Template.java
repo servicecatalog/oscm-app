@@ -62,10 +62,10 @@ public class Template {
 
     setDiskSpaceMB(paramHandler, template, configSpec, tplDiskSpace);
 
-    CustomizationSpecTemplate customSpec = new CustomizationSpecTemplate(paramHandler);
+    CustomizationSpecTemplate customSpec = createCustomizationSpecTemplate(paramHandler);
     CustomizationSpec custSpec = customSpec.getCustomizationSpec(configSpec);
 
-    InventoryTemplate inventory = new InventoryTemplate(vmw, paramHandler);
+    InventoryTemplate inventory = createInventoryTemplate(paramHandler);
     VirtualMachineRelocateSpec relocSpec = inventory.getHostAndStorageSpec(vmDataCenter);
     VirtualMachineCloneSpec cloneSpec = createVirtualMachineCloneSpec(relocSpec);
 
@@ -87,6 +87,15 @@ public class Template {
         service.cloneVMTask(vmTpl, moRefTargetFolder, newInstanceName, cloneSpec);
 
     return (TaskInfo) vmw.getServiceUtil().getDynamicProperty(cloneTask, "info");
+  }
+
+  protected InventoryTemplate createInventoryTemplate(VMPropertyHandler paramHandler) {
+    return new InventoryTemplate(vmw, paramHandler);
+  }
+
+  protected CustomizationSpecTemplate createCustomizationSpecTemplate(
+      VMPropertyHandler paramHandler) {
+    return new CustomizationSpecTemplate(paramHandler);
   }
 
   protected void setDiskSpaceMB(
@@ -167,7 +176,7 @@ public class Template {
       throws APPlatformException {
     double requestedDiskSpace = paramHandler.getConfigDiskSpaceMB();
     List<VirtualDevice> devices = configSpec.getHardware().getDevice();
-    long capacityInKB = DiskManager.getSystemDiskCapacity(devices, configSpec.getName());
+    long capacityInKB = getSystemDiskCapacity(configSpec, devices);
     double requestedDiskSpaceKB = requestedDiskSpace * 1024.0;
     logger.debug(
         "Requested disk space: "
@@ -187,6 +196,11 @@ public class Template {
               paramHandler.getLocale(), "error_invalid_diskspace", new Object[] {minValExp}));
     }
     return requestedDiskSpace;
+  }
+
+  protected long getSystemDiskCapacity(
+      VirtualMachineConfigInfo configSpec, List<VirtualDevice> devices) throws APPlatformException {
+    return DiskManager.getSystemDiskCapacity(devices, configSpec.getName());
   }
 
   protected Long getTemplateDiskSpace(
