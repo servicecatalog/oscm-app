@@ -112,7 +112,7 @@ public class ApprovalInstanceAccessTest {
   }
 
   void givenBasicSettings() throws Exception {
-    customAttributes.put("APPROVAL_URL", new Setting("APPROVAL_URL", "http://oscm-app/approval"));
+    configSettings.put("APPROVAL_URL", new Setting("APPROVAL_URL", "http://oscm-app/approval"));
     givenPasswordAutentication("admin", "adminpw");
   }
 

@@ -248,7 +248,7 @@ public class ApprovalInstanceAccess implements InstanceAccess {
 
     BasicSettings(ProvisioningSettings ps, String wsdlUrl) {
       this.wsdlUrl = wsdlUrl;
-      approvalUrl = ps.getCustomAttributes().get("APPROVAL_URL");
+      approvalUrl = ps.getConfigSettings().get("APPROVAL_URL");
       ownerCredentials = ps.getAuthentication();
       isSet = ownerCredentials != null && isPresent(approvalUrl);
     }
