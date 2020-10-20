@@ -125,7 +125,7 @@ public class NetworkManagerTest {
     doReturn(summary).when(moa).getDynamicProperty(mor, "summary");
 
     // when
-    String result = NetworkManager.getNetworkName(vmw, vmwInstance, 1);
+    NetworkManager.getNetworkName(vmw, vmwInstance, 1);
   }
 
   @Test(expected = Exception.class)
@@ -277,7 +277,6 @@ public class NetworkManagerTest {
     VirtualDevice vd = new VirtualDevice();
 
     ManagedObjectReference hostRef = mock(ManagedObjectReference.class);
-    ManagedObjectReference man = mock(ManagedObjectReference.class);
     ManagedObjectReference sw = mock(ManagedObjectReference.class);
     VirtualMachineRuntimeInfo vmRuntimeInfo = mock(VirtualMachineRuntimeInfo.class);
 
@@ -306,7 +305,6 @@ public class NetworkManagerTest {
     VirtualDevice vd = new VirtualDevice();
 
     ManagedObjectReference hostRef = mock(ManagedObjectReference.class);
-    ManagedObjectReference man = mock(ManagedObjectReference.class);
     ManagedObjectReference sw = mock(ManagedObjectReference.class);
     VirtualMachineRuntimeInfo vmRuntimeInfo = mock(VirtualMachineRuntimeInfo.class);
 
