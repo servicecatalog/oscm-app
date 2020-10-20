@@ -15,7 +15,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -150,6 +152,18 @@ public class ApprovalInstanceAccess implements InstanceAccess {
     return is;
   }
 
+  static Map<String, String> toStringMap(HashMap<String, Setting> hashMap) {
+    Map<String, String> r =
+        hashMap
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    e -> e.getKey(),
+                    e -> ((e.getValue() == null) ? null : e.getValue().getValue())));
+    return r;
+  }
+
   /** Client data for approval trigger callback. */
   public class ClientData implements Serializable {
 
@@ -250,6 +264,7 @@ public class ApprovalInstanceAccess implements InstanceAccess {
       this.wsdlUrl = wsdlUrl;
       approvalUrl = ps.getConfigSettings().get("APPROVAL_URL");
       ownerCredentials = ps.getAuthentication();
+      params = toStringMap(ps.getParameters());
       isSet = ownerCredentials != null && isPresent(approvalUrl);
     }
 
@@ -268,9 +283,17 @@ public class ApprovalInstanceAccess implements InstanceAccess {
     public boolean isSet() {
       return isSet;
     }
+    
+    
+    public Map<String, String> getParams() {
+      return params;
+    }
 
+    private Map<String, String> params;
     private String wsdlUrl;
     Setting approvalUrl;
     PasswordAuthentication ownerCredentials;
+
+  
   }
 }

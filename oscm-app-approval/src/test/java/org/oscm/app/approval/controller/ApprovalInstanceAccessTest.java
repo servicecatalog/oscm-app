@@ -70,6 +70,22 @@ public class ApprovalInstanceAccessTest {
   }
 
   @Test
+  public void getBasicSettings_Params() throws Exception {
+    // given
+    givenAnyApprover();
+    givenBasicSettingsWithParams();
+
+    // when
+    ApprovalInstanceAccess.BasicSettings settings = access.getBasicSettings();
+
+    // then
+    assertNotNull(settings);
+    assertTrue(settings.isSet());
+    assertNotNull(settings.getParams());
+    assertEquals("Test", settings.getParams().get("APPROVAL_MSG_SUBECT"));
+  }
+
+  @Test
   public void getCustomerSettings() throws APPlatformException {
     // given
     givenCustomerSettings("3fe2a1");
@@ -114,6 +130,11 @@ public class ApprovalInstanceAccessTest {
   void givenBasicSettings() throws Exception {
     configSettings.put("APPROVAL_URL", new Setting("APPROVAL_URL", "http://oscm-app/approval"));
     givenPasswordAutentication("admin", "adminpw");
+  }
+
+  void givenBasicSettingsWithParams() throws Exception {
+    givenBasicSettings();
+    params.put("APPROVAL_MSG_SUBECT", new Setting("APPROVAL_MSG_SUBECT", "Test"));
   }
 
   private void givenPasswordAutentication(String user, String password) {
