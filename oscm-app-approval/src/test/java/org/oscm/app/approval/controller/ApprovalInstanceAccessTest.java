@@ -48,6 +48,7 @@ public class ApprovalInstanceAccessTest {
     doReturn(s).when(access).getPlatformService();
     access.platformService = s;
     ProvisioningSettings ps = mockProvisioningSettings();
+    doReturn("http://oscm-core/{service}?wsdl").when(s).getBSSWebServiceWSDLUrl();
     Collection<String> result = Arrays.asList(new String[] {"instance_12345678"});
     doReturn(result).when(s).listServiceInstances(any(), any());
     doReturn(ps).when(s).getServiceInstanceDetails(anyString(), anyString(), any());
@@ -65,6 +66,7 @@ public class ApprovalInstanceAccessTest {
     // then
     assertNotNull(settings);
     assertTrue(settings.isSet());
+    assertNotNull(settings.getWsdlUrl());
   }
 
   @Test
@@ -111,9 +113,6 @@ public class ApprovalInstanceAccessTest {
 
   void givenBasicSettings() throws Exception {
     customAttributes.put("APPROVAL_URL", new Setting("APPROVAL_URL", "http://oscm-app/approval"));
-    customAttributes.put(
-        "BSS_WEBSERVICE_WSDL_URL",
-        new Setting("BSS_WEBSERVICE_WSDL_URL", "http://oscm-core/trigger?wsdl"));
     givenPasswordAutentication("admin", "adminpw");
   }
 
