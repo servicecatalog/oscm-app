@@ -44,9 +44,6 @@ public class DiskManager {
   /** Reconfigures VMware system disks and data disks. */
   public void reconfigureDisks(
       VirtualMachineConfigSpec vmConfigSpec, ManagedObjectReference vmwInstance) throws Exception {
-
-    logger.debug("");
-
     long systemDiskMB = (long) paramHandler.getConfigDiskSpaceMB();
     VirtualMachineConfigInfo configSpec =
         (VirtualMachineConfigInfo) vmw.getServiceUtil().getDynamicProperty(vmwInstance, "config");
