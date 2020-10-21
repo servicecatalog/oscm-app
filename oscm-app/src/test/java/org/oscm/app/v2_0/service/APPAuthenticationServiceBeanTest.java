@@ -21,6 +21,7 @@ import org.oscm.app.domain.ServiceInstance;
 import org.oscm.app.v2_0.data.ControllerConfigurationKey;
 import org.oscm.app.v2_0.data.PasswordAuthentication;
 import org.oscm.app.v2_0.data.Setting;
+import org.oscm.app.v2_0.exceptions.APPlatformException;
 import org.oscm.app.v2_0.exceptions.AuthenticationException;
 import org.oscm.types.enumtypes.UserRoleType;
 import org.oscm.vo.VOUser;
@@ -102,7 +103,20 @@ public class APPAuthenticationServiceBeanTest {
   }
 
   @Test
-  public void authenticateTMForController() {}
+  public void authenticateTMForController() throws Exception {
+    // given
+    PasswordAuthentication authentication = new PasswordAuthentication("username", "password");
+    String controllerId = "controller_id";
+    doReturn(new VOUserDetails())
+        .when(serviceBean)
+        .getAuthenticatedTMForController(anyString(), any(PasswordAuthentication.class));
+
+    // when
+    serviceBean.authenticateTMForController(controllerId, authentication);
+
+    // then
+    verify(serviceBean, times(1)).getAuthenticatedTMForController(controllerId, authentication);
+  }
 
   @Test
   public void getAuthenticatedTMForController() throws Exception {
