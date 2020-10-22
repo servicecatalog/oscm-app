@@ -10,6 +10,7 @@
 package org.oscm.app.vmware.business;
 
 import java.util.List;
+
 import org.oscm.app.v2_0.exceptions.APPlatformException;
 import org.oscm.app.vmware.business.model.Cluster;
 import org.oscm.app.vmware.business.model.DistributedVirtualSwitch;
@@ -39,7 +40,7 @@ public class PortgroupIpSettings {
     portgroupIPPool = ph.getPortgroupIPPool(portgroup);
   }
 
-  private Cluster getCluster(String targetCluster, List<Cluster> clusters) {
+  protected Cluster getCluster(String targetCluster, List<Cluster> clusters) {
     Cluster cluster = null;
     for (int i = 0; clusters.size() > i; i++) {
       if (clusters.get(i).getName().equals(targetCluster)) {
@@ -50,7 +51,7 @@ public class PortgroupIpSettings {
     return cluster;
   }
 
-  private DistributedVirtualSwitch getDistributedVirtualSwitch(
+  protected DistributedVirtualSwitch getDistributedVirtualSwitch(
       String dvsName, List<DistributedVirtualSwitch> distributedVirtualSwitches) {
     DistributedVirtualSwitch distributedVirtualSwitch = null;
     for (int i = 0; distributedVirtualSwitches.size() > i; i++) {
@@ -67,7 +68,7 @@ public class PortgroupIpSettings {
     return distributedVirtualSwitch;
   }
 
-  private Portgroup getPortgroup(String portgroupName, List<Portgroup> portgroups) {
+  protected Portgroup getPortgroup(String portgroupName, List<Portgroup> portgroups) {
     Portgroup portgroup = null;
     for (int i = 0; portgroups.size() > i; i++) {
       logger.debug(
@@ -94,14 +95,8 @@ public class PortgroupIpSettings {
           ip = portgroupIPPool.get(i).getIp_adress().trim();
           return ip;
         } catch (Exception e) {
-            Messages
-            .getAll("error_no_ip_left").get(0)
-            .getText();
-          throw new APPlatformException(Messages
-                  .getAll("error_no_ip_left").get(0)
-                  .getText(),
-              e);
-          
+          Messages.getAll("error_no_ip_left").get(0).getText();
+          throw new APPlatformException(Messages.getAll("error_no_ip_left").get(0).getText(), e);
         }
       }
     }
@@ -116,7 +111,7 @@ public class PortgroupIpSettings {
             das.unReservePortgroupIPAddress(portgroupIPPool.get(i).getTkey());
           } catch (Exception e) {
             throw new IllegalArgumentException(
-                    Messages.getAll("error_invalid_ip", ip).get(0).getText());
+                Messages.getAll("error_invalid_ip", ip).get(0).getText());
           }
         }
       }
