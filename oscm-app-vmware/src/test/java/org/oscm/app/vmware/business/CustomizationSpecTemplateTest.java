@@ -102,10 +102,11 @@ public class CustomizationSpecTemplateTest {
     // given
     doReturn("3").when(paramHandler).getServiceSetting(VMPropertyHandler.TS_NUMBER_OF_NICS);
     doNothing().when(template).setIpForNetworkCard(anyBoolean(), any(), anyInt());
+
     // when
     template.setIpsForCustomSpec(true, cspec);
-    // then
 
+    // then
     verify(template, times(3)).setIpForNetworkCard(anyBoolean(), any(), anyInt());
   }
 
