@@ -15,7 +15,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -70,8 +72,9 @@ public class ApprovalInstanceAccess implements InstanceAccess {
   }
 
   public BasicSettings getBasicSettings() throws APPlatformException {
+    final String wsdUrl = getPlatformService().getBSSWebServiceWSDLUrl();
 
-    BasicSettings basicSettings = new BasicSettings();
+    BasicSettings basicSettings = new BasicSettings(wsdUrl);
 
     Collection<String> instances =
         getPlatformService().listServiceInstances(ApprovalController.ID, null);
@@ -80,7 +83,7 @@ public class ApprovalInstanceAccess implements InstanceAccess {
       ProvisioningSettings ps =
           getPlatformService().getServiceInstanceDetails(ApprovalController.ID, instance, null);
       if (anyApprover(ps).isPresent()) {
-        return new BasicSettings(ps);
+        return new BasicSettings(ps, wsdUrl);
       }
     }
     return basicSettings;
@@ -144,9 +147,21 @@ public class ApprovalInstanceAccess implements InstanceAccess {
   static boolean isPresent(Setting... settings) {
     boolean is = true;
     for (Setting s : settings) {
-      is &= (s!=null && s.getKey() != null && s.getValue() != null && s.getValue().length() > 0);
+      is &= (s != null && s.getKey() != null && s.getValue() != null && s.getValue().length() > 0);
     }
     return is;
+  }
+
+  static Map<String, String> toStringMap(HashMap<String, Setting> hashMap) {
+    Map<String, String> r =
+        hashMap
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    e -> e.getKey(),
+                    e -> ((e.getValue() == null) ? null : e.getValue().getValue())));
+    return r;
   }
 
   /** Client data for approval trigger callback. */
@@ -170,8 +185,9 @@ public class ApprovalInstanceAccess implements InstanceAccess {
     }
 
     public boolean isSet() {
-      return isPresent(getOrgAdminUserId(),getOrgAdminUserId(),getOrgAdminUserPwd(), getApproverOrgId());
-     }
+      return isPresent(
+          getOrgAdminUserId(), getOrgAdminUserId(), getOrgAdminUserPwd(), getApproverOrgId());
+    }
 
     public void set(ProvisioningSettings ps) {
       setApproverOrgId(getSetting(ps, PARAM_APPROVER_ORG_ID));
@@ -240,20 +256,23 @@ public class ApprovalInstanceAccess implements InstanceAccess {
     private static final long serialVersionUID = 9206647239461503333L;
     boolean isSet = false;
 
-    BasicSettings() {}
+    BasicSettings(String wsdlUrl) {
+      this.wsdlUrl = wsdlUrl;
+    }
 
-    BasicSettings(ProvisioningSettings ps) {
-      approvalUrl = ps.getCustomAttributes().get("APPROVAL_URL");
-      wsdlUrl = ps.getCustomAttributes().get("BSS_WEBSERVICE_WSDL_URL");
+    BasicSettings(ProvisioningSettings ps, String wsdlUrl) {
+      this.wsdlUrl = wsdlUrl;
+      approvalUrl = ps.getConfigSettings().get("APPROVAL_URL");
       ownerCredentials = ps.getAuthentication();
-      isSet = ownerCredentials != null && isPresent(approvalUrl, wsdlUrl); 
+      params = toStringMap(ps.getParameters());
+      isSet = ownerCredentials != null && isPresent(approvalUrl);
     }
 
     public PasswordAuthentication getOwnerCredentials() {
       return ownerCredentials;
     }
 
-    public Setting getWsdlUrl() {
+    public String getWsdlUrl() {
       return wsdlUrl;
     }
 
@@ -264,10 +283,17 @@ public class ApprovalInstanceAccess implements InstanceAccess {
     public boolean isSet() {
       return isSet;
     }
+    
+    
+    public Map<String, String> getParams() {
+      return params;
+    }
 
+    private Map<String, String> params;
+    private String wsdlUrl;
     Setting approvalUrl;
-    Setting wsdlUrl;
-
     PasswordAuthentication ownerCredentials;
+
+  
   }
 }
