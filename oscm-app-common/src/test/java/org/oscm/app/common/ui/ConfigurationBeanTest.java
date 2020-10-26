@@ -181,4 +181,16 @@ public class ConfigurationBeanTest {
     // then
     assertEquals(userId, loggedInUserId);
   }
+
+  @Test
+  public void testApplyCurrentUser() {
+    // given
+    bean.getItems();
+
+    // when
+    bean.applyCurrentUser();
+
+    // then
+    verify(httpSession, times(5)).getAttribute(anyString());
+  }
 }

@@ -22,11 +22,13 @@ import org.oscm.app.v2_0.data.Template;
 import org.oscm.app.v2_0.intf.APPTemplateService;
 import org.oscm.app.v2_0.intf.ControllerAccess;
 
+import javax.faces.component.UIViewRoot;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpSession;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.Locale;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -52,6 +54,20 @@ public class TemplateBeanTest {
     doReturn(facesCtx).when(templateBean).getContext();
     when(facesCtx.getExternalContext()).thenReturn(externalCtx);
     when(externalCtx.getSession(anyBoolean())).thenReturn(httpSession);
+  }
+
+  @Test
+  public void testInit() {
+    // given
+    UIViewRoot viewRoot = mock(UIViewRoot.class);
+    when(facesCtx.getViewRoot()).thenReturn(viewRoot);
+    when(viewRoot.getLocale()).thenReturn(Locale.getDefault());
+
+    // when
+    templateBean.init();
+
+    // then
+    verify(templateBean, times(1)).load();
   }
 
   @Test
