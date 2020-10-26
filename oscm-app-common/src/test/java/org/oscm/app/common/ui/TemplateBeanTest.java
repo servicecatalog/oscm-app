@@ -1,10 +1,12 @@
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
- *  Copyright FUJITSU LIMITED 2018
+ * <p>Copyright FUJITSU LIMITED 2018
  *
- *  Creation Date: 10.04.2017
+ * <p>Creation Date: 10.04.2017
  *
- *******************************************************************************/
+ * <p>*****************************************************************************
+ */
 package org.oscm.app.common.ui;
 
 import org.apache.myfaces.custom.fileupload.UploadedFile;
@@ -13,7 +15,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.oscm.app.v2_0.data.PasswordAuthentication;
@@ -23,6 +24,7 @@ import org.oscm.app.v2_0.intf.ControllerAccess;
 
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpSession;
 import java.io.OutputStream;
 import java.util.Date;
 
@@ -39,21 +41,21 @@ public class TemplateBeanTest {
   @Spy @InjectMocks private TemplateBean templateBean = new TemplateBean();
 
   @Mock private APPTemplateService templateService;
-
   @Mock private ControllerAccess controllerAccess;
-
   @Mock private UploadedFile uploadedFile;
+  @Mock private ExternalContext externalCtx;
+  @Mock private HttpSession httpSession;
+  @Mock private FacesContext facesCtx;
 
   @Before
   public void setup() {
-
-    PasswordAuthentication sampleAuthentication = new PasswordAuthentication("test", "test");
-    doReturn(sampleAuthentication).when(templateBean).getAuthentication();
+    doReturn(facesCtx).when(templateBean).getContext();
+    when(facesCtx.getExternalContext()).thenReturn(externalCtx);
+    when(externalCtx.getSession(anyBoolean())).thenReturn(httpSession);
   }
 
   @Test
   public void testLoad() {
-
     // given
     assertNull(templateBean.getModel());
 
@@ -66,7 +68,6 @@ public class TemplateBeanTest {
 
   @Test
   public void testSave() {
-
     // given
     when(uploadedFile.getName()).thenReturn("test.txt");
     assertNull(templateBean.getStatus());
@@ -80,7 +81,6 @@ public class TemplateBeanTest {
 
   @Test
   public void testDelete() {
-
     // given
     assertNull(templateBean.getModel());
 
@@ -93,25 +93,20 @@ public class TemplateBeanTest {
 
   @Test
   public void testExport() throws Exception {
-
     // given
     Template template = givenTemplate();
 
-    FacesContext facesContext = mock(FacesContext.class);
-    ExternalContext externalContext = mock(ExternalContext.class);
     OutputStream os = mock(OutputStream.class);
 
-    doReturn(facesContext).when(templateBean).getContext();
     when(templateService.getTemplate(anyString(), anyString(), any(PasswordAuthentication.class)))
         .thenReturn(template);
-    when(facesContext.getExternalContext()).thenReturn(externalContext);
-    when(externalContext.getResponseOutputStream()).thenReturn(os);
+    when(externalCtx.getResponseOutputStream()).thenReturn(os);
 
     // when
     templateBean.export("file");
 
     // then
-    Mockito.verify(facesContext).responseComplete();
+    verify(facesCtx).responseComplete();
   }
 
   private Template givenTemplate() {
