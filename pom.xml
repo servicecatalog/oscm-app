@@ -214,6 +214,24 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-mockito</artifactId>
+                <version>1.6.2</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-core</artifactId>
+                <version>1.6.2</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-junit4</artifactId>
+                <version>1.6.2</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.sling</groupId>
                 <artifactId>org.apache.sling.commons.json</artifactId>
                 <version>2.0.6</version>
