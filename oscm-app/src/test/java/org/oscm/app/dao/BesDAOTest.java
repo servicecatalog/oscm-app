@@ -1,10 +1,12 @@
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
- *  Copyright FUJITSU LIMITED 2018
+ * <p>Copyright FUJITSU LIMITED 2018
  *
- *  Creation Date: 17.08.2010
+ * <p>Creation Date: 17.08.2010
  *
- *******************************************************************************/
+ * <p>*****************************************************************************
+ */
 package org.oscm.app.dao;
 
 import org.junit.Assert;
@@ -29,6 +31,7 @@ import org.oscm.intf.IdentityService;
 import org.oscm.intf.SubscriptionService;
 import org.oscm.provisioning.data.InstanceInfo;
 import org.oscm.provisioning.data.InstanceResult;
+import org.oscm.types.enumtypes.OperationStatus;
 import org.oscm.types.enumtypes.UserRoleType;
 import org.oscm.types.exceptions.ConcurrentModificationException;
 import org.oscm.types.exceptions.*;
@@ -62,7 +65,7 @@ public class BesDAOTest {
   private final APPConfigurationServiceBean confServ = mock(APPConfigurationServiceBean.class);
 
   /** Internal interface combining IdentityService with BindingProvider to allow easy mocking. */
-  private static interface EnhancedIdentityService extends IdentityService, BindingProvider {}
+  private interface EnhancedIdentityService extends IdentityService, BindingProvider {}
 
   @Before
   public void setup() throws APPlatformException, MalformedURLException {
@@ -87,10 +90,10 @@ public class BesDAOTest {
     Map<String, Setting> settings = getSettingsForMode("OIDC");
 
     // when
-    Boolean actual = Boolean.valueOf(besDAO.isSsoMode(settings));
+    Boolean actual = besDAO.isSsoMode(settings);
 
     // then
-    assertEquals(Boolean.valueOf(true), actual);
+    assertEquals(Boolean.TRUE, actual);
   }
 
   @Test
@@ -99,10 +102,10 @@ public class BesDAOTest {
     Map<String, Setting> settings = getSettingsForMode("INTERNAL");
 
     // when
-    Boolean actual = Boolean.valueOf(besDAO.isSsoMode(settings));
+    Boolean actual = besDAO.isSsoMode(settings);
 
     // then
-    assertEquals(Boolean.valueOf(false), actual);
+    assertEquals(Boolean.FALSE, actual);
   }
 
   @Test
@@ -241,7 +244,7 @@ public class BesDAOTest {
   @Test(expected = APPlatformException.class)
   public void getUser_APPlatformException() throws APPlatformException {
     // given
-    doThrow(new APPlatformException(Arrays.asList(new LocalizedText())))
+    doThrow(new APPlatformException(Collections.singletonList(new LocalizedText())))
         .when(besDAO)
         .getBESWebService(
             eq(IdentityService.class), any(ServiceInstance.class), any(Optional.class));
@@ -252,7 +255,7 @@ public class BesDAOTest {
   @Test(expected = APPlatformException.class)
   public void getUserDetails_APPlatformException() throws APPlatformException {
     // given
-    doThrow(new APPlatformException(Arrays.asList(new LocalizedText())))
+    doThrow(new APPlatformException(Collections.singletonList(new LocalizedText())))
         .when(besDAO)
         .getBESWebService(
             eq(IdentityService.class), any(ServiceInstance.class), any(Optional.class));
@@ -336,7 +339,7 @@ public class BesDAOTest {
       throws APPlatformException, BESNotificationException, ObjectNotFoundException,
           SubscriptionStateException, TechnicalServiceNotAliveException,
           TechnicalServiceOperationException, OrganizationAuthoritiesException,
-          OperationNotPermittedException, ValidationException {
+          OperationNotPermittedException {
     // given
     doReturn(subServ)
         .when(besDAO)
@@ -412,7 +415,7 @@ public class BesDAOTest {
       throws APPlatformException, BESNotificationException, ObjectNotFoundException,
           SubscriptionStateException, TechnicalServiceNotAliveException,
           TechnicalServiceOperationException, OrganizationAuthoritiesException,
-          OperationNotPermittedException, ValidationException {
+          OperationNotPermittedException {
     // given
     doReturn(subServ)
         .when(besDAO)
@@ -551,7 +554,7 @@ public class BesDAOTest {
       throws APPlatformException, BESNotificationException, ObjectNotFoundException,
           SubscriptionStateException, TechnicalServiceNotAliveException,
           TechnicalServiceOperationException, OrganizationAuthoritiesException,
-          OperationNotPermittedException, ValidationException {
+          OperationNotPermittedException {
     // given
     doReturn(subServ)
         .when(besDAO)
@@ -986,7 +989,7 @@ public class BesDAOTest {
   public void notifyAsyncSubscription_APPlatformException()
       throws APPlatformException, BESNotificationException {
     // given
-    doThrow(new APPlatformException(Arrays.asList(new LocalizedText())))
+    doThrow(new APPlatformException(Collections.singletonList(new LocalizedText())))
         .when(besDAO)
         .getBESWebService(
             eq(IdentityService.class), any(ServiceInstance.class), any(Optional.class));
@@ -1160,8 +1163,7 @@ public class BesDAOTest {
     IdentityService client = besDAO.getBESWebService(IdentityService.class, si, Optional.empty());
 
     // then
-    verify(besDAO, times(1))
-        .setBinding((BindingProvider) client, USER_TM_TechSvc, USER_PWD);
+    verify(besDAO, times(1)).setBinding((BindingProvider) client, USER_TM_TechSvc, USER_PWD);
   }
 
   @Test
@@ -1177,8 +1179,7 @@ public class BesDAOTest {
     IdentityService client = besDAO.getBESWebService(IdentityService.class, si, Optional.empty());
 
     // then
-    verify(besDAO, times(1))
-        .setBinding((BindingProvider) client, USER_TM_TechSvc, USER_PWD);
+    verify(besDAO, times(1)).setBinding((BindingProvider) client, USER_TM_TechSvc, USER_PWD);
   }
 
   @Test(expected = ConfigurationException.class)
@@ -1191,8 +1192,7 @@ public class BesDAOTest {
     ServiceInstance si = getServiceInstanceWithParameters(false, true);
 
     // when
-    new APPConfigurationServiceBean()
-        .getAuthenticationForBESTechnologyManager(null, si);
+    new APPConfigurationServiceBean().getAuthenticationForBESTechnologyManager(null, si);
   }
 
   @Test(expected = ConfigurationException.class)
@@ -1205,8 +1205,7 @@ public class BesDAOTest {
     ServiceInstance si = getServiceInstanceWithParameters(true, false);
 
     // when
-    new APPConfigurationServiceBean()
-        .getAuthenticationForBESTechnologyManager(null, si);
+    new APPConfigurationServiceBean().getAuthenticationForBESTechnologyManager(null, si);
   }
 
   @Test(expected = ConfigurationException.class)
@@ -1224,8 +1223,7 @@ public class BesDAOTest {
             return controllerSettings;
           }
         };
-    configurationServiceBean.getAuthenticationForBESTechnologyManager(
-        "ess.sample", null);
+    configurationServiceBean.getAuthenticationForBESTechnologyManager("ess.sample", null);
   }
 
   @Test
@@ -1273,8 +1271,7 @@ public class BesDAOTest {
     IdentityService client = besDAO.getBESWebService(IdentityService.class, si, Optional.of(""));
 
     // then
-    verify(besDAO, times(1))
-        .setBinding((BindingProvider) client, USER_TM_TechSvc, USER_WS_PWD);
+    verify(besDAO, times(1)).setBinding((BindingProvider) client, USER_TM_TechSvc, USER_WS_PWD);
   }
 
   @Test(expected = ConfigurationException.class)
@@ -1287,8 +1284,7 @@ public class BesDAOTest {
     ServiceInstance si = getServiceInstanceWithParameters(false, true);
 
     // when
-    new APPConfigurationServiceBean()
-        .getAuthenticationForBESTechnologyManager(null, si);
+    new APPConfigurationServiceBean().getAuthenticationForBESTechnologyManager(null, si);
   }
 
   @Test(expected = ConfigurationException.class)
@@ -1301,8 +1297,7 @@ public class BesDAOTest {
     ServiceInstance si = getServiceInstanceWithParameters(true, false);
 
     // when
-    new APPConfigurationServiceBean()
-        .getAuthenticationForBESTechnologyManager(null, si);
+    new APPConfigurationServiceBean().getAuthenticationForBESTechnologyManager(null, si);
   }
 
   @Test
@@ -1571,6 +1566,41 @@ public class BesDAOTest {
     // then
     verify(subServ, times(1))
         .notifySubscriptionAboutVmsNumber(anyString(), anyString(), any(VOInstanceInfo.class));
+  }
+
+  @Test
+  public void testNotifyAsyncOperationStatus() throws Exception {
+    // given
+    ServiceInstance si = givenServiceInstance(false);
+    si.setServiceAccessInfo("accessInfo");
+    doReturn(subServ)
+        .when(besDAO)
+        .getBESWebService(
+            eq(SubscriptionService.class), any(ServiceInstance.class), any(Optional.class));
+    // when
+    besDAO.notifyAsyncOperationStatus(si, "id", OperationStatus.RUNNING, new ArrayList<>());
+
+    // then
+    verify(subServ, times(1))
+        .updateAsyncOperationProgress(anyString(), any(OperationStatus.class), anyList());
+    verify(subServ, times(1))
+        .updateAccessInformation(anyString(), anyString(), any(VOInstanceInfo.class));
+  }
+
+  @Test
+  public void testNotifyInstanceStatusOfAsyncOperation() throws Exception {
+    // given
+    ServiceInstance si = givenServiceInstance(false);
+    doReturn(subServ)
+        .when(besDAO)
+        .getBESWebService(
+            eq(SubscriptionService.class), any(ServiceInstance.class), any(Optional.class));
+    // when
+    besDAO.notifyInstanceStatusOfAsyncOperation(si);
+
+    // then
+    verify(subServ, times(1))
+        .updateAsyncSubscriptionStatus(anyString(), anyString(), any(VOInstanceInfo.class));
   }
 
   private LocalizedText givenText(String locale, String text) {
