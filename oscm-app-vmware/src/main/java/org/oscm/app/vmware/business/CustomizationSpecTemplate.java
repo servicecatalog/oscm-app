@@ -297,7 +297,7 @@ public class CustomizationSpecTemplate {
     return isWindows;
   }
 
-  private boolean isLinux(String guestid) {
+  protected boolean isLinux(String guestid) {
     boolean isLinux =
         guestid.startsWith("cent")
             || guestid.startsWith("debian")
