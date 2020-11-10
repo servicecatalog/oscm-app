@@ -5,7 +5,6 @@
  *  Creation Date: Jul 16, 2015                                                      
  *
  *******************************************************************************/
-
 package org.oscm.app.business;
 
 import org.junit.Before;
@@ -22,8 +21,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -131,5 +129,13 @@ public class ProvisioningResultsTest {
         ServiceInstance result = Whitebox.invokeMethod(provResult, "getInstance", instance, instanceId);
 
         assertEquals(instanceId, result.getInstanceId());
+    }
+
+    @Test
+    public void testIsError() {
+        BaseResult baseResult = new BaseResult();
+        baseResult.setRc(0);
+
+        assertFalse(provResult.isError(baseResult));
     }
 }
