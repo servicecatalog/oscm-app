@@ -12,22 +12,34 @@ package org.oscm.app.v2_0.service;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.oscm.app.business.APPlatformControllerFactory;
 import org.oscm.app.business.ProductProvisioningServiceFactoryBean;
 import org.oscm.app.business.exceptions.BESNotificationException;
 import org.oscm.app.dao.BesDAO;
 import org.oscm.app.dao.OperationDAO;
 import org.oscm.app.dao.ServiceInstanceDAO;
 import org.oscm.app.domain.*;
-import org.oscm.app.v2_0.exceptions.APPlatformException;
-import org.oscm.app.v2_0.exceptions.ConfigurationException;
-import org.oscm.app.v2_0.exceptions.SuspendException;
+import org.oscm.app.v2_0.data.InstanceStatus;
+import org.oscm.app.v2_0.data.ProvisioningSettings;
+import org.oscm.app.v2_0.data.Setting;
+import org.oscm.app.v2_0.exceptions.*;
+import org.oscm.app.v2_0.intf.APPlatformController;
 import org.oscm.encrypter.AESEncrypter;
+import org.oscm.operation.data.OperationResult;
 import org.oscm.provisioning.data.InstanceInfo;
 import org.oscm.provisioning.data.InstanceRequest;
 import org.oscm.provisioning.data.InstanceResult;
 import org.oscm.provisioning.intf.ProvisioningService;
+import org.oscm.types.enumtypes.OperationStatus;
 import org.oscm.vo.VOUserDetails;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 
 import javax.ejb.Timer;
@@ -39,10 +51,16 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
+@RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"javax.management.*", "javax.script.*", "jdk.internal.reflect.*"})
+@PrepareForTest({APPTimerServiceBean.class, APPlatformControllerFactory.class, ProvisioningStatus.class})
 public class APPTimerServiceBeanTest {
   private static final String CONTROLLER_ID = "ess.aws";
+
+  @InjectMocks
   private APPTimerServiceBean timerService;
   private Timer timer;
+
   private TimerService ts;
   private EntityManager em;
   private ServiceInstanceDAO instanceDAO;
@@ -54,6 +72,19 @@ public class APPTimerServiceBeanTest {
   private Logger logger;
   private APPTimerServiceBean timerBean;
   private ProvisioningService provisioningService;
+  private ServiceInstance serviceInstance;
+  private APPlatformController controller;
+  private InstanceStatus instanceStatus;
+  private ProvisioningStatus provisioningStatus;
+  private OperationServiceBean operationServiceBean;
+  private OperationResult operationResult;
+  private Operation operation;
+  private Setting setting;
+  private InstanceParameter instanceParameter;
+  private InstanceResult instanceResult;
+  private InstanceInfo instanceInfo;
+  private Properties properties;
+  private ProvisioningSettings provisioningSettings;
 
   @BeforeClass
   public static void setUp() {
@@ -62,7 +93,7 @@ public class APPTimerServiceBeanTest {
 
   @Before
   public void setup() throws Exception {
-    timerService = spy(new APPTimerServiceBean());
+    timerService = PowerMockito.spy(new APPTimerServiceBean());
     timer = mock(Timer.class);
     em = mock(EntityManager.class);
     logger = mock(Logger.class);
@@ -78,6 +109,23 @@ public class APPTimerServiceBeanTest {
     instanceDAO = mock(ServiceInstanceDAO.class);
     timerBean = mock(APPTimerServiceBean.class);
     provisioningService = mock(ProvisioningService.class);
+    serviceInstance = mock(ServiceInstance.class);
+    controller = mock(APPlatformController.class);
+    instanceStatus = mock(InstanceStatus.class);
+    provisioningStatus = mock(ProvisioningStatus.class);
+    operationServiceBean = mock(OperationServiceBean.class);
+    operationResult = mock(OperationResult.class);
+    operation = mock(Operation.class);
+    setting = mock(Setting.class);
+    instanceParameter = mock(InstanceParameter.class);
+    instanceResult = mock(InstanceResult.class);
+    instanceInfo = mock(InstanceInfo.class);
+    properties = mock(Properties.class);
+    provisioningSettings = mock(ProvisioningSettings.class);
+    PowerMockito.mockStatic(APPlatformControllerFactory.class);
+
+    MockitoAnnotations.initMocks(this);
+
     timerService.instanceDAO = instanceDAO;
     timerService.configService = configService;
     timerService.mailService = mailService;
@@ -643,5 +691,192 @@ public class APPTimerServiceBeanTest {
 
     // then
     verify(mailService, times(1)).sendMail(anyList(), anyString(), anyString());
+  }
+
+  @Test
+  public void testDoHandleControllerProvisioning_instanceReady_initTimers() throws Exception {
+
+    when(serviceInstance.getProvisioningStatus()).thenReturn(provisioningStatus);
+    when(APPlatformControllerFactory.getInstance(anyString())).thenReturn(controller);
+    when(controller.getInstanceStatus(anyString(), any())).thenReturn(instanceStatus);
+    when(instanceStatus.getChangedParameters()).thenReturn(null);
+    when(instanceStatus.isReady()).thenReturn(false);
+    when(provisioningStatus.isWaitingForCreation()).thenReturn(true);
+    when(serviceInstance.getProvisioningStatus().isCompleted()).thenReturn(true);
+    when(operationServiceBean.executeServiceOperationFromQueue(anyString())).thenReturn(operationResult);
+    when(instanceDAO.getInstanceById(anyString())).thenReturn(serviceInstance);
+    when(serviceInstance.getProvisioningStatus().isWaitingForOperation()).thenReturn(true);
+
+    timerService.doHandleControllerProvisioning(serviceInstance);
+
+    verify(timerService, times(1)).initTimers();
+  }
+
+  @Test
+  public void testDoHandleControllerProvisioning_instanceReady_waitingForOperation() throws Exception {
+
+    when(serviceInstance.getProvisioningStatus()).thenReturn(provisioningStatus);
+    when(APPlatformControllerFactory.getInstance(anyString())).thenReturn(controller);
+    when(controller.getInstanceStatus(anyString(), any())).thenReturn(instanceStatus);
+    when(instanceStatus.getChangedParameters()).thenReturn(null);
+    when(instanceStatus.isReady()).thenReturn(false);
+    when(provisioningStatus.isWaitingForCreation()).thenReturn(false);
+    when(provisioningStatus.isWaitingForOperation()).thenReturn(true);
+    when(operationDAO.getOperationByInstanceId(anyString())).thenReturn(operation);
+
+    timerService.doHandleControllerProvisioning(serviceInstance);
+
+    verify(besDAOMock, times(1)).notifyAsyncOperationStatus(eq(serviceInstance), anyString(), eq(OperationStatus.RUNNING), anyList());
+  }
+
+  @Test
+  public void testDoHandleControllerProvisioning_instanceNotReady_waitingForDeletion() throws Exception {
+
+    when(serviceInstance.getProvisioningStatus()).thenReturn(provisioningStatus);
+    when(APPlatformControllerFactory.getInstance(anyString())).thenReturn(controller);
+    when(controller.getInstanceStatus(anyString(), any())).thenReturn(instanceStatus);
+    when(instanceStatus.getChangedParameters()).thenReturn(null);
+    when(instanceStatus.isReady()).thenReturn(true);
+    when(provisioningStatus.isWaitingForDeletion()).thenReturn(true);
+
+    timerService.doHandleControllerProvisioning(serviceInstance);
+
+    verify(em, times(1)).remove(serviceInstance);
+  }
+
+  @Test
+  public void testDoHandleControllerProvisioning_provisioningRequest_mapContainsPublicIP() throws Exception {
+
+    HashMap<String, Setting> parameters = new HashMap<>();
+    parameters.put("APP_PUBLIC_IP", setting);
+    when(serviceInstance.getProvisioningStatus()).thenReturn(provisioningStatus);
+    when(APPlatformControllerFactory.getInstance(anyString())).thenReturn(controller);
+    when(controller.getInstanceStatus(anyString(), any())).thenReturn(instanceStatus);
+    when(instanceStatus.getChangedParameters()).thenReturn(parameters);
+    when(instanceStatus.isReady()).thenReturn(true);
+    when(instanceStatus.isInstanceProvisioningRequested()).thenReturn(true);
+
+    timerService.doHandleControllerProvisioning(serviceInstance);
+
+    verify(instanceStatus, times(1)).setIsReady(false);
+    verify(serviceInstance, times(1)).setServiceLoginPath(anyString());
+    verify(em, times(2)).persist(serviceInstance);
+  }
+
+  @Test
+  public void testDoHandleControllerProvisioning_provisioningRequest_mapWithoutPublicIP() throws Exception {
+
+    when(serviceInstance.getProvisioningStatus()).thenReturn(provisioningStatus);
+    when(APPlatformControllerFactory.getInstance(anyString())).thenReturn(controller);
+    when(controller.getInstanceStatus(anyString(), any())).thenReturn(instanceStatus);
+    when(instanceStatus.getChangedParameters()).thenReturn(null);
+    when(instanceStatus.isReady()).thenReturn(true);
+    when(instanceStatus.isInstanceProvisioningRequested()).thenReturn(true);
+    when(serviceInstance.getParameterForKey(anyString())).thenReturn(instanceParameter);
+
+    timerService.doHandleControllerProvisioning(serviceInstance);
+
+    verify(serviceInstance, times(1)).getParameterForKey(InstanceParameter.PUBLIC_IP);
+    verify(instanceStatus, times(1)).setIsReady(false);
+    verify(serviceInstance, times(1)).setServiceLoginPath(anyString());
+    verify(em, times(2)).persist(serviceInstance);
+  }
+
+  @Test
+  public void testDoHandleControllerProvisioning_notProvisioningRequest() throws Exception {
+
+    when(serviceInstance.getProvisioningStatus()).thenReturn(provisioningStatus);
+    when(APPlatformControllerFactory.getInstance(anyString())).thenReturn(controller);
+    when(controller.getInstanceStatus(anyString(), any())).thenReturn(instanceStatus);
+    when(instanceStatus.getChangedParameters()).thenReturn(null);
+    when(instanceStatus.isReady()).thenReturn(true);
+    when(instanceStatus.isInstanceProvisioningRequested()).thenReturn(false);
+    PowerMockito.whenNew(InstanceResult.class).withNoArguments().thenReturn(instanceResult);
+    PowerMockito.whenNew(InstanceInfo.class).withNoArguments().thenReturn(instanceInfo);
+
+    timerService.doHandleControllerProvisioning(serviceInstance);
+
+    verify(serviceInstance, times(1)).setProvisioningStatus(ProvisioningStatus.COMPLETED);
+    verify(serviceInstance, times(1)).setServiceLoginPath(anyString());
+    verify(em, times(1)).persist(serviceInstance);
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testDoHandleControllerProvisioning_exception() {
+
+    timerService.doHandleControllerProvisioning(serviceInstance);
+
+  }
+
+  @Test
+  public void testDoHandleControllerProvisioning_catchControllerException() throws ControllerLookupException {
+
+    String errorMsg = "App controller not found";
+    when(serviceInstance.getProvisioningStatus()).thenReturn(provisioningStatus);
+    when(APPlatformControllerFactory.getInstance(anyString())).thenThrow(new ControllerLookupException(errorMsg));
+
+    timerService.doHandleControllerProvisioning(serviceInstance);
+
+    verify(logger, times(1)).error(errorMsg);
+  }
+
+  @Test
+  public void testDoHandleControllerProvisioning_catchBESNotificationException() throws APPlatformException, BESNotificationException {
+
+    String errorMsg = "Instance not alive";
+    when(serviceInstance.getProvisioningStatus()).thenReturn(provisioningStatus);
+    when(APPlatformControllerFactory.getInstance(anyString())).thenReturn(controller);
+    when(controller.getInstanceStatus(anyString(), any())).thenThrow(new InstanceNotAliveException(errorMsg));
+    doNothing().when(timerService).handleInstanceNotAliveException(any(), any(), any());
+    when(operationDAO.getOperationByInstanceId(anyString())).thenReturn(operation);
+
+    timerService.doHandleControllerProvisioning(serviceInstance);
+
+    verify(besDAOMock, times(1)).notifyInstanceStatusOfAsyncOperation(any());
+  }
+
+  @Test
+  public void testDoHandleControllerProvisioning_catchSuspendException() throws APPlatformException, BESNotificationException {
+
+    String errorMsg = "Instance suspended";
+    when(serviceInstance.getProvisioningStatus()).thenReturn(provisioningStatus);
+    when(APPlatformControllerFactory.getInstance(anyString())).thenReturn(controller);
+    when(controller.getInstanceStatus(anyString(), any())).thenThrow(new SuspendException(errorMsg));
+    doNothing().when(timerService).handleSuspendException(any(), any(), any());
+    when(operationDAO.getOperationByInstanceId(anyString())).thenReturn(operation);
+
+    timerService.doHandleControllerProvisioning(serviceInstance);
+
+    verify(besDAOMock, times(1)).notifyAsyncOperationStatus(any(), anyString(), any(), anyList());
+  }
+
+  @Test
+  public void testHandleInstanceNotAliveException() throws Exception {
+
+    HashMap<String, Setting> parameters = new HashMap<>();
+    parameters.put("APP_PUBLIC_IP", setting);
+    String errorMsg = "Instance not alive";
+    PowerMockito.doNothing().when(timerService, "updateParameterMapSafe", serviceInstance, parameters);
+    PowerMockito.doNothing().when(timerService).sendInfoMail(eq(true), eq(serviceInstance), anyString(), any());
+
+    timerService.handleInstanceNotAliveException(serviceInstance, parameters, new InstanceNotAliveException(errorMsg));
+
+    verify(timerService, times(1)).sendInfoMail(eq(true), eq(serviceInstance), anyString(), any());
+  }
+
+  @Test
+  public void testRaiseEvent() throws Exception {
+
+    when(instanceDAO.getInstanceById(anyString(), anyString())).thenReturn(serviceInstance);
+    when(configService.getProvisioningSettings(any(), any(), anyBoolean())).thenReturn(provisioningSettings);
+    when(APPlatformControllerFactory.getInstance(anyString())).thenReturn(controller);
+    when(controller.notifyInstance(anyString(), any(), any())).thenReturn(instanceStatus);
+    when(instanceStatus.getRunWithTimer()).thenReturn(true);
+    when(properties.getProperty(anyString(), anyString())).thenReturn("yes");
+
+    timerService.raiseEvent("ControllerId", "InstanceId", properties);
+
+    verify(timerService, times(1)).initTimers();
+    verify(instanceStatus, times(1)).setRunWithTimer(true);
   }
 }

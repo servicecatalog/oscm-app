@@ -42,132 +42,132 @@ import static org.mockito.Mockito.*;
 @PrepareForTest({AsynchronousProvisioningProxyImpl.class, APPlatformControllerFactory.class, UserMapper.class})
 public class AsynchronousProvisioningProxyImplTest {
 
-    @InjectMocks
-    private AsynchronousProvisioningProxyImpl provisioningProxyImpl;
+  @InjectMocks
+  private AsynchronousProvisioningProxyImpl provisioningProxyImpl;
 
-    private ServiceInstance instance;
-    private User user;
-    private APPlatformController controller;
-    private ServiceUser serviceUser;
-    private ProvisioningSettings settings;
-    private APPConfigurationServiceBean configService;
-    private InstanceStatus status;
-    private ProvisioningService provisioning;
-    private BaseResult baseResult;
-    private ProvisioningResults provResultHelper;
-    private ProductProvisioningServiceFactoryBean provisioningFactory;
-    private ServiceInstanceDAO instanceDAO;
+  private ServiceInstance instance;
+  private User user;
+  private APPlatformController controller;
+  private ServiceUser serviceUser;
+  private ProvisioningSettings settings;
+  private APPConfigurationServiceBean configService;
+  private InstanceStatus status;
+  private ProvisioningService provisioning;
+  private BaseResult baseResult;
+  private ProvisioningResults provResultHelper;
+  private ProductProvisioningServiceFactoryBean provisioningFactory;
+  private ServiceInstanceDAO instanceDAO;
 
-    // It is necessary due to Injection
-    private APPTimerServiceBean timerService;
-    private Logger logger;
+  // It is necessary due to Injection
+  private APPTimerServiceBean timerService;
+  private Logger logger;
 
-    @Before
-    public void setUp() {
-        provisioningProxyImpl = new AsynchronousProvisioningProxyImpl();
-        PowerMockito.mockStatic(APPlatformControllerFactory.class);
-        PowerMockito.mockStatic(UserMapper.class);
-        configService = mock(APPConfigurationServiceBean.class);
-        instance = mock(ServiceInstance.class);
-        user = mock(User.class);
-        controller = mock(APPlatformController.class);
-        serviceUser = mock(ServiceUser.class);
-        settings = mock(ProvisioningSettings.class);
-        status = mock(InstanceStatus.class);
-        timerService = mock(APPTimerServiceBean.class);
-        provResultHelper = mock(ProvisioningResults.class);
-        provisioning = mock(ProvisioningService.class);
-        provisioningFactory = mock(ProductProvisioningServiceFactoryBean.class);
-        baseResult = mock(BaseResult.class);
-        instanceDAO = mock(ServiceInstanceDAO.class);
-        logger = mock(Logger.class);
+  @Before
+  public void setUp() {
+    provisioningProxyImpl = new AsynchronousProvisioningProxyImpl();
+    PowerMockito.mockStatic(APPlatformControllerFactory.class);
+    PowerMockito.mockStatic(UserMapper.class);
+    configService = mock(APPConfigurationServiceBean.class);
+    instance = mock(ServiceInstance.class);
+    user = mock(User.class);
+    controller = mock(APPlatformController.class);
+    serviceUser = mock(ServiceUser.class);
+    settings = mock(ProvisioningSettings.class);
+    status = mock(InstanceStatus.class);
+    timerService = mock(APPTimerServiceBean.class);
+    provResultHelper = mock(ProvisioningResults.class);
+    provisioning = mock(ProvisioningService.class);
+    provisioningFactory = mock(ProductProvisioningServiceFactoryBean.class);
+    baseResult = mock(BaseResult.class);
+    instanceDAO = mock(ServiceInstanceDAO.class);
+    logger = mock(Logger.class);
 
-        MockitoAnnotations.initMocks(this);
-    }
+    MockitoAnnotations.initMocks(this);
+  }
 
-    @Test
-    public void testGetInstance() throws Exception {
-        PowerMockito.whenNew(APPConfigurationServiceBean.class).withNoArguments().thenReturn(configService);
-        when(instance.getSubscriptionId()).thenReturn("SubscriptionID");
-        when(APPlatformControllerFactory.getInstance(anyString())).thenReturn(controller);
-        when(UserMapper.toServiceUser(user)).thenReturn(serviceUser);
-        when(configService.getProvisioningSettings(instance, serviceUser)).thenReturn(settings);
-        when(controller.deleteInstance(anyString(), any())).thenReturn(status);
+  @Test
+  public void testGetInstance() throws Exception {
+    PowerMockito.whenNew(APPConfigurationServiceBean.class).withNoArguments().thenReturn(configService);
+    when(instance.getSubscriptionId()).thenReturn("SubscriptionID");
+    when(APPlatformControllerFactory.getInstance(anyString())).thenReturn(controller);
+    when(UserMapper.toServiceUser(user)).thenReturn(serviceUser);
+    when(configService.getProvisioningSettings(instance, serviceUser)).thenReturn(settings);
+    when(controller.deleteInstance(anyString(), any())).thenReturn(status);
 
-        provisioningProxyImpl.deleteInstance(instance, user);
+    provisioningProxyImpl.deleteInstance(instance, user);
 
-        verify(instance, never()).getOrganizationId();
-        verify(instance, times(1)).setInstanceParameters((HashMap<String, Setting>) anyMap());
-    }
+    verify(instance, never()).getOrganizationId();
+    verify(instance, times(1)).setInstanceParameters((HashMap<String, Setting>) anyMap());
+  }
 
-    @Test
-    public void testGetInstanceStatusIsInstance() throws Exception {
-        PowerMockito.whenNew(APPConfigurationServiceBean.class).withNoArguments().thenReturn(configService);
-        when(instance.getSubscriptionId()).thenReturn("SubscriptionID");
-        when(APPlatformControllerFactory.getInstance(anyString())).thenReturn(controller);
-        when(UserMapper.toServiceUser(user)).thenReturn(serviceUser);
-        when(configService.getProvisioningSettings(instance, serviceUser)).thenReturn(settings);
-        when(controller.deleteInstance(anyString(), any())).thenReturn(status);
-        when(status.isInstanceProvisioningRequested()).thenReturn(true);
-        when(provisioningFactory.getInstance(instance)).thenReturn(provisioning);
-        when(provisioning.deleteInstance(anyString(), anyString(), anyString(), any())).thenReturn(baseResult);
+  @Test
+  public void testGetInstanceStatusIsInstance() throws Exception {
+    PowerMockito.whenNew(APPConfigurationServiceBean.class).withNoArguments().thenReturn(configService);
+    when(instance.getSubscriptionId()).thenReturn("SubscriptionID");
+    when(APPlatformControllerFactory.getInstance(anyString())).thenReturn(controller);
+    when(UserMapper.toServiceUser(user)).thenReturn(serviceUser);
+    when(configService.getProvisioningSettings(instance, serviceUser)).thenReturn(settings);
+    when(controller.deleteInstance(anyString(), any())).thenReturn(status);
+    when(status.isInstanceProvisioningRequested()).thenReturn(true);
+    when(provisioningFactory.getInstance(instance)).thenReturn(provisioning);
+    when(provisioning.deleteInstance(anyString(), anyString(), anyString(), any())).thenReturn(baseResult);
 
-        provisioningProxyImpl.deleteInstance(instance, user);
+    provisioningProxyImpl.deleteInstance(instance, user);
 
-        verify(instance, times(1)).getOrganizationId();
-        verify(instance, times(1)).setInstanceParameters((HashMap<String, Setting>) anyMap());
-    }
+    verify(instance, times(1)).getOrganizationId();
+    verify(instance, times(1)).setInstanceParameters((HashMap<String, Setting>) anyMap());
+  }
 
-    @Test
-    public void testGetInstanceResultIsError() throws Exception {
-        PowerMockito.whenNew(APPConfigurationServiceBean.class).withNoArguments().thenReturn(configService);
-        when(instance.getSubscriptionId()).thenReturn("SubscriptionID");
-        when(APPlatformControllerFactory.getInstance(anyString())).thenReturn(controller);
-        when(UserMapper.toServiceUser(user)).thenReturn(serviceUser);
-        when(configService.getProvisioningSettings(instance, serviceUser)).thenReturn(settings);
-        when(controller.deleteInstance(anyString(), any())).thenReturn(status);
-        when(status.isInstanceProvisioningRequested()).thenReturn(true);
-        when(provisioningFactory.getInstance(instance)).thenReturn(provisioning);
-        when(provisioning.deleteInstance(anyString(), anyString(), anyString(), any())).thenReturn(baseResult);
-        when(provResultHelper.isError(baseResult)).thenReturn(true);
+  @Test
+  public void testGetInstanceResultIsError() throws Exception {
+    PowerMockito.whenNew(APPConfigurationServiceBean.class).withNoArguments().thenReturn(configService);
+    when(instance.getSubscriptionId()).thenReturn("SubscriptionID");
+    when(APPlatformControllerFactory.getInstance(anyString())).thenReturn(controller);
+    when(UserMapper.toServiceUser(user)).thenReturn(serviceUser);
+    when(configService.getProvisioningSettings(instance, serviceUser)).thenReturn(settings);
+    when(controller.deleteInstance(anyString(), any())).thenReturn(status);
+    when(status.isInstanceProvisioningRequested()).thenReturn(true);
+    when(provisioningFactory.getInstance(instance)).thenReturn(provisioning);
+    when(provisioning.deleteInstance(anyString(), anyString(), anyString(), any())).thenReturn(baseResult);
+    when(provResultHelper.isError(baseResult)).thenReturn(true);
 
-        provisioningProxyImpl.deleteInstance(instance, user);
+    provisioningProxyImpl.deleteInstance(instance, user);
 
-        verify(instance, times(1)).getOrganizationId();
-        verify(instance, never()).setInstanceParameters((HashMap<String, Setting>) anyMap());
-    }
+    verify(instance, times(1)).getOrganizationId();
+    verify(instance, never()).setInstanceParameters((HashMap<String, Setting>) anyMap());
+  }
 
-    @Test
-    public void testDeleteInstanceServiceNotFound() throws Exception {
+  @Test
+  public void testDeleteInstanceServiceNotFound() throws Exception {
 
-        when(instanceDAO.getInstance(anyString(), anyString(), anyString())).thenThrow(new ServiceInstanceNotFoundException("Instamce not found"));
+    when(instanceDAO.getInstance(anyString(), anyString(), anyString())).thenThrow(new ServiceInstanceNotFoundException("Instamce not found"));
 
-        provisioningProxyImpl.deleteInstance(anyString(), anyString(), anyString(), user);
+    provisioningProxyImpl.deleteInstance(anyString(), anyString(), anyString(), user);
 
-        verify(provResultHelper, times(1)).getOKResult(any());
-        verify(provResultHelper, never()).getErrorResult(any(), any(), anyString(), any(), anyString());
-    }
+    verify(provResultHelper, times(1)).getOKResult(any());
+    verify(provResultHelper, never()).getErrorResult(any(), any(), anyString(), any(), anyString());
+  }
 
-    @Test
-    public void testDeleteInstanceIsDeleted() throws Exception {
+  @Test
+  public void testDeleteInstanceIsDeleted() throws Exception {
 
-        when(instanceDAO.getInstance(anyString(), anyString(), anyString())).thenReturn(instance);
-        when(instance.isDeleted()).thenReturn(true);
+    when(instanceDAO.getInstance(anyString(), anyString(), anyString())).thenReturn(instance);
+    when(instance.isDeleted()).thenReturn(true);
 
-        provisioningProxyImpl.deleteInstance(anyString(), anyString(), anyString(), user);
+    provisioningProxyImpl.deleteInstance(anyString(), anyString(), anyString(), user);
 
-        verify(provResultHelper, times(1)).getOKResult(any());
-        verify(provResultHelper, never()).getErrorResult(any(), any(), anyString(), any(), anyString());
-    }
+    verify(provResultHelper, times(1)).getOKResult(any());
+    verify(provResultHelper, never()).getErrorResult(any(), any(), anyString(), any(), anyString());
+  }
 
-    @Test
-    public void testDeleteInstanceCatchException() throws Exception {
+  @Test
+  public void testDeleteInstanceCatchException() throws Exception {
 
-        when(instanceDAO.getInstance(anyString(), anyString(), anyString())).thenReturn(instance);
+    when(instanceDAO.getInstance(anyString(), anyString(), anyString())).thenReturn(instance);
 
-        provisioningProxyImpl.deleteInstance(anyString(), anyString(), anyString(), user);
+    provisioningProxyImpl.deleteInstance(anyString(), anyString(), anyString(), user);
 
-        verify(provResultHelper, never()).getOKResult(any());
-        verify(provResultHelper, times(1)).getErrorResult(any(), any(), anyString(), any(), anyString());
-    }
+    verify(provResultHelper, never()).getOKResult(any());
+    verify(provResultHelper, times(1)).getErrorResult(any(), any(), anyString(), any(), anyString());
+  }
 }
