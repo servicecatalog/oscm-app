@@ -48,7 +48,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 @RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"javax.management.*", "javax.script.*", "jdk.internal.reflect.*", "javax.net.ssl.*"})
+@PowerMockIgnore({"javax.management.*", "javax.script.*", "jdk.internal.reflect.*"})
 @PrepareForTest({APPlatformServiceBean.class, APPlatformControllerFactory.class, MessageDigest.class, KeyStore.class})
 public class APPlatformServiceBeanTest {
 
@@ -81,7 +81,6 @@ public class APPlatformServiceBeanTest {
     MockitoAnnotations.initMocks(this);
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void updateUserCredentials_isExecutedSuccessfully_ifAllControllersConfigured()
       throws Exception {
@@ -101,7 +100,6 @@ public class APPlatformServiceBeanTest {
         .storeControllerConfigurationSettings(anyString(), any(HashMap.class));
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void updateUserCredentials_hasNoInteractions_ifNoControllerIsConfigured()
       throws Exception {
