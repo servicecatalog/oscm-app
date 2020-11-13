@@ -30,35 +30,35 @@ import static org.mockito.Mockito.when;
 @PrepareForTest({APPlatformControllerFactory.class, APPlatformController.class})
 public class APPlatformControllerFactoryTest {
 
-    private APPlatformControllerFactory controllerFactory;
-    private InitialContext context;
-    private APPlatformController lookup;
+  private APPlatformControllerFactory controllerFactory;
+  private InitialContext context;
+  private APPlatformController lookup;
 
-    @Before
-    public void setUp() {
-        controllerFactory = PowerMockito.spy(new APPlatformControllerFactory());
-        PowerMockito.mockStatic(APPlatformController.class);
-        context = mock(InitialContext.class);
-        lookup = mock(APPlatformController.class);
-    }
+  @Before
+  public void setUp() {
+    controllerFactory = PowerMockito.spy(new APPlatformControllerFactory());
+    PowerMockito.mockStatic(APPlatformController.class);
+    context = mock(InitialContext.class);
+    lookup = mock(APPlatformController.class);
+  }
 
-    @Test
-    public void testGetInstance() throws Exception {
-        PowerMockito.whenNew(InitialContext.class).withAnyArguments().thenReturn(context);
-        when(context.lookup(anyString())).thenReturn(lookup);
-        PowerMockito.when(APPlatformController.class.isAssignableFrom(lookup.getClass())).thenReturn(true);
+  @Test
+  public void testGetInstance() throws Exception {
+    PowerMockito.whenNew(InitialContext.class).withAnyArguments().thenReturn(context);
+    when(context.lookup(anyString())).thenReturn(lookup);
+    PowerMockito.when(APPlatformController.class.isAssignableFrom(lookup.getClass())).thenReturn(true);
 
-        APPlatformControllerAdapter result = Whitebox.invokeMethod(controllerFactory, "getInstance", "ControllerID");
+    APPlatformControllerAdapter result = Whitebox.invokeMethod(controllerFactory, "getInstance", "ControllerID");
 
-        assertEquals(APPlatformControllerAdapter.class, result.getClass());
-    }
+    assertEquals(APPlatformControllerAdapter.class, result.getClass());
+  }
 
-    @Test(expected = Exception.class)
-    public void testGetInstanceThrowsExce() throws Exception {
-        PowerMockito.whenNew(InitialContext.class).withAnyArguments().thenReturn(context);
-        when(context.lookup(anyString())).thenReturn(lookup);
+  @Test(expected = Exception.class)
+  public void testGetInstanceThrowsExce() throws Exception {
+    PowerMockito.whenNew(InitialContext.class).withAnyArguments().thenReturn(context);
+    when(context.lookup(anyString())).thenReturn(lookup);
 
-        APPlatformControllerAdapter result = Whitebox.invokeMethod(controllerFactory, "getInstance", "ControllerID");
-    }
+    APPlatformControllerAdapter result = Whitebox.invokeMethod(controllerFactory, "getInstance", "ControllerID");
+  }
 
 }
