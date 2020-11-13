@@ -1,10 +1,10 @@
 /*******************************************************************************
  *
- *  Copyright FUJITSU LIMITED 2020
+ *  <p>Copyright FUJITSU LIMITED 2020
  *
- *  Creation Date: Nov 9, 2020
+ *  <p>Creation Date: Nov 9, 2020
  *
- *******************************************************************************/
+ *<p>******************************************************************************/
 package org.oscm.app.business;
 
 import org.junit.Test;
@@ -24,52 +24,52 @@ import static org.junit.Assert.assertNull;
 @PrepareForTest({UserMapper.class})
 public class UserMapperTest {
 
-    @Test
-    public void testToServiceUser() throws Exception {
+  @Test
+  public void testToServiceUser() throws Exception {
 
-        User fromUser = new User();
-        fromUser.setApplicationUserId("TestUser");
-        fromUser.setEmail("test@email.com");
-        fromUser.setLocale("en");
-        fromUser.setRoleIdentifier("user");
-        fromUser.setUserLastName("User");
-        fromUser.setUserFirstName("Test");
-        ServiceUser serviceUser = new ServiceUser();
-        PowerMockito.whenNew(ServiceUser.class).withNoArguments().thenReturn(serviceUser);
+    User fromUser = new User();
+    fromUser.setApplicationUserId("TestUser");
+    fromUser.setEmail("test@email.com");
+    fromUser.setLocale("en");
+    fromUser.setRoleIdentifier("user");
+    fromUser.setUserLastName("User");
+    fromUser.setUserFirstName("Test");
+    ServiceUser serviceUser = new ServiceUser();
+    PowerMockito.whenNew(ServiceUser.class).withNoArguments().thenReturn(serviceUser);
 
-        ServiceUser result = UserMapper.toServiceUser(fromUser);
+    ServiceUser result = UserMapper.toServiceUser(fromUser);
 
-        assertEquals("Test", result.getFirstName());
-    }
+    assertEquals("Test", result.getFirstName());
+  }
 
-    @Test
-    public void testToServiceUserUserNull() {
+  @Test
+  public void testToServiceUserUserNull() {
 
-        assertNull(UserMapper.toServiceUser(null));
-    }
+    assertNull(UserMapper.toServiceUser(null));
+  }
 
 
-    @Test
-    public void testToProvisioningUser() throws Exception {
+  @Test
+  public void testToProvisioningUser() throws Exception {
 
-        ServiceUser serviceUser = new ServiceUser();
-        serviceUser.setApplicationUserId("TestUser");
-        serviceUser.setEmail("test@email.com");
-        serviceUser.setLocale("en");
-        serviceUser.setRoleIdentifier("user");
-        serviceUser.setLastName("User");
-        serviceUser.setFirstName("Test");
-        User user = new User();
-        PowerMockito.whenNew(User.class).withNoArguments().thenReturn(user);
+    ServiceUser serviceUser = new ServiceUser();
+    serviceUser.setApplicationUserId("TestUser");
+    serviceUser.setEmail("test@email.com");
+    serviceUser.setLocale("en");
+    serviceUser.setRoleIdentifier("user");
+    serviceUser.setLastName("User");
+    serviceUser.setFirstName("Test");
+    User user = new User();
+    PowerMockito.whenNew(User.class).withNoArguments().thenReturn(user);
 
-        User result = UserMapper.toProvisioningUser(serviceUser);
+    User result = UserMapper.toProvisioningUser(serviceUser);
 
-        assertEquals("Test", result.getUserFirstName());
-    }
+    assertEquals("Test", result.getUserFirstName());
+  }
 
-    @Test
-    public void testToProvisioningUserServiceUserNull() {
+  @Test
+  public void testToProvisioningUserServiceUserNull() {
 
-        assertNull(UserMapper.toProvisioningUser(null));
-    }
+    assertNull(UserMapper.toProvisioningUser(null));
+  }
 }

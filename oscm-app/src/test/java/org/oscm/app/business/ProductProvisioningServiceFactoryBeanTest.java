@@ -1,10 +1,10 @@
 /*******************************************************************************
  *
- *  Copyright FUJITSU LIMITED 2018
+ *  <p>Copyright FUJITSU LIMITED 2018
  *
- *  Creation Date: 29.08.2012                                                      
+ *  <p>Creation Date: 29.08.2012
  *
- *******************************************************************************/
+ *<p>******************************************************************************/
 
 package org.oscm.app.business;
 
@@ -26,7 +26,6 @@ import java.util.ArrayList;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
-
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"javax.management.*", "javax.script.*", "jdk.internal.reflect.*"})
