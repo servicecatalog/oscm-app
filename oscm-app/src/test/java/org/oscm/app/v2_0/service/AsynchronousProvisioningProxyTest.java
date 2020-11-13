@@ -14,18 +14,21 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.oscm.app.business.APPlatformControllerFactory;
+import org.oscm.app.business.ProductProvisioningServiceFactoryBean;
 import org.oscm.app.business.ProvisioningResults;
 import org.oscm.app.business.exceptions.BadResultException;
+import org.oscm.app.business.exceptions.ServiceInstanceNotFoundException;
 import org.oscm.app.dao.ServiceInstanceDAO;
 import org.oscm.app.domain.CustomAttribute;
 import org.oscm.app.domain.InstanceParameter;
 import org.oscm.app.domain.ProvisioningStatus;
 import org.oscm.app.domain.ServiceInstance;
-import org.oscm.app.v2_0.data.InstanceDescription;
-import org.oscm.app.v2_0.data.ProvisioningSettings;
-import org.oscm.app.v2_0.data.Setting;
+import org.oscm.app.v2_0.data.*;
+import org.oscm.app.v2_0.exceptions.APPlatformException;
 import org.oscm.app.v2_0.intf.APPlatformController;
+import org.oscm.provisioning.data.User;
 import org.oscm.provisioning.data.*;
+import org.oscm.provisioning.intf.ProvisioningService;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -54,11 +57,17 @@ public class AsynchronousProvisioningProxyTest {
   @Mock private ServiceInstanceDAO instanceDAO;
   @Mock private APPConfigurationServiceBean configService;
   @Mock private APPTimerServiceBean timerService;
+  @Mock private ProductProvisioningServiceFactoryBean provisioningFactory;
 
   @Before
   public void setup() throws Exception {
     PowerMockito.mockStatic(APPlatformControllerFactory.class);
     when(APPlatformControllerFactory.getInstance(anyString())).thenReturn(controller);
+
+    when(provisioningResults.newOkBaseResult()).thenCallRealMethod();
+    when(provisioningResults.getOKResult(any())).thenCallRealMethod();
+    when(provisioningResults.getSuccesfulResult(any(), anyString())).thenCallRealMethod();
+    when(provisioningResults.getBaseResult(any(), anyInt(), anyString())).thenCallRealMethod();
 
     proxy = spy(new AsynchronousProvisioningProxy());
     proxy.em = entityManager;
@@ -67,6 +76,11 @@ public class AsynchronousProvisioningProxyTest {
     proxy.instanceDAO = instanceDAO;
     proxy.configService = configService;
     proxy.timerService = timerService;
+    proxy.provisioningFactory = provisioningFactory;
+
+    ProvisioningService provisioningService = mock(ProvisioningService.class);
+    when(provisioningFactory.getInstance(any(ServiceInstance.class)))
+        .thenReturn(provisioningService);
   }
 
   @Test
@@ -74,24 +88,45 @@ public class AsynchronousProvisioningProxyTest {
     // given
     InstanceRequest instanceRequest = new InstanceRequest();
     User user = new User();
-
+    user.setLocale(Locale.getDefault().getLanguage());
     InstanceDescription description = new InstanceDescription();
+    LocalizedText localizedText = new LocalizedText();
+    localizedText.setText("text");
+    localizedText.setLocale(Locale.getDefault().getLanguage());
+    description.setDescription(Collections.singletonList(localizedText));
     doReturn(description).when(proxy).getInstanceDescription(instanceRequest, user);
 
     ServiceInstance instance = new ServiceInstance();
     doReturn(instance).when(proxy).createPersistentServiceInstance(instanceRequest, description);
 
+    // when
+    BaseResult result = proxy.asyncCreateInstance(instanceRequest, user);
+
+    // then
+    assertEquals(0, result.getRc());
+    assertEquals(localizedText.getText(), result.getDesc());
+    verify(timerService, times(1)).initTimers();
+    verify(proxy, times(1)).getInstanceDescription(instanceRequest, user);
+    verify(proxy, times(1)).createPersistentServiceInstance(instanceRequest, description);
+  }
+
+  @Test
+  public void testAsyncCreateInstance_ExceptionIsThrown() throws Exception {
+    // given
+    InstanceRequest instanceRequest = new InstanceRequest();
+    User user = new User();
+    doThrow(APPlatformException.class).when(proxy).getInstanceDescription(instanceRequest, user);
+
     BaseResult baseResult = new BaseResult();
-    when(provisioningResults.getSuccesfulResult(any(), anyString())).thenReturn(baseResult);
+    when(provisioningResults.getErrorResult(
+            any(), any(), anyString(), any(ServiceInstance.class), anyString()))
+        .thenReturn(baseResult);
 
     // when
     BaseResult result = proxy.asyncCreateInstance(instanceRequest, user);
 
     // then
     assertEquals(baseResult, result);
-    verify(timerService, times(1)).initTimers();
-    verify(proxy, times(1)).getInstanceDescription(instanceRequest, user);
-    verify(proxy, times(1)).createPersistentServiceInstance(instanceRequest, description);
   }
 
   @Test
@@ -189,8 +224,6 @@ public class AsynchronousProvisioningProxyTest {
     User user = new User();
     Query query = mock(Query.class);
     when(entityManager.createNamedQuery(anyString())).thenReturn(query);
-    when(provisioningResults.newOkBaseResult()).thenCallRealMethod();
-    when(provisioningResults.getBaseResult(any(), anyInt(), anyString())).thenCallRealMethod();
 
     // when
     BaseResult result = proxy.saveAttributes("orgId", attributes, user);
@@ -210,19 +243,36 @@ public class AsynchronousProvisioningProxyTest {
     instance.setProvisioningStatus(ProvisioningStatus.COMPLETED);
     when(instanceDAO.getInstanceById(anyString())).thenReturn(instance);
 
-    UserResult result = new UserResult();
-    ArrayList<User> users = new ArrayList<>();
-    result.setUsers(users);
-
-    when(provisioningResults.getOKResult(any())).thenReturn(result);
+    InstanceStatusUsers statusUsers = new InstanceStatusUsers();
+    statusUsers.setChangedUsers(Arrays.asList(new ServiceUser()));
+    when(controller.createUsers(anyString(), any(ProvisioningSettings.class), anyList()))
+        .thenReturn(statusUsers);
 
     // when
-    UserResult userResult = proxy.createUsers(instance.getInstanceId(), users, new User());
+    UserResult result = proxy.createUsers(instance.getInstanceId(), new ArrayList<>(), new User());
 
     // then
-    assertEquals(result, userResult);
+    assertEquals(0, result.getRc());
+    assertEquals("Ok", result.getDesc());
     verify(timerService, times(1)).initTimers();
     verify(entityManager, times(1)).persist(any());
+  }
+
+  @Test
+  public void testCreateUsers_ExceptionIsThrown() throws Exception {
+    // given
+    doThrow(ServiceInstanceNotFoundException.class).when(instanceDAO).getInstanceById(anyString());
+
+    UserResult baseResult = new UserResult();
+    when(provisioningResults.getErrorResult(
+            any(), any(), anyString(), any(ServiceInstance.class), anyString()))
+        .thenReturn(baseResult);
+
+    // when
+    UserResult userResult = proxy.createUsers("instanceId", new ArrayList<>(), new User());
+
+    // then
+    assertEquals(baseResult, userResult);
   }
 
   @Test
@@ -234,16 +284,19 @@ public class AsynchronousProvisioningProxyTest {
     instance.setProvisioningStatus(ProvisioningStatus.COMPLETED);
     when(instanceDAO.getInstanceById(anyString())).thenReturn(instance);
 
-    BaseResult result = new BaseResult();
-    when(provisioningResults.newOkBaseResult()).thenReturn(result);
+    InstanceStatus status = new InstanceStatus();
+    status.setInstanceProvisioningRequired(true);
+    when(controller.updateUsers(anyString(), any(ProvisioningSettings.class), anyList()))
+        .thenReturn(status);
 
     ArrayList<User> users = new ArrayList<>();
 
     // when
-    BaseResult baseResult = proxy.updateUsers(instance.getInstanceId(), users, new User());
+    BaseResult result = proxy.updateUsers(instance.getInstanceId(), users, new User());
 
     // then
-    assertEquals(result, baseResult);
+    assertEquals(0, result.getRc());
+    assertEquals("Ok", result.getDesc());
     verify(timerService, times(1)).initTimers();
     verify(entityManager, times(1)).persist(any());
   }
@@ -257,16 +310,91 @@ public class AsynchronousProvisioningProxyTest {
     instance.setProvisioningStatus(ProvisioningStatus.COMPLETED);
     when(instanceDAO.getInstanceById(anyString())).thenReturn(instance);
 
-    BaseResult result = new BaseResult();
-    when(provisioningResults.newOkBaseResult()).thenReturn(result);
-
+    InstanceStatus status = new InstanceStatus();
+    status.setInstanceProvisioningRequired(true);
+    when(controller.deleteUsers(anyString(), any(ProvisioningSettings.class), anyList()))
+        .thenReturn(status);
     ArrayList<User> users = new ArrayList<>();
 
     // when
-    BaseResult baseResult = proxy.deleteUsers(instance.getInstanceId(), users, new User());
+    BaseResult result = proxy.deleteUsers(instance.getInstanceId(), users, new User());
 
     // then
-    assertEquals(result, baseResult);
+    assertEquals(0, result.getRc());
+    assertEquals("Ok", result.getDesc());
+    verify(timerService, times(1)).initTimers();
+    verify(entityManager, times(1)).persist(any());
+  }
+
+  @Test
+  public void testAsyncModifySubscription() throws Exception {
+    // given
+    ServiceInstance instance = mock(ServiceInstance.class);
+    when(instance.isAvailable()).thenReturn(true);
+    when(instanceDAO.getInstanceById(anyString())).thenReturn(instance);
+
+    ProvisioningSettings settings = mock(ProvisioningSettings.class);
+    when(configService.getProvisioningSettings(any(ServiceInstance.class), any(ServiceUser.class)))
+        .thenReturn(settings);
+
+    InstanceStatus status = new InstanceStatus();
+    status.setInstanceProvisioningRequired(true);
+    when(controller.modifyInstance(
+            anyString(), any(ProvisioningSettings.class), any(ProvisioningSettings.class)))
+        .thenReturn(status);
+
+    // when
+    BaseResult result =
+        proxy.asyncModifySubscription(
+            "instanceId", "subId", "refId", new ArrayList<>(), new ArrayList<>(), new User());
+
+    // then
+    assertEquals(0, result.getRc());
+    assertEquals("Ok", result.getDesc());
+    verify(timerService, times(1)).initTimers();
+    verify(entityManager, times(1)).persist(any());
+  }
+
+  @Test
+  public void testActivateInstance() throws Exception {
+    // given
+    ServiceInstance instance = mock(ServiceInstance.class);
+    when(instance.isAvailable()).thenReturn(true);
+    when(instanceDAO.getInstanceById(anyString())).thenReturn(instance);
+
+    InstanceStatus status = new InstanceStatus();
+    status.setInstanceProvisioningRequired(true);
+    when(controller.activateInstance(anyString(), any(ProvisioningSettings.class)))
+        .thenReturn(status);
+
+    // when
+    BaseResult result = proxy.activateInstance("instanceId", new User());
+
+    // then
+    assertEquals(0, result.getRc());
+    assertEquals("Ok", result.getDesc());
+    verify(timerService, times(1)).initTimers();
+    verify(entityManager, times(1)).persist(any());
+  }
+
+  @Test
+  public void testDeactivateInstance() throws Exception {
+    // given
+    ServiceInstance instance = mock(ServiceInstance.class);
+    when(instance.isAvailable()).thenReturn(true);
+    when(instanceDAO.getInstanceById(anyString())).thenReturn(instance);
+
+    InstanceStatus status = new InstanceStatus();
+    status.setInstanceProvisioningRequired(true);
+    when(controller.deactivateInstance(anyString(), any(ProvisioningSettings.class)))
+        .thenReturn(status);
+
+    // when
+    BaseResult result = proxy.deactivateInstance("instanceId", new User());
+
+    // then
+    assertEquals(0, result.getRc());
+    assertEquals("Ok", result.getDesc());
     verify(timerService, times(1)).initTimers();
     verify(entityManager, times(1)).persist(any());
   }
