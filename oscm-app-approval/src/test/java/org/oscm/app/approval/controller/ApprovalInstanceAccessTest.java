@@ -9,30 +9,31 @@
  */
 package org.oscm.app.approval.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.oscm.app.approval.data.State;
 import org.oscm.app.v2_0.data.PasswordAuthentication;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
 import org.oscm.app.v2_0.data.Setting;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
 import org.oscm.app.v2_0.intf.APPlatformService;
+import org.oscm.app.v2_0.intf.ServerInformation;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-/** @author goebel */
+import java.util.*;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
+
+@RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"javax.management.*", "javax.script.*", "jdk.internal.reflect.*"})
+@PrepareForTest({ApprovalInstanceAccess.class})
 public class ApprovalInstanceAccessTest {
   ApprovalInstanceAccess access;
   HashMap<String, Setting> configSettings = new HashMap<String, Setting>();
@@ -40,18 +41,23 @@ public class ApprovalInstanceAccessTest {
   HashMap<String, Setting> params = new HashMap<String, Setting>();
   HashMap<String, Setting> customAttributes = new HashMap<String, Setting>();
   PasswordAuthentication auth = new PasswordAuthentication("user", "pwd");
+  private ProvisioningSettings settings;
+  private APPlatformService platformService;
+  private PropertyHandler propertyHandler;
 
   @Before
   public void setup() throws Exception {
-    APPlatformService s = mock(APPlatformService.class);
+    platformService = mock(APPlatformService.class);
     access = spy(new ApprovalInstanceAccess());
-    doReturn(s).when(access).getPlatformService();
-    access.platformService = s;
+    settings = mock(ProvisioningSettings.class);
+    propertyHandler = mock(PropertyHandler.class);
+    doReturn(platformService).when(access).getPlatformService();
+    access.platformService = platformService;
     ProvisioningSettings ps = mockProvisioningSettings();
-    doReturn("http://oscm-core/{service}?wsdl").when(s).getBSSWebServiceWSDLUrl();
-    Collection<String> result = Arrays.asList(new String[] {"instance_12345678"});
-    doReturn(result).when(s).listServiceInstances(any(), any());
-    doReturn(ps).when(s).getServiceInstanceDetails(anyString(), anyString(), any());
+    doReturn("http://oscm-core/{service}?wsdl").when(platformService).getBSSWebServiceWSDLUrl();
+    Collection<String> result = Arrays.asList(new String[]{"instance_12345678"});
+    doReturn(result).when(platformService).listServiceInstances(any(), any());
+    doReturn(ps).when(platformService).getServiceInstanceDetails(anyString(), anyString(), any());
   }
 
   @Test
@@ -111,6 +117,53 @@ public class ApprovalInstanceAccessTest {
     // then
     assertNotNull(settings);
     assertFalse(settings.isSet());
+  }
+
+  @Test
+  public void getServerDetails() throws Exception {
+    // given
+    when(access.getPlatformService()).thenReturn(platformService);
+    when(platformService.getServiceInstanceDetails(anyString(), anyString(), anyString(), anyString())).thenReturn(settings);
+    PowerMockito.whenNew(PropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
+    when(propertyHandler.getState()).thenReturn(State.CREATING);
+
+    // when
+    List<? extends ServerInformation> result =
+        access.getServerDetails("instanceId", "subscriptionId", "organizationId");
+
+    // then
+    assertEquals(1, result.size());
+  }
+
+  @Test
+  public void getAccessInfo() throws Exception {
+    // given
+    when(access.getPlatformService()).thenReturn(platformService);
+    when(platformService.getServiceInstanceDetails(anyString(), anyString(), anyString(), anyString())).thenReturn(settings);
+
+    // when
+    access.getAccessInfo("instanceId", "subscriptionId", "organizationId");
+
+    // then
+    verify(settings, times(1)).getServiceAccessInfo();
+  }
+
+  @Test
+  public void getPlatformService() {
+
+    // when
+    APPlatformService result = access.getPlatformService();
+
+    // then
+    assertEquals(platformService, result);
+  }
+
+  @Test
+  public void getPlatformService_AssignNewInstance() {
+    platformService = null;
+
+    // when
+    assertNotNull(access.getPlatformService());
   }
 
   Map<String, Setting> givenCustomerSettings(String id) {
