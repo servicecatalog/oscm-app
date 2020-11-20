@@ -1,454 +1,102 @@
 /*******************************************************************************
  *
- *  Copyright FUJITSU LIMITED 2018
+ *  Copyright FUJITSU LIMITED 2020
  *
- *  Creation Date: 2016-05-24
+ *  Creation Date: 2020-11-20
  *
  *******************************************************************************/
-
 package org.oscm.app.vmware.business.statemachine;
 
-import static org.junit.Assert.assertNotNull;
-
-import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.MockitoAnnotations;
+import org.oscm.app.v2_0.data.InstanceStatus;
+import org.oscm.app.v2_0.data.ProvisioningSettings;
+import org.oscm.app.v2_0.data.Setting;
+import org.oscm.app.v2_0.exceptions.APPlatformException;
+import org.oscm.app.vmware.business.VMPropertyHandler;
+import org.oscm.app.vmware.business.VMwareDatacenterInventory;
+import org.oscm.app.vmware.business.balancer.DynamicEquipartitionStorageBalancer;
+import org.oscm.app.vmware.business.balancer.XMLHelper;
+import org.oscm.app.vmware.business.model.VMwareStorage;
+import org.oscm.app.vmware.business.statemachine.api.StateMachineAction;
+import org.oscm.app.vmware.business.statemachine.api.StateMachineException;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
+import java.io.*;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.oscm.app.v2_0.data.InstanceStatus;
-import org.oscm.app.v2_0.data.ProvisioningSettings;
-import org.oscm.app.vmware.business.statemachine.api.StateMachineAction;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
+import static org.powermock.api.mockito.PowerMockito.when;
 
-/**
- * @author kulle
- *
- */
-//TODO: resolve it - resources are in different module
-@Ignore
+@RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"javax.management.*", "javax.script.*", "jdk.internal.reflect.*"})
+@PrepareForTest({StateMachine.class, Thread.class})
 public class StateMachineTest {
 
-    private States loadStates(String filename) throws Exception {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        try (InputStream stream = loader
-                .getResourceAsStream("statemachines/" + filename);) {
-            JAXBContext jaxbContext = JAXBContext.newInstance(States.class);
-            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            return (States) jaxbUnmarshaller.unmarshal(stream);
-        }
+    private StateMachine stateMachine;
+    private Thread thread;
+    private ClassLoader loader;
+
+    static ProvisioningSettings ps;
+    static HashMap<String, Setting> parameters;
+    static HashMap<String, Setting> configSettings;
+    static HashMap<String, Setting> attributes;
+    static HashMap<String, Setting> customAttributes;
+
+    @BeforeClass
+    public static void setup() {
+        parameters = new HashMap<>();
+        configSettings = new HashMap<>();
+        attributes = new HashMap<>();
+        customAttributes = new HashMap<>();
+
+        parameters.put("SM_STATE", new Setting("state1", "delete_vm.xml"));
+        parameters.put("SM_STATE_HISTORY", new Setting("state2", "Value2"));
+        parameters.put("SM_STATE_MACHINE", new Setting("state3", "delete_vm.xml"));
+        configSettings.put("key1", new Setting("name1", "value1"));
+        configSettings.put("key2", new Setting("name2", "value2"));
+        attributes.put("attr1", new Setting("key1", "value1"));
+        attributes.put("attr2", new Setting("key2", "value2"));
+        customAttributes.put("cuAttr1", new Setting("key1", "value1"));
+        customAttributes.put("cuAttr2", new Setting("key2", "value2"));
+
+        ps = new ProvisioningSettings(parameters, attributes, customAttributes, configSettings, "en");
     }
 
-    /**
-     * For all states except final states is checked that the action method
-     * exists on the state class. The ERROR state for example is ignored because
-     * it is a final state and the error handling is done by the controller and
-     * not the action class.
-     */
-    private void ensureActionMethods(States states) throws Exception {
-        String clazz = states.getActionClass();
-        for (State s : states.getStates()) {
-            if (isFinal(s)) {
-                continue;
-            }
-            Method method = loadMethod(clazz, s);
-            assertNotNull(method);
-            assertNotNull(
-                    method.getName()
-                            + " is missing @StateMachineAction annotation",
-                    method.getAnnotation(StateMachineAction.class));
-        }
-    }
+    @Before
+    public void setUp() throws StateMachineException, FileNotFoundException {
+        PowerMockito.mockStatic(Thread.class);
+        thread = mock(Thread.class);
+        loader = mock(ClassLoader.class);
 
-    private boolean isFinal(State state) {
-        return state.getAction() == null;
-    }
+        final File initialFile = new File("test-jar/src/main/resources/statemachines/delete_vm.xml");
+        final InputStream targetStream =
+            new DataInputStream(new FileInputStream(initialFile));
 
-    private Method loadMethod(String clazz, State state) throws Exception {
-        Class<?> c = Class.forName(clazz);
-
-        Class<?>[] paramTypes = new Class[3];
-        paramTypes[0] = String.class;
-        paramTypes[1] = ProvisioningSettings.class;
-        paramTypes[2] = InstanceStatus.class;
-
-        String methodName = state.getAction();
-        try {
-            return c.getMethod(methodName, paramTypes);
-        } catch (@SuppressWarnings("unused") NoSuchMethodException e) {
-            return c.getSuperclass().getMethod(methodName, paramTypes);
-        }
-    }
-
-    /**
-     * Checks for each transition the existence of the next state.
-     */
-    private void checkForBrokenTransitions(States states) {
-        List<State> allStates = states.getStates();
-        for (State s : allStates) {
-            if (s.getEvents() == null) {
-                // final state, no outgoing transitions
-                continue;
-            }
-
-            for (Event e : s.getEvents()) {
-                findStateById(e.getState(), states);
-            }
-        }
-
-    }
-
-    private State findStateById(String stateId, States states) {
-        for (State state : states.getStates()) {
-            if (state.getId().equals(stateId)) {
-                return state;
-            }
-        }
-        throw new IllegalStateException("State '" + stateId + "' not found");
-    }
-
-    private void checkStateUniqueness(States states) {
-        List<String> foundStates = new ArrayList<String>();
-        for (State s : states.getStates()) {
-            if (foundStates.contains(s.getId())) {
-                throw new IllegalStateException(
-                        "State " + s.getId() + " is defined multiple times.");
-            }
-            foundStates.add(s.getId());
-        }
+        when(Thread.currentThread()).thenReturn(thread);
+        when(thread.getContextClassLoader()).thenReturn(loader);
+        when(loader.getResourceAsStream(anyString())).thenReturn(targetStream);
+        stateMachine = PowerMockito.spy(new StateMachine(ps));
     }
 
     @Test
-    public void activateVm_checkStateUniqueness() throws Exception {
-        // given
-        States states = loadStates("activate_vm.xml");
+    public void testLoadStateMachine() throws Exception {
 
-        // when
-        checkStateUniqueness(states);
-
-        // then no exception expected
+        Whitebox.invokeMethod(stateMachine, "loadStateMachine", "oscm-app-vmware-statemachines/src/main/resources/statemachines/delete_vm.xml");
     }
-
-    @Test
-    public void activateVm_checkForBrokenTransitions() throws Exception {
-        // given
-        States states = loadStates("activate_vm.xml");
-
-        // when
-        checkForBrokenTransitions(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void activateVm() throws Exception {
-        // given
-        States states = loadStates("activate_vm.xml");
-
-        // when
-        ensureActionMethods(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void createVm_checkStateUniqueness() throws Exception {
-        // given
-        States states = loadStates("create_vm.xml");
-
-        // when
-        checkStateUniqueness(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void createVm_checkForBrokenTransitions() throws Exception {
-        // given
-        States states = loadStates("create_vm.xml");
-
-        // when
-        checkForBrokenTransitions(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void createVm() throws Exception {
-        // given
-        States states = loadStates("create_vm.xml");
-
-        // when
-        ensureActionMethods(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void deactivateVm_checkStateUniqueness() throws Exception {
-        // given
-        States states = loadStates("deactivate_vm.xml");
-
-        // when
-        checkStateUniqueness(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void deactivateVm_checkForBrokenTransitions() throws Exception {
-        // given
-        States states = loadStates("deactivate_vm.xml");
-
-        // when
-        checkForBrokenTransitions(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void deactivateVm() throws Exception {
-        // given
-        States states = loadStates("deactivate_vm.xml");
-
-        // when
-        ensureActionMethods(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void deleteVm_checkStateUniqueness() throws Exception {
-        // given
-        States states = loadStates("delete_vm.xml");
-
-        // when
-        checkStateUniqueness(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void deleteVm_checkForBrokenTransitions() throws Exception {
-        // given
-        States states = loadStates("delete_vm.xml");
-
-        // when
-        checkForBrokenTransitions(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void deleteVm() throws Exception {
-        // given
-        States states = loadStates("delete_vm.xml");
-
-        // when
-        ensureActionMethods(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void modifyVm_checkStateUniqueness() throws Exception {
-        // given
-        States states = loadStates("modify_vm.xml");
-
-        // when
-        checkStateUniqueness(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void modifyVm_checkForBrokenTransitions() throws Exception {
-        // given
-        States states = loadStates("modify_vm.xml");
-
-        // when
-        checkForBrokenTransitions(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void modifyVm() throws Exception {
-        // given
-        States states = loadStates("modify_vm.xml");
-
-        // when
-        ensureActionMethods(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void restartVm_checkStateUniqueness() throws Exception {
-        // given
-        States states = loadStates("restart_vm.xml");
-
-        // when
-        checkStateUniqueness(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void restartVm_checkForBrokenTransitions() throws Exception {
-        // given
-        States states = loadStates("restart_vm.xml");
-
-        // when
-        checkForBrokenTransitions(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void restartVm() throws Exception {
-        // given
-        States states = loadStates("restart_vm.xml");
-
-        // when
-        ensureActionMethods(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void restoreVm_checkStateUniqueness() throws Exception {
-        // given
-        States states = loadStates("restore_vm.xml");
-
-        // when
-        checkStateUniqueness(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void restoreVm_checkForBrokenTransitions() throws Exception {
-        // given
-        States states = loadStates("restore_vm.xml");
-
-        // when
-        checkForBrokenTransitions(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void restoreVm() throws Exception {
-        // given
-        States states = loadStates("restore_vm.xml");
-
-        // when
-        ensureActionMethods(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void snapshotVm_checkStateUniqueness() throws Exception {
-        // given
-        States states = loadStates("snapshot_vm.xml");
-
-        // when
-        checkStateUniqueness(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void snapshotVm_checkForBrokenTransitions() throws Exception {
-        // given
-        States states = loadStates("snapshot_vm.xml");
-
-        // when
-        checkForBrokenTransitions(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void snapshotVm() throws Exception {
-        // given
-        States states = loadStates("snapshot_vm.xml");
-
-        // when
-        ensureActionMethods(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void startVm_checkStateUniqueness() throws Exception {
-        // given
-        States states = loadStates("start_vm.xml");
-
-        // when
-        checkStateUniqueness(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void startVm_checkForBrokenTransitions() throws Exception {
-        // given
-        States states = loadStates("start_vm.xml");
-
-        // when
-        checkForBrokenTransitions(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void startVm() throws Exception {
-        // given
-        States states = loadStates("start_vm.xml");
-
-        // when
-        ensureActionMethods(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void stopVm_checkStateUniqueness() throws Exception {
-        // given
-        States states = loadStates("stop_vm.xml");
-
-        // when
-        checkStateUniqueness(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void stopVm_checkForBrokenTransitions() throws Exception {
-        // given
-        States states = loadStates("stop_vm.xml");
-
-        // when
-        checkForBrokenTransitions(states);
-
-        // then no exception expected
-    }
-
-    @Test
-    public void stopVm() throws Exception {
-        // given
-        States states = loadStates("stop_vm.xml");
-
-        // when
-        ensureActionMethods(states);
-
-        // then no exception expected
-    }
-
 }
