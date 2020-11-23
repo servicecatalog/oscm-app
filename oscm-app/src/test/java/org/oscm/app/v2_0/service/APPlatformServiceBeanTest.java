@@ -9,24 +9,37 @@
  */
 package org.oscm.app.v2_0.service;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.MockitoAnnotations;
+import org.oscm.app.business.APPlatformControllerFactory;
 import org.oscm.app.business.exceptions.ServiceInstanceNotFoundException;
 import org.oscm.app.dao.ServiceInstanceDAO;
 import org.oscm.app.domain.PlatformConfigurationKey;
 import org.oscm.app.domain.ServiceInstance;
 import org.oscm.app.v2_0.data.PasswordAuthentication;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
+import org.oscm.app.v2_0.data.Setting;
 import org.oscm.app.v2_0.data.User;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
+import org.oscm.app.v2_0.exceptions.ConfigurationException;
 import org.oscm.app.v2_0.exceptions.ObjectNotFoundException;
 import org.oscm.app.v2_0.exceptions.SuspendException;
+import org.oscm.app.v2_0.intf.APPlatformController;
 import org.oscm.vo.VOUserDetails;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.io.FileInputStream;
+import java.security.KeyStore;
+import java.security.MessageDigest;
+import java.security.PublicKey;
+import java.security.cert.Certificate;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -34,18 +47,40 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"javax.management.*", "javax.script.*", "jdk.internal.reflect.*"})
+@PrepareForTest({APPlatformServiceBean.class, APPlatformControllerFactory.class, MessageDigest.class, KeyStore.class})
 public class APPlatformServiceBeanTest {
 
-  @Spy @InjectMocks private APPlatformServiceBean applatformService = new APPlatformServiceBean();
+  @InjectMocks
+  private APPlatformServiceBean applatformService;
 
-  @Mock private APPConfigurationServiceBean appConfigurationService;
-  @Mock private APPAuthenticationServiceBean authService;
-  @Mock private ServiceInstanceDAO instanceDAO;
-  @Mock private APPConcurrencyServiceBean concurrencyService;
-  @Mock private APPCommunicationServiceBean mailService;
+  @Mock
+  private APPConfigurationServiceBean appConfigurationService;
+  @Mock
+  private APPAuthenticationServiceBean authService;
+  @Mock
+  private ServiceInstanceDAO instanceDAO;
+  @Mock
+  private APPConcurrencyServiceBean concurrencyService;
+  @Mock
+  private APPCommunicationServiceBean mailService;
+  @Mock
+  private PasswordAuthentication passwordAuthentication;
+  @Mock
+  private APPlatformController platformController;
 
-  @SuppressWarnings("unchecked")
+
+  @Before
+  public void setup() {
+    applatformService = PowerMockito.spy(new APPlatformServiceBean());
+    PowerMockito.mockStatic(APPlatformControllerFactory.class);
+    PowerMockito.mockStatic(MessageDigest.class);
+    PowerMockito.mockStatic(KeyStore.class);
+
+    MockitoAnnotations.initMocks(this);
+  }
+
   @Test
   public void updateUserCredentials_isExecutedSuccessfully_ifAllControllersConfigured()
       throws Exception {
@@ -65,7 +100,6 @@ public class APPlatformServiceBeanTest {
         .storeControllerConfigurationSettings(anyString(), any(HashMap.class));
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void updateUserCredentials_hasNoInteractions_ifNoControllerIsConfigured()
       throws Exception {
@@ -88,7 +122,7 @@ public class APPlatformServiceBeanTest {
 
     // given
     when(appConfigurationService.getProxyConfigurationSetting(
-            PlatformConfigurationKey.BSS_AUTH_MODE))
+        PlatformConfigurationKey.BSS_AUTH_MODE))
         .thenReturn("OIDC");
 
     // when
@@ -103,7 +137,7 @@ public class APPlatformServiceBeanTest {
 
     // given
     when(appConfigurationService.getProxyConfigurationSetting(
-            PlatformConfigurationKey.BSS_AUTH_MODE))
+        PlatformConfigurationKey.BSS_AUTH_MODE))
         .thenReturn("INTERNAL");
 
     // when
@@ -125,7 +159,7 @@ public class APPlatformServiceBeanTest {
     userDetails.setFirstName("firstName");
     userDetails.setLastName("lastName");
     when(authService.getAuthenticatedTMForController(
-            anyString(), any(PasswordAuthentication.class)))
+        anyString(), any(PasswordAuthentication.class)))
         .thenReturn(userDetails);
 
     // when
@@ -219,7 +253,7 @@ public class APPlatformServiceBeanTest {
     // given
     String url = "http://url";
     when(appConfigurationService.getProxyConfigurationSetting(
-            PlatformConfigurationKey.APP_BASE_URL))
+        PlatformConfigurationKey.APP_BASE_URL))
         .thenReturn(url);
 
     // when
@@ -351,7 +385,7 @@ public class APPlatformServiceBeanTest {
   public void testCheckToken_truststoreIsNull() throws Exception {
     // given
     when(appConfigurationService.getProxyConfigurationSetting(
-            PlatformConfigurationKey.APP_TRUSTSTORE))
+        PlatformConfigurationKey.APP_TRUSTSTORE))
         .thenReturn(null);
 
     // when
@@ -359,6 +393,140 @@ public class APPlatformServiceBeanTest {
 
     // then
     assertFalse(check);
+  }
+
+  @Test
+  public void testCheckToken_CertNull() throws Exception {
+
+    byte[] digest = new byte[12];
+    MessageDigest messageDigest = mock(MessageDigest.class);
+    FileInputStream inputStream = mock(FileInputStream.class);
+    KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+
+    when(appConfigurationService.getProxyConfigurationSetting(PlatformConfigurationKey.APP_TRUSTSTORE))
+        .thenReturn("locale");
+    when(appConfigurationService.getProxyConfigurationSetting(PlatformConfigurationKey.APP_TRUSTSTORE_PASSWORD))
+        .thenReturn("password");
+    when(appConfigurationService.getProxyConfigurationSetting(PlatformConfigurationKey.APP_TRUSTSTORE_BSS_ALIAS))
+        .thenReturn("alias");
+    when(MessageDigest.getInstance("SHA-256")).thenReturn(messageDigest);
+    when(messageDigest.digest()).thenReturn(digest);
+    PowerMockito.whenNew(FileInputStream.class).withAnyArguments().thenReturn(inputStream);
+    when(KeyStore.getInstance(any())).thenReturn(keystore);
+
+    boolean check = applatformService.checkToken("token", "signature");
+
+    assertFalse(check);
+  }
+
+  @Test
+  public void testCheckToken_KeyNull() throws Exception {
+
+    byte[] digest = new byte[12];
+    MessageDigest messageDigest = mock(MessageDigest.class);
+    FileInputStream inputStream = mock(FileInputStream.class);
+    KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+    Certificate certificate = mock(Certificate.class);
+
+    when(appConfigurationService.getProxyConfigurationSetting(PlatformConfigurationKey.APP_TRUSTSTORE))
+        .thenReturn("locale");
+    when(appConfigurationService.getProxyConfigurationSetting(PlatformConfigurationKey.APP_TRUSTSTORE_PASSWORD))
+        .thenReturn("password");
+    when(appConfigurationService.getProxyConfigurationSetting(PlatformConfigurationKey.APP_TRUSTSTORE_BSS_ALIAS))
+        .thenReturn("alias");
+    when(MessageDigest.getInstance("SHA-256")).thenReturn(messageDigest);
+    when(messageDigest.digest()).thenReturn(digest);
+    PowerMockito.whenNew(FileInputStream.class).withAnyArguments().thenReturn(inputStream);
+    when(KeyStore.getInstance(any())).thenReturn(keystore);
+    when(keystore.getCertificate(anyString())).thenReturn(certificate);
+
+    boolean check = applatformService.checkToken("token", "signature");
+
+    assertFalse(check);
+  }
+
+  @Test
+  public void testCheckToken_NullOrEmptyTransformation() throws Exception {
+
+    byte[] digest = new byte[12];
+    MessageDigest messageDigest = mock(MessageDigest.class);
+    FileInputStream inputStream = mock(FileInputStream.class);
+    KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+    Certificate certificate = mock(Certificate.class);
+    PublicKey key = mock(PublicKey.class);
+
+    when(appConfigurationService.getProxyConfigurationSetting(PlatformConfigurationKey.APP_TRUSTSTORE))
+        .thenReturn("locale");
+    when(appConfigurationService.getProxyConfigurationSetting(PlatformConfigurationKey.APP_TRUSTSTORE_PASSWORD))
+        .thenReturn("password");
+    when(appConfigurationService.getProxyConfigurationSetting(PlatformConfigurationKey.APP_TRUSTSTORE_BSS_ALIAS))
+        .thenReturn("alias");
+    when(MessageDigest.getInstance("SHA-256")).thenReturn(messageDigest);
+    when(messageDigest.digest()).thenReturn(digest);
+    PowerMockito.whenNew(FileInputStream.class).withAnyArguments().thenReturn(inputStream);
+    when(KeyStore.getInstance(any())).thenReturn(keystore);
+    when(keystore.getCertificate(anyString())).thenReturn(certificate);
+    when(certificate.getPublicKey()).thenReturn(key);
+
+    boolean check = applatformService.checkToken("token", "signature");
+
+    assertFalse(check);
+  }
+
+  @Test
+  public void testDecryptPassword_FailedDecryption() throws Exception {
+
+    FileInputStream inputStream = mock(FileInputStream.class);
+    KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+    PublicKey key = mock(PublicKey.class);
+
+    when(appConfigurationService.getProxyConfigurationSetting(PlatformConfigurationKey.APP_TRUSTSTORE))
+        .thenReturn("locale");
+    when(appConfigurationService.getProxyConfigurationSetting(PlatformConfigurationKey.APP_TRUSTSTORE_PASSWORD))
+        .thenReturn("password");
+    when(appConfigurationService.getProxyConfigurationSetting(PlatformConfigurationKey.APP_TRUSTSTORE_BSS_ALIAS))
+        .thenReturn("alias");
+    PowerMockito.whenNew(FileInputStream.class).withAnyArguments().thenReturn(inputStream);
+    when(KeyStore.getInstance(any())).thenReturn(keystore);
+    when(keystore.getKey(anyString(), any())).thenReturn(key);
+
+    Optional<String> result = applatformService.decryptPassword("password");
+
+    assertEquals(Optional.empty(), result);
+  }
+
+  @Test
+  public void testExist() {
+
+    boolean result = applatformService.exists(anyString(), anyString());
+
+    assertFalse(result);
+  }
+
+  @Test
+  public void testGetBSSWebServiceUrl() throws ConfigurationException {
+
+    applatformService.getBSSWebServiceUrl();
+
+    verify(appConfigurationService, times(1)).getProxyConfigurationSetting(PlatformConfigurationKey.BSS_WEBSERVICE_URL);
+  }
+
+  @Test
+  public void testGetControllerSettings() throws APPlatformException {
+
+    applatformService.getControllerSettings("ControllerId", passwordAuthentication);
+
+    verify(appConfigurationService, times(1)).getControllerConfigurationSettings("ControllerId");
+  }
+
+  @Test
+  public void testStoreControllerSettings() throws Exception {
+    HashMap<String, Setting> controllerSettings = new HashMap<>();
+    when(APPlatformControllerFactory.getInstance(anyString())).thenReturn(platformController);
+
+    applatformService.storeControllerSettings("ControllerId", controllerSettings, passwordAuthentication);
+
+    verify(applatformService, times(1)).requestControllerSettings("ControllerId");
   }
 
   private static ServiceInstance newServiceInstance(String instanceId, String orgId) {

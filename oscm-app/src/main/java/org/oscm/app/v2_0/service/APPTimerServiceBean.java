@@ -386,8 +386,7 @@ public class APPTimerServiceBean implements Cloneable {
                     try {
                         ServiceInstance si = instanceDAO.getInstanceById(
                                 serviceInstance.getInstanceId());
-                        if (si.getProvisioningStatus()
-                                .isWaitingForOperation()) {
+                        if (si.getProvisioningStatus().isWaitingForOperation()) {
                             initTimers();
                         }
                     } catch (ServiceInstanceNotFoundException e) {

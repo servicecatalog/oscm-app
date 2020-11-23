@@ -36,6 +36,7 @@ import org.oscm.types.enumtypes.UserRoleType;
 import org.oscm.types.exceptions.ConcurrentModificationException;
 import org.oscm.types.exceptions.*;
 import org.oscm.vo.*;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Binding;
@@ -50,7 +51,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
-@SuppressWarnings("unchecked")
 public class BesDAOTest {
 
   private static final String USER_ID = "userId";
