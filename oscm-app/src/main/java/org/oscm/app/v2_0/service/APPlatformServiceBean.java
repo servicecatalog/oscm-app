@@ -351,7 +351,7 @@ public class APPlatformServiceBean implements APPlatformService {
         | IllegalBlockSizeException
         | BadPaddingException
         | ConfigurationException e) {
-      LOGGER.error(e.getMessage());
+      LOGGER.error("An error occur during the token validation", e);
     } finally {
       try {
         if (is != null) {
