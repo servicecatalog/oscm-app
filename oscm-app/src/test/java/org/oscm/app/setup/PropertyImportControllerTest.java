@@ -152,7 +152,6 @@ public class PropertyImportControllerTest {
         assertEquals(CONTROLLER_ID_PROXY, propImport.getControllerId());
     }
 
-    @Ignore
     @Test
     public void execute_ProxySettings() {
         // given
@@ -235,6 +234,7 @@ public class PropertyImportControllerTest {
         Properties p = new Properties();
 
         p.put(PlatformConfigurationKey.APP_BASE_URL.name(), APP_BASE_URL);
+        p.put(PlatformConfigurationKey.APP_KEY_PATH.name(), APP_BASE_URL + "key");
         p.put(PlatformConfigurationKey.APP_ADMIN_MAIL_ADDRESS.name(),
                 "here@there.com");
         p.put(PlatformConfigurationKey.APP_TIMER_INTERVAL.name(), "15000");
@@ -242,10 +242,18 @@ public class PropertyImportControllerTest {
         p.put(PlatformConfigurationKey.APP_TIMER_REFRESH_USAGEDATA.name(), "86400000");
         p.put(PlatformConfigurationKey.BSS_WEBSERVICE_URL.name(),
                 "http://localhost:8680/{service}/BASIC?wsdl");
+        p.put(PlatformConfigurationKey.BSS_WEBSERVICE_WSDL_URL.name(),
+                "http://localhost:8680/{service}/BASIC?wsdl");
 
         p.put(PlatformConfigurationKey.BSS_USER_KEY.name(), "1000");
         p.put(PlatformConfigurationKey.BSS_USER_PWD.name(), "_crypt:admin123");
         p.put(PlatformConfigurationKey.BSS_AUTH_MODE.name(), "INTERNAL");
+
+        p.put(PlatformConfigurationKey.APP_TRUSTSTORE.name(), "http://localhost:8680/{service}/truststore");
+        p.put(PlatformConfigurationKey.APP_TRUSTSTORE_BSS_ALIAS.name(), "alias");
+        p.put(PlatformConfigurationKey.APP_TRUSTSTORE_PASSWORD.name(), "password");
+
+
         return p;
     }
 }

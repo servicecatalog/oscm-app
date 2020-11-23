@@ -184,17 +184,17 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
-                <version>5.0.9.Final</version>
+                <version>5.4.23.Final</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-entitymanager</artifactId>
-                <version>5.0.9.Final</version>
+                <version>5.4.23.Final</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.javax.persistence</groupId>
                 <artifactId>hibernate-jpa-2.1-api</artifactId>
-                <version>1.0.0.Final</version>
+                <version>1.0.2.Final</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.spec.javax.transaction</groupId>
@@ -216,19 +216,19 @@
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-api-mockito</artifactId>
-                <version>1.6.2</version>
+                <version>1.7.4</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-core</artifactId>
-                <version>1.6.2</version>
+                <version>1.7.4</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-module-junit4</artifactId>
-                <version>1.6.2</version>
+                <version>1.7.4</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
