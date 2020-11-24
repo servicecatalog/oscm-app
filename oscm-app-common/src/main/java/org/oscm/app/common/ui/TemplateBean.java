@@ -46,7 +46,7 @@ public class TemplateBean {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(TemplateBean.class);
 
-    private static final String[] allowedControllers = { "ess.openstack" };
+    private static final String[] allowedControllers = { "ess.openstack", "ess.approval" };
 
     private static final String STATUS_CLASS_INFO = "statusInfo";
     private static final String STATUS_CLASS_ERROR = "statusError";

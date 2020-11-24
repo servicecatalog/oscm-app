@@ -10,6 +10,7 @@
 package org.oscm.app.approval.controller;
 
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,21 +21,29 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 import org.oscm.app.approval.data.Server;
 import org.oscm.app.v2_0.APPlatformServiceFactory;
 import org.oscm.app.v2_0.data.PasswordAuthentication;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
 import org.oscm.app.v2_0.data.Setting;
+import org.oscm.app.v2_0.data.Template;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
+import org.oscm.app.v2_0.intf.APPTemplateService;
 import org.oscm.app.v2_0.intf.APPlatformService;
 import org.oscm.app.v2_0.intf.InstanceAccess;
 import org.oscm.app.v2_0.intf.ServerInformation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ApprovalInstanceAccess implements InstanceAccess {
+  private static final Logger LOGGER = LoggerFactory.getLogger(ApprovalInstanceAccess.class);
 
   private static final long serialVersionUID = -7079269432576472393L;
   protected APPlatformService platformService;
+  protected APPTemplateService templateService;
 
   APPlatformService getPlatformService() {
     if (platformService == null) {
@@ -87,6 +96,26 @@ public class ApprovalInstanceAccess implements InstanceAccess {
       }
     }
     return basicSettings;
+  }
+
+  String getTemplateContent(String file, PasswordAuthentication cred) {
+
+    try {
+      final Template t = getTemplateService().getTemplate(file, ApprovalController.ID, cred);
+      return new String(t.getContent(), StandardCharsets.UTF_8);
+
+    } catch (NamingException | APPlatformException e) {
+      final String msg =
+          String.format(
+              "Failed to load mail template file %s. The specified file was not found or could not be loaded. Using default template instead.",
+              file);
+      LOGGER.warn(msg, e);
+      return "";
+    }
+  }
+
+  private APPTemplateService getTemplateService() throws NamingException {
+    return templateService = InitialContext.doLookup(APPTemplateService.JNDI_NAME);
   }
 
   private Optional<String> getApprovers(ProvisioningSettings ps, String customerOrgId) {
@@ -266,6 +295,13 @@ public class ApprovalInstanceAccess implements InstanceAccess {
       ownerCredentials = ps.getAuthentication();
       params = toStringMap(ps.getParameters());
       isSet = ownerCredentials != null && isPresent(approvalUrl);
+      initTemplate(ps.getParameters().get("MAIL_TEMPLATE"));
+    }
+
+    private void initTemplate(Setting mailTemplateName) {
+      if (isPresent(mailTemplateName)) {
+        mailTemplate = getTemplateContent(mailTemplateName.getValue(), getOwnerCredentials());
+      }
     }
 
     public PasswordAuthentication getOwnerCredentials() {
@@ -280,20 +316,26 @@ public class ApprovalInstanceAccess implements InstanceAccess {
       return approvalUrl;
     }
 
+    public Setting getMailTemplateName() {
+      return mailTemplateName;
+    }
+
     public boolean isSet() {
       return isSet;
     }
-    
-    
+
+    public String getMailTemplate() {
+      return mailTemplate;
+    }
+
     public Map<String, String> getParams() {
       return params;
     }
 
     private Map<String, String> params;
     private String wsdlUrl;
-    Setting approvalUrl;
+    private String mailTemplate = "";
+    Setting approvalUrl, mailTemplateName;
     PasswordAuthentication ownerCredentials;
-
-  
   }
 }
