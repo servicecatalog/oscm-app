@@ -57,6 +57,7 @@ public class StateMachineTest {
   private PasswordAuthentication passwordAuthentication;
   private APPlatformService apPlatformService;
   private InputStream inputStream;
+  private Event mockEvent;
 
   static ProvisioningSettings ps;
   static HashMap<String, Setting> parameters;
@@ -71,9 +72,9 @@ public class StateMachineTest {
     attributes = new HashMap<>();
     customAttributes = new HashMap<>();
 
-    parameters.put("SM_STATE", new Setting("state1", "CREATE_VM"));
-    parameters.put("SM_STATE_HISTORY", new Setting("state2", "State History"));
-    parameters.put("SM_STATE_MACHINE", new Setting("state3", "create_vm.xml"));
+    parameters.put("SM_STATE", new Setting("state1", "BEGIN"));
+    parameters.put("SM_STATE_HISTORY", new Setting("state2", ""));
+    parameters.put("SM_STATE_MACHINE", new Setting("state3", "CREATE_VM"));
     configSettings.put("key1", new Setting("name1", "value1"));
     configSettings.put("key2", new Setting("name2", "value2"));
     attributes.put("attr1", new Setting("key1", "value1"));
@@ -99,6 +100,7 @@ public class StateMachineTest {
     passwordAuthentication = mock(PasswordAuthentication.class);
     apPlatformService = mock(APPlatformService.class);
     inputStream = mock(InputStream.class);
+    mockEvent = mock(Event.class);
 
     when(Thread.currentThread()).thenReturn(thread);
     when(thread.getContextClassLoader()).thenReturn(loader);
@@ -111,9 +113,9 @@ public class StateMachineTest {
 
   @Test
   public void testInitializeProvisioningSettings() {
-
+    // when
     StateMachine.initializeProvisioningSettings(ps, "CREATE_VM");
-
+    // then
     assertEquals("", ps.getParameters().get(StateMachineProperties.SM_STATE_HISTORY).getValue());
     assertEquals("CREATE_VM", ps.getParameters().get(StateMachineProperties.SM_STATE_MACHINE).getValue());
     assertEquals("BEGIN", ps.getParameters().get(StateMachineProperties.SM_STATE).getValue());
@@ -121,130 +123,12 @@ public class StateMachineTest {
 
   @Test
   public void testExecuteAction() throws Exception {
-
-    List<State> listStates = prepareListStates();
-    when(states.getStates()).thenReturn(listStates);
-    when(states.invokeAction(any(), anyString(), any(), any())).thenReturn("CREATE_VM");
-    PowerMockito.when(stateMachine, "getNextState", listStates.get(0), "CREATE_VM").thenReturn("CREATE_VM");
-    PowerMockito.whenNew(VMPropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
-    when(propertyHandler.getServiceSetting(anyString())).thenReturn("suspended");
-
-    stateMachine.executeAction(ps, "Instance ID", null);
-
-    PowerMockito.verifyPrivate(stateMachine).invoke("setReferenceForTimeout", propertyHandler);
-    verify(propertyHandler, times(1)).getServiceSetting(VMPropertyHandler.GUEST_READY_TIMEOUT_REF);
-  }
-
-  @Test
-  public void testExecuteActionNotSameState() throws Exception {
-
-    List<State> listStates = prepareListStates();
-    when(states.getStates()).thenReturn(listStates);
-    when(states.invokeAction(any(), anyString(), any(), any())).thenReturn("CREATE_VM");
-    PowerMockito.when(stateMachine, "getNextState", listStates.get(0), "CREATE_VM").thenReturn("STOP_VM");
-    PowerMockito.whenNew(VMPropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
-
-    stateMachine.executeAction(ps, "Instance ID", null);
-
-    PowerMockito.verifyPrivate(stateMachine).invoke("setReferenceForTimeout", propertyHandler);
-    verify(propertyHandler, never()).getServiceSetting(VMPropertyHandler.GUEST_READY_TIMEOUT_REF);
-  }
-
-  @Test(expected = SuspendException.class)
-  public void testExecuteActionThrowException() throws Exception {
-
-    List<State> listStates = prepareListStates();
-    when(states.getStates()).thenReturn(listStates);
-    when(states.invokeAction(any(), anyString(), any(), any())).thenReturn("CREATE_VM");
-    PowerMockito.when(stateMachine, "getNextState", listStates.get(0), "CREATE_VM").thenReturn("CREATE_VM");
-    PowerMockito.whenNew(VMPropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
-    when(propertyHandler.getServiceSetting(anyString())).thenReturn("500");
-    when(mockState.getTimeout()).thenReturn("500");
-    PowerMockito.doNothing().when(stateMachine, "storeSettings", "Instance ID", propertyHandler);
-
-    stateMachine.executeAction(ps, "Instance ID", null);
-  }
-
-  @Test
-  public void testStoreSettings() throws Exception {
-
-    when(propertyHandler.getTechnologyProviderCredentials()).thenReturn(passwordAuthentication);
-    when(APPlatformServiceFactory.getInstance()).thenReturn(apPlatformService);
-
-    Whitebox.invokeMethod(stateMachine, "storeSettings", "Instance ID", propertyHandler);
-
-    verify(propertyHandler, times(1)).getProvisioningSettings();
-    verify(apPlatformService, times(1))
-        .storeServiceInstanceDetails(Controller.ID, "Instance ID", propertyHandler.getProvisioningSettings(), passwordAuthentication);
-  }
-
-  @Test
-  public void testGetReadyTimeout() throws Exception {
-
-    when(mockState.getTimeout()).thenReturn("$555");
-    when(propertyHandler.getGuestReadyTimeout(anyString())).thenReturn("5");
-
-    String result = Whitebox.invokeMethod(stateMachine, "getReadyTimeout", mockState, propertyHandler);
-
-    assertEquals("5", result);
-  }
-
-  @Test
-  public void testExceededTimeoutReturnFalse() throws Exception {
-
-    assertFalse(Whitebox.invokeMethod(stateMachine, "exceededTimeout", propertyHandler, ""));
-  }
-
-  @Test
-  public void testExceededTimeoutCatchException() throws Exception {
-
-    assertFalse(Whitebox.invokeMethod(stateMachine, "exceededTimeout", propertyHandler, ""));
-  }
-
-  @Test(expected = StateMachineException.class)
-  public void testGetStateThrowException() throws Exception {
-
-    Whitebox.invokeMethod(stateMachine, "getState", "");
-  }
-
-  @Test(expected = StateMachineException.class)
-  public void testGetNextStateThrowException() throws Exception {
-
-    Whitebox.invokeMethod(stateMachine, "getNextState", mockState, "");
-  }
-
-  @Test
-  public void testAppendStateToHistoryReturnState() throws Exception {
-
-    String result =
-        Whitebox.invokeMethod(stateMachine, "appendStateToHistory", "State", "");
-
-    assertEquals("State", result);
-  }
-
-  @Test
-  public void testAppendStateToHistoryReturnStateHistory() throws Exception {
-
-    String result =
-        Whitebox.invokeMethod(stateMachine, "appendStateToHistory", "State", "HistoryState");
-
-    assertEquals("HistoryState", result);
-  }
-
-  @Test
-  public void testLoadPreviousStateFromHistory() throws Exception {
-
-    String result = stateMachine.loadPreviousStateFromHistory(ps);
-
-    assertEquals("State History", result);
-  }
-
-  private List<State> prepareListStates() {
+    // given
     State state = new State();
     Event event = new Event();
-    event.setId("CREATE_VM");
-    event.setState("Creating");
-    state.setId("CREATE_VM");
+    event.setId("Begin");
+    event.setState("BEGIN");
+    state.setId("BEGIN");
     state.setTimeout("100");
     List<Event> listEvents = new ArrayList<>();
     listEvents.add(event);
@@ -252,9 +136,150 @@ public class StateMachineTest {
     List<State> listStates = new ArrayList<>();
     listStates.add(state);
     state = new State();
-    state.setId("STOP_VM");
+    state.setId("CREATE_VM");
     state.setTimeout("500");
+    state.setEvents(listEvents);
     listStates.add(state);
-    return listStates;
+    when(states.getStates()).thenReturn(listStates);
+    when(states.invokeAction(any(), anyString(), any(), any())).thenReturn("Begin");
+    PowerMockito.whenNew(VMPropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
+    when(propertyHandler.getServiceSetting(anyString())).thenReturn("suspended");
+    // when
+    stateMachine.executeAction(ps, "Instance ID", null);
+    // then
+    PowerMockito.verifyPrivate(stateMachine).invoke("setReferenceForTimeout", propertyHandler);
+    verify(propertyHandler, times(1)).getServiceSetting(VMPropertyHandler.GUEST_READY_TIMEOUT_REF);
+  }
+
+  @Test
+  public void testExecuteActionNotSameState() throws Exception {
+    // given
+    State state = new State();
+    Event event = new Event();
+    event.setId("Creating");
+    event.setState("CREATE_VM");
+    state.setId("BEGIN");
+    state.setTimeout("100");
+    List<Event> listEvents = new ArrayList<>();
+    listEvents.add(event);
+    state.setEvents(listEvents);
+    List<State> listStates = new ArrayList<>();
+    listStates.add(state);
+    state = new State();
+    state.setId("CREATE_VM");
+    state.setTimeout("500");
+    state.setEvents(listEvents);
+    listStates.add(state);
+    when(states.getStates()).thenReturn(listStates);
+    when(states.invokeAction(any(), anyString(), any(), any())).thenReturn("Creating");
+    PowerMockito.whenNew(VMPropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
+    // when
+    stateMachine.executeAction(ps, "Instance ID", null);
+    // then
+    PowerMockito.verifyPrivate(stateMachine).invoke("setReferenceForTimeout", propertyHandler);
+    verify(propertyHandler, never()).getServiceSetting(VMPropertyHandler.GUEST_READY_TIMEOUT_REF);
+  }
+
+  @Test(expected = SuspendException.class)
+  public void testExecuteActionThrowException() throws Exception {
+
+    State state = new State();
+    Event event = new Event();
+    event.setId("Begin");
+    event.setState("BEGIN");
+    state.setId("BEGIN");
+    state.setTimeout("100");
+    List<Event> listEvents = new ArrayList<>();
+    listEvents.add(event);
+    state.setEvents(listEvents);
+    List<State> listStates = new ArrayList<>();
+    listStates.add(state);
+    state = new State();
+    state.setId("CREATE_VM");
+    state.setTimeout("500");
+    state.setEvents(listEvents);
+    listStates.add(state);
+    when(states.getStates()).thenReturn(listStates);
+    when(states.invokeAction(any(), anyString(), any(), any())).thenReturn("Begin");
+    PowerMockito.whenNew(VMPropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
+    when(propertyHandler.getServiceSetting(anyString())).thenReturn("500");
+    when(mockState.getTimeout()).thenReturn("500");
+    PowerMockito.doNothing().when(stateMachine, "storeSettings", "Instance ID", propertyHandler);
+    // when
+    stateMachine.executeAction(ps, "Instance ID", null);
+  }
+
+  @Test
+  public void testStoreSettings() throws Exception {
+    // given
+    when(propertyHandler.getTechnologyProviderCredentials()).thenReturn(passwordAuthentication);
+    when(APPlatformServiceFactory.getInstance()).thenReturn(apPlatformService);
+    // when
+    Whitebox.invokeMethod(stateMachine, "storeSettings", "Instance ID", propertyHandler);
+    // then
+    verify(propertyHandler, times(1)).getProvisioningSettings();
+    verify(apPlatformService, times(1))
+        .storeServiceInstanceDetails(Controller.ID, "Instance ID", propertyHandler.getProvisioningSettings(), passwordAuthentication);
+  }
+
+  @Test
+  public void testGetReadyTimeout() throws Exception {
+    // given
+    when(mockState.getTimeout()).thenReturn("$555");
+    when(propertyHandler.getGuestReadyTimeout(anyString())).thenReturn("5");
+    // when
+    String result = Whitebox.invokeMethod(stateMachine, "getReadyTimeout", mockState, propertyHandler);
+    // then
+    assertEquals("5", result);
+  }
+
+  @Test
+  public void testExceededTimeoutReturnFalse() throws Exception {
+    // when    // then
+    assertFalse(Whitebox.invokeMethod(stateMachine, "exceededTimeout", propertyHandler, ""));
+  }
+
+  @Test
+  public void testExceededTimeoutCatchException() throws Exception {
+    // when    // then
+    assertFalse(Whitebox.invokeMethod(stateMachine, "exceededTimeout", propertyHandler, ""));
+  }
+
+  @Test(expected = StateMachineException.class)
+  public void testGetStateThrowException() throws Exception {
+    // when
+    Whitebox.invokeMethod(stateMachine, "getState", "");
+  }
+
+  @Test(expected = StateMachineException.class)
+  public void testGetNextStateThrowException() throws Exception {
+    // when
+    Whitebox.invokeMethod(stateMachine, "getNextState", mockState, "");
+  }
+
+  @Test
+  public void testAppendStateToHistoryReturnState() throws Exception {
+    // when
+    String result =
+        Whitebox.invokeMethod(stateMachine, "appendStateToHistory", "State", "");
+    // then
+    assertEquals("State", result);
+  }
+
+  @Test
+  public void testAppendStateToHistoryReturnStateHistory() throws Exception {
+    // when
+    String result =
+        Whitebox.invokeMethod(stateMachine, "appendStateToHistory", "State", "HistoryState");
+    // then
+    assertEquals("HistoryState", result);
+  }
+
+  @Test
+  public void testLoadPreviousStateFromHistory() throws Exception {
+    // when
+    String result = stateMachine.loadPreviousStateFromHistory(ps);
+    // then
+    assertEquals("", result);
   }
 }

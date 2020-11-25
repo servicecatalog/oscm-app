@@ -107,224 +107,225 @@ public class ActionsTest {
 
   @Test
   public void testConfigureVMReturnConfiguring() throws Exception {
-
+    // given
     PowerMockito.whenNew(VMPropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
     PowerMockito.when(VMClientPool.getInstance()).thenReturn(clientPool);
     when(clientPool.getPool()).thenReturn(objectPool);
     when(objectPool.borrowObject(anyString())).thenReturn(vmClient);
     PowerMockito.whenNew(VM.class).withAnyArguments().thenReturn(vm);
     when(vm.reconfigureVirtualMachine(propertyHandler)).thenReturn(taskInfo);
-
+    // when
     String result = actions.configureVM("Instance ID", ps, instanceStatus);
-
+    // then
     assertEquals("configuring", result);
   }
 
   @Test
   public void testConfigureVMReturnFailed() {
-
+    // given
     PowerMockito.when(VMClientPool.getInstance()).thenReturn(clientPool);
     when(clientPool.getPool()).thenReturn(objectPool);
-
+    // when
     String result = actions.configureVM("Instance ID", ps, instanceStatus);
-
+    // then
     assertEquals("failed", result);
   }
 
   @Test
   public void testShutdownVMReturnStopped() throws Exception {
-
+    // given
     PowerMockito.whenNew(VMPropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
     PowerMockito.when(VMClientPool.getInstance()).thenReturn(clientPool);
     when(clientPool.getPool()).thenReturn(objectPool);
     when(objectPool.borrowObject(anyString())).thenReturn(vmClient);
     PowerMockito.whenNew(VM.class).withAnyArguments().thenReturn(vm);
-
+    // when
     String result = actions.shutdownVM("Instance ID", ps, instanceStatus);
-
+    // then
     assertEquals("stopped", result);
   }
 
   @Test
   public void testShutdownVMReturnFailed() {
-
+    // given
     PowerMockito.when(VMClientPool.getInstance()).thenReturn(clientPool);
     when(clientPool.getPool()).thenReturn(objectPool);
-
+    // when
     String result = actions.shutdownVM("Instance ID", ps, instanceStatus);
-
+    // then
     assertEquals("failed", result);
   }
 
   @Test
   public void testPowerOffVMReturnStopping() throws Exception {
-
+    // given
     PowerMockito.whenNew(VMPropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
     PowerMockito.when(VMClientPool.getInstance()).thenReturn(clientPool);
     when(clientPool.getPool()).thenReturn(objectPool);
     when(objectPool.borrowObject(anyString())).thenReturn(vmClient);
     PowerMockito.whenNew(VM.class).withAnyArguments().thenReturn(vm);
     when(vm.stop(true)).thenReturn(taskInfo);
-
+    // when
     String result = actions.powerOffVM("Instance ID", ps, instanceStatus);
-
+    // then
     assertEquals("stopping", result);
   }
 
   @Test
   public void testPowerOffVMReturnFailed() {
-
+    // given
     PowerMockito.when(VMClientPool.getInstance()).thenReturn(clientPool);
     when(clientPool.getPool()).thenReturn(objectPool);
-
+    // when
     String result = actions.powerOffVM("Instance ID", ps, instanceStatus);
-
+    // then
     assertEquals("failed", result);
   }
 
   @Test
   public void testStartVMReturnStarting() throws Exception {
-
+    // given
     PowerMockito.whenNew(VMPropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
     PowerMockito.when(VMClientPool.getInstance()).thenReturn(clientPool);
     when(clientPool.getPool()).thenReturn(objectPool);
     when(objectPool.borrowObject(anyString())).thenReturn(vmClient);
     PowerMockito.whenNew(VM.class).withAnyArguments().thenReturn(vm);
     when(vm.start()).thenReturn(taskInfo);
-
+    // when
     String result = actions.startVM("Instance ID", ps, instanceStatus);
-
+    // then
     assertEquals("starting", result);
   }
 
   @Test
   public void testStartVMReturnFailed() {
-
+    // given
     PowerMockito.when(VMClientPool.getInstance()).thenReturn(clientPool);
     when(clientPool.getPool()).thenReturn(objectPool);
-
+    // when
     String result = actions.startVM("Instance ID", ps, instanceStatus);
-
+    // then
     assertEquals("failed", result);
   }
 
   @Test
   public void testCheckVMRunningReturnNotRunning() throws Exception {
-
+    // given
     PowerMockito.whenNew(VMPropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
     PowerMockito.when(VMClientPool.getInstance()).thenReturn(clientPool);
     when(clientPool.getPool()).thenReturn(objectPool);
     when(objectPool.borrowObject(anyString())).thenReturn(vmClient);
     PowerMockito.whenNew(VM.class).withAnyArguments().thenReturn(vm);
-
+    // when
     String result = actions.checkVMRunning("Instance ID", ps, instanceStatus);
-
+    // then
     assertEquals("not running", result);
   }
 
   @Test
   public void testCheckVMRunningReturnFailed() {
-
+    // given
     PowerMockito.when(VMClientPool.getInstance()).thenReturn(clientPool);
     when(clientPool.getPool()).thenReturn(objectPool);
-
+    // when
     String result = actions.checkVMRunning("Instance ID", ps, instanceStatus);
-
+    // then
     assertEquals("failed", result);
   }
 
   @Test
   public void testCheckVMStoppedReturnRunning() throws Exception {
-
+    // given
     PowerMockito.whenNew(VMPropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
     PowerMockito.when(VMClientPool.getInstance()).thenReturn(clientPool);
     when(clientPool.getPool()).thenReturn(objectPool);
     when(objectPool.borrowObject(anyString())).thenReturn(vmClient);
     PowerMockito.whenNew(VM.class).withAnyArguments().thenReturn(vm);
-
+    // when
     String result = actions.checkVMStopped("Instance ID", ps, instanceStatus);
-
+    // then
     assertEquals("running", result);
   }
 
   @Test
   public void testCheckVMStoppedReturnFailed() {
-
+    // given
     PowerMockito.when(VMClientPool.getInstance()).thenReturn(clientPool);
     when(clientPool.getPool()).thenReturn(objectPool);
-
+    // when
     String result = actions.checkVMStopped("Instance ID", ps, instanceStatus);
-
+    // then
     assertEquals("failed", result);
   }
 
   @Test
   public void testFinalizeProvisioningReturnSuccess() throws Exception {
-
+    // given
     PowerMockito.whenNew(VMPropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
     PowerMockito.when(VMClientPool.getInstance()).thenReturn(clientPool);
     when(clientPool.getPool()).thenReturn(objectPool);
     when(objectPool.borrowObject(anyString())).thenReturn(vmClient);
     PowerMockito.whenNew(VM.class).withAnyArguments().thenReturn(vm);
-
+    // when
     String result = actions.finalizeProvisioning("Instance ID", ps, instanceStatus);
-
+    // then
     assertEquals("success", result);
   }
 
   @Test
   public void testFinalizeProvisioningReturnFailed() {
-
+    // given
     PowerMockito.when(VMClientPool.getInstance()).thenReturn(clientPool);
     when(clientPool.getPool()).thenReturn(objectPool);
-
+    // when
     String result = actions.finalizeProvisioning("Instance ID", ps, instanceStatus);
-
+    // then
     assertEquals("failed", result);
   }
 
   @Test
   public void testFinish() {
-
+    // when
     String result = actions.finish("Instance ID", ps, instanceStatus);
-
+    // then
     assertEquals("success", result);
   }
 
   @Test
   public void testThrowSuspendException() {
-
+    // when
     String result = actions.throwSuspendException("Instance ID", ps, instanceStatus);
-
+    // then
     assertEquals("failed", result);
   }
 
   @Test
   public void testInspectTaskResultReturnSuccess() throws Exception {
-
+    // given
     PowerMockito.whenNew(VMPropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
     PowerMockito.when(VMClientPool.getInstance()).thenReturn(clientPool);
     when(clientPool.getPool()).thenReturn(objectPool);
     when(objectPool.borrowObject(anyString())).thenReturn(vmClient);
-
+    // when
     String result = actions.inspectTaskResult("Instance ID", ps, instanceStatus);
-
+    // then
     assertEquals("success", result);
   }
 
   @Test
   public void testInspectTaskResultReturnCatchError() {
-
+    // given
     PowerMockito.when(VMClientPool.getInstance()).thenReturn(clientPool);
     when(clientPool.getPool()).thenReturn(objectPool);
-
+    // when
     String result = actions.inspectTaskResult("Instance ID", ps, instanceStatus);
-
+    // then
     assertEquals("error", result);
   }
 
   @Test
   public void testInspectTaskResultReturnError() throws Exception {
+    // given
     List<TaskInfo> taskList = new ArrayList<>();
     TaskInfo task = new TaskInfo();
     task.setKey("Task key");
@@ -350,11 +351,10 @@ public class ActionsTest {
     when(localizedMethodFault.getFault()).thenReturn(methodFault);
     when(methodFault.getFaultMessage()).thenReturn(messages);
     when(methodFault.getFaultCause()).thenReturn(localizedMethodFault);
-
     when(taskInfo.getState()).thenReturn(TaskInfoState.ERROR);
-
+    // when
     String result = actions.inspectTaskResult("Instance ID", ps, instanceStatus);
-
+    // then
     assertEquals("error", result);
   }
 }
