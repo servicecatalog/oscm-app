@@ -85,11 +85,12 @@ public class SampleControllerTest {
 
   @Test
   public void testCreateInstance() throws Exception {
+    // given
     PowerMockito.whenNew(PropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
     PowerMockito.whenNew(InstanceDescription.class).withNoArguments().thenReturn(instanceDescription);
-
+    // when
     InstanceDescription result = sampleController.createInstance(ps);
-
+    // then
     assertEquals(Status.CREATION_REQUESTED, propertyHandler.getState());
     assertEquals(parameters, result.getChangedParameters());
     assertEquals(attributes, result.getChangedAttributes());
@@ -98,11 +99,12 @@ public class SampleControllerTest {
 
   @Test
   public void testDeleteInstance() throws Exception {
+    // given
     PowerMockito.whenNew(PropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
     PowerMockito.whenNew(InstanceStatus.class).withNoArguments().thenReturn(instanceStatus);
-
+    // when
     InstanceStatus result = sampleController.deleteInstance("InstanceId", ps);
-
+    // then
     assertEquals(Status.DELETION_REQUESTED, propertyHandler.getState());
     assertEquals(parameters, result.getChangedParameters());
     assertEquals(attributes, result.getChangedAttributes());
@@ -111,11 +113,12 @@ public class SampleControllerTest {
 
   @Test
   public void testModifyInstance() throws Exception {
+    // given
     PowerMockito.whenNew(PropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
     PowerMockito.whenNew(InstanceStatus.class).withNoArguments().thenReturn(instanceStatus);
-
+    // when
     InstanceStatus result = sampleController.modifyInstance("InstanceId", ps, ps);
-
+    // then
     assertEquals(Status.MODIFICATION_REQUESTED, propertyHandler.getState());
     assertEquals(parameters, result.getChangedParameters());
     assertEquals(attributes, result.getChangedAttributes());
@@ -124,24 +127,26 @@ public class SampleControllerTest {
 
   @Test
   public void testGetInstanceStatus() throws Exception {
+    // given
     PowerMockito.whenNew(PropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
     propertyHandler.setState(Status.FINISHED);
-
+    // when
     InstanceStatus result = sampleController.getInstanceStatus("InstanceId", ps);
-
+    // then
     assertEquals(true, result.isReady());
     assertEquals(parameters, result.getChangedParameters());
   }
 
   @Test
   public void testNotifyInstance() throws Exception {
+    // given
     PowerMockito.whenNew(PropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
     PowerMockito.whenNew(InstanceStatus.class).withNoArguments().thenReturn(instanceStatus);
 
     propertyHandler.setState(Status.WAITING_FOR_ACTIVATION);
-
+    // when
     InstanceStatus result = sampleController.notifyInstance("InstanceId", ps, properties);
-
+    // then
     assertEquals(Status.FINSIHING_MANUAL_PROVISIONING, propertyHandler.getState());
     assertEquals(parameters, result.getChangedParameters());
     assertEquals(attributes, result.getChangedAttributes());
@@ -149,19 +154,21 @@ public class SampleControllerTest {
 
   @Test(expected = APPlatformException.class)
   public void testNotifyInstanceThrowException() throws Exception {
+    // given
     PowerMockito.whenNew(PropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
     PowerMockito.whenNew(InstanceStatus.class).withNoArguments().thenReturn(instanceStatus);
-
+    // when
     sampleController.notifyInstance("InstanceId", ps, properties);
   }
 
   @Test
   public void testActivateInstance() throws Exception {
+    // given
     PowerMockito.whenNew(PropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
     PowerMockito.whenNew(InstanceStatus.class).withNoArguments().thenReturn(instanceStatus);
-
+    // when
     InstanceStatus result = sampleController.activateInstance("InstanceId", ps);
-
+    // then
     assertEquals(Status.ACTIVATION_REQUESTED, propertyHandler.getState());
     assertEquals(parameters, result.getChangedParameters());
     assertEquals(attributes, result.getChangedAttributes());
@@ -169,11 +176,12 @@ public class SampleControllerTest {
 
   @Test
   public void testDeactivateInstance() throws Exception {
+    // given
     PowerMockito.whenNew(PropertyHandler.class).withAnyArguments().thenReturn(propertyHandler);
     PowerMockito.whenNew(InstanceStatus.class).withNoArguments().thenReturn(instanceStatus);
-
+    // when
     InstanceStatus result = sampleController.deactivateInstance("InstanceId", ps);
-
+    // then
     assertEquals(Status.DEACTIVATION_REQUESTED, propertyHandler.getState());
     assertEquals(parameters, result.getChangedParameters());
     assertEquals(attributes, result.getChangedAttributes());
@@ -181,8 +189,9 @@ public class SampleControllerTest {
 
   @Test(expected = APPlatformException.class)
   public void testValidateParameters() throws Exception {
+    // given
     propertyHandler = mock(PropertyHandler.class);
-
+    // when
     Whitebox.invokeMethod(sampleController, "validateParameters", propertyHandler);
   }
 }
