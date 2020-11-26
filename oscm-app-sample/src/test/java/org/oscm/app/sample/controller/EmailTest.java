@@ -1,274 +1,337 @@
 /*******************************************************************************
- *                                                                              
+ *
  *  Copyright FUJITSU LIMITED 2019                                           
- *                                                                                                                                 
+ *
  *  Creation Date: 12.12.2019                                                      
- *                                                                              
+ *
  *******************************************************************************/
 package org.oscm.app.sample.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.HashMap;
-
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
 import org.oscm.app.v2_0.data.Setting;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.naming.InitialContext;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
-/**
- * @author goebel
- *
- */
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
+import static org.powermock.api.mockito.PowerMockito.when;
+
+@RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"javax.management.*", "javax.script.*", "jdk.internal.reflect.*"})
+@PrepareForTest({Email.class, Session.class, Transport.class})
 public class EmailTest {
 
-    static ProvisioningSettings ps;
+  static ProvisioningSettings ps;
 
-    @BeforeClass
-    public static void setup() {
-        HashMap<String, Setting> parameters = new HashMap<String, Setting>();
-        HashMap<String, Setting> configSettings = new HashMap<String, Setting>();
+  private InitialContext initialContext;
+  private Session mailSession;
+  private MimeMessage message;
+  private InternetAddress internetAddress;
 
-        parameters.put("key1", new Setting("name1", "value1"));
-        parameters.put("key2", new Setting("name2", "value2"));
-        parameters.put("CSSSTYLE", new Setting("name2", "value2"));
-        configSettings.put("key1", new Setting("name1", "value1"));
-        configSettings.put("key2", new Setting("name2", "value2"));
+  @BeforeClass
+  public static void setup() {
+    HashMap<String, Setting> parameters = new HashMap<String, Setting>();
+    HashMap<String, Setting> configSettings = new HashMap<String, Setting>();
 
-        ps = new ProvisioningSettings(parameters, configSettings, "en");
-    }
+    parameters.put("key1", new Setting("name1", "value1"));
+    parameters.put("key2", new Setting("name2", "value2"));
+    parameters.put("CSSSTYLE", new Setting("name2", "value2"));
+    configSettings.put("key1", new Setting("name1", "value1"));
+    configSettings.put("key2", new Setting("name2", "value2"));
 
-    @Test
-    public void testEmail() {
-        // given
-        givenCSSIsNotUsed();
+    ps = new ProvisioningSettings(parameters, configSettings, "en");
+  }
 
-        // when
-        Email e = getEmail();
+  @Before
+  public void setUp() {
+    mailSession = mock(Session.class);
+    message = mock(MimeMessage.class);
+    initialContext = mock(InitialContext.class);
+    internetAddress = mock(InternetAddress.class);
+    PowerMockito.mockStatic(Transport.class);
+  }
 
-        // then
-        assertTextType(e);
-    }
+  @Test
+  public void testEmail() {
+    // given
+    givenCSSIsNotUsed();
 
-    @Test
-    public void testHtmlEmail() {
-        // given
-        givenCSSIsUsed();
-        
-        // when
-        Email e = getEmail();
+    // when
+    Email e = getEmail();
 
-        // then
-        assertHTMLType(e);
-    }
+    // then
+    assertTextType(e);
+  }
 
-    @Test
-    public void testEmail_filterPWD() {
+  @Test
+  public void testHtmlEmail() {
+    // given
+    givenCSSIsUsed();
 
-        setPassword();
-        givenCSSIsUsed();
+    // when
+    Email e = getEmail();
 
-        Email e = getEmail();
+    // then
+    assertHTMLType(e);
+  }
 
-        // when
-        String body = e.getBody();
+  @Test
+  public void testEmail_filterPWD() {
 
-        assertNoPassword(body);
-    }
-    
+    setPassword();
+    givenCSSIsUsed();
+
+    Email e = getEmail();
+
+    // when
+    String body = e.getBody();
+
+    assertNoPassword(body);
+  }
+
   @Test
   public void testCreateConfirmationLink() throws APPlatformException {
-      //given
-      givenCSSIsNotUsed();
-      setAppBaseUrl();
-      setAppControllerID();
-      Email e = getEmail();
-      //when
-      String result = e.createConfirmationLink("1");
-      
-      //then
-      assertConfirmationLink(result);
+    //given
+    givenCSSIsNotUsed();
+    setAppBaseUrl();
+    setAppControllerID();
+    Email e = getEmail();
+    //when
+    String result = e.createConfirmationLink("1");
+
+    //then
+    assertConfirmationLink(result);
   }
-  
+
   @Test
   public void testCreateConfirmationLinkHTML() throws APPlatformException {
-      //given
-      givenCSSIsUsed();
-      setAppBaseUrl();
-      setAppControllerID();
-      Email e = getEmail();
-      
-      //when
-      String result = e.createConfirmationLink("1");
-      
-      //then
-      assertHTMLConfirmationLink(result);
+    //given
+    givenCSSIsUsed();
+    setAppBaseUrl();
+    setAppControllerID();
+    Email e = getEmail();
+
+    //when
+    String result = e.createConfirmationLink("1");
+
+    //then
+    assertHTMLConfirmationLink(result);
   }
-  
-    @Test
-    public void testSampleSubject() {
-        // given
-        givenCSSIsNotUsed();
-        Email e = getEmail();
-        String instanceId = "1";
-        Status currentState = Status.CREATION_STEP2;
 
-        // when
-        String subject = e.getSubject(instanceId, currentState);
+  @Test
+  public void testSampleSubject() {
+    // given
+    givenCSSIsNotUsed();
+    Email e = getEmail();
+    String instanceId = "1";
+    Status currentState = Status.CREATION_STEP2;
 
-        // then
-        assertSampleSubject(subject);
-    }
+    // when
+    String subject = e.getSubject(instanceId, currentState);
 
-    @Test
-    public void testConfiguredSubject() {
-        // given
-        givenCSSIsNotUsed();
-        setMailSubject();
-        Email e = getEmail();
-        String instanceId = "1";
-        Status currentState = Status.MANUAL_CREATION;
-        
-        // when
-        String subject = e.getSubject(instanceId, currentState);
- 
-        // then
-        assertConfiguredSubject(subject);
-    }
-    
-    @Test
-    public void testSampleText() {
-        // given
-        givenCSSIsNotUsed();
-        setSampleEmailText();
-        Email e = getEmail();
-        String instanceId = "1";
-        Status currentState = Status.CREATION_STEP2;
+    // then
+    assertSampleSubject(subject);
+  }
 
-        // when
-        String text = e.getText(instanceId, currentState);
+  @Test
+  public void testConfiguredSubject() {
+    // given
+    givenCSSIsNotUsed();
+    setMailSubject();
+    Email e = getEmail();
+    String instanceId = "1";
+    Status currentState = Status.MANUAL_CREATION;
 
-        // then
-        assertSampleText(text);
-    }
-    
-    @Test
-    public void testConfiguredText() {
-        // given
-        givenCSSIsNotUsed();
-        setAppBaseUrl();
-        setAppControllerID();
-        setSampleEmailText();
-        Email e = getEmail();
-        String instanceId = "1";
-        Status currentState = Status.MANUAL_CREATION;
+    // when
+    String subject = e.getSubject(instanceId, currentState);
 
-        // when
-        String text = e.getText(instanceId, currentState);
+    // then
+    assertConfiguredSubject(subject);
+  }
 
-        // then
-        assertConfiguredText(text);
-    }
-    
-    private void assertConfiguredText(String text) {
-        assertEquals("Some message", text);
-    }
+  @Test
+  public void testSampleText() {
+    // given
+    givenCSSIsNotUsed();
+    setSampleEmailText();
+    Email e = getEmail();
+    String instanceId = "1";
+    Status currentState = Status.CREATION_STEP2;
 
-    private void assertSampleText(String text) {
-        assertEquals(
-                "The sample instance '1' is currently being provisioned."
-                        + " Current status: CREATION_STEP2.\n\n Some message",
-                text);
-    }
+    // when
+    String text = e.getText(instanceId, currentState);
 
-    private void assertConfiguredSubject(String subject) {
-        assertEquals("This is a test subject", subject);
-    }
-    
-    private void assertSampleSubject(String subject) {
-        assertEquals("Sample instance '1' is currently being provisioned.", subject);
-    }
-  
-    private void assertNoPassword(String body) {
-        assertFalse(body.contains("PWD"));
-    }
-    
-    private void assertHTMLConfirmationLink(String result) {
-        assertEquals(getHTMLConfirmationLink(), result);
-    }
+    // then
+    assertSampleText(text);
+  }
 
-    private void assertConfirmationLink(String result) {
-        assertEquals(getConfirmationLink(), result);
-    }
-    
-    private void assertHTMLType(Email e) {
-        assertTrue(e.getBody().contains("<html>"));
-        assertTrue(e.getBody().contains("meta content=\"text/html"));
-        assertEquals("text/html;charset=UTF-8", e.getContentType());
+  @Test
+  public void testConfiguredText() {
+    // given
+    givenCSSIsNotUsed();
+    setAppBaseUrl();
+    setAppControllerID();
+    setSampleEmailText();
+    Email e = getEmail();
+    String instanceId = "1";
+    Status currentState = Status.MANUAL_CREATION;
 
-    }
+    // when
+    String text = e.getText(instanceId, currentState);
 
-    private void assertTextType(Email e) {
-        assertFalse(e.getBody().contains("<html>"));
-        assertFalse(e.getBody().contains("text/html"));
-        assertEquals("text/plain; charset=UTF-8", e.getContentType());
-    }
+    // then
+    assertConfiguredText(text);
+  }
 
-    private void givenCSSIsUsed() {
-        HashMap<String, Setting> params = ps.getParameters();
-        params.put(Email.CSS_STYLE, new Setting(Email.CSS_STYLE,
-                "td, th, caption  { font: 15px arial;  }   caption  { font: bold 15px arial; background-color: #F2F2F2; margin:5px;}        .tcol       { width: 200px; }     .vcol       { width: 400px; }      .ckey        {  font: 15px arial; }      .cval        {  font: 15px arial; background-color: #F2F2F2; }  "));
+  @Test
+  public void testSend() throws Exception {
+    // given
+    Email email = getEmail();
+    List<String> recipient = new ArrayList<>();
+    recipient.add("test@fujitsu.com");
+    PowerMockito.whenNew(InitialContext.class).withNoArguments().thenReturn(initialContext);
+    when(initialContext.lookup(anyString())).thenReturn(mailSession);
+    PowerMockito.whenNew(MimeMessage.class).withAnyArguments().thenReturn(message);
+    PowerMockito.whenNew(InternetAddress.class).withAnyArguments().thenReturn(internetAddress);
+    PowerMockito.doNothing().when(Transport.class, "send", message);
 
-    }
+    // when
+    email.send(recipient, "Test e-mail", "This should be the body of the email");
 
-    private void setPassword() {
-        HashMap<String, Setting> params = ps.getParameters();
-        params.put("CUSTOMER_PWD", new Setting("CUSTOMER_PWD", "test123"));
-    }
+    // then
+    PowerMockito.verifyStatic(times(1));
+    Transport.send(message);
+  }
 
-    private void givenCSSIsNotUsed() {
-        HashMap<String, Setting> params = ps.getParameters();
-        params.put(Email.CSS_STYLE, new Setting(Email.CSS_STYLE, ""));
-    }
+  @Test(expected = APPlatformException.class)
+  public void testSendThrowException() throws Exception {
+    // given
+    Email email = getEmail();
+    List<String> recipient = new ArrayList<>();
+    recipient.add("test@fujitsu.com");
+    PowerMockito.whenNew(InitialContext.class).withNoArguments().thenReturn(initialContext);
+    when(initialContext.lookup(anyString())).thenReturn(mailSession);
+    PowerMockito.whenNew(MimeMessage.class).withAnyArguments().thenReturn(message);
+    PowerMockito.whenNew(InternetAddress.class).withAnyArguments().thenReturn(internetAddress);
+    doThrow(new MessagingException("")).when(message).setSubject(anyString(), anyString());
 
-    private Email getEmail() {
-        Email e = Email.get(ps);
-        e.mainText = "Das ist eine Test Email";
-        System.out.println(e.getBody());
-        return e;
-    }
-    
-    private String getConfirmationLink() {
-        return "https://fujitsu.com/global/notify?sid=1&controllerid=ess.sample&_resume=yes";
-    }
-    
-    private String getHTMLConfirmationLink() {
-        return "<a href=https://fujitsu.com/global/notify?sid=1&controllerid=ess.sample&_resume=yes>";
-    }
+    // when
+    email.send(recipient, "Test e-mail", "This should be the body of the email");
+  }
 
-    private void setAppControllerID() {
-        HashMap<String, Setting> params = ps.getParameters();
-        params.put("APP_CONTROLLER_ID", new Setting("APP_CONTROLLER_ID", "ess.sample"));
-    }
-    
-    private void setAppBaseUrl() {
-        HashMap<String, Setting> params = ps.getParameters();
-        params.put("APP_BASE_URL_FOR_NOTIFICATION", new Setting("APP_BASE_URL_FOR_NOTIFICATION", "https://fujitsu.com/global"));
-    }
-    
-    private void setMailSubject() {
-        HashMap<String, Setting> params = ps.getParameters();
-        params.put("EMAIL_SUBJECT", new Setting("EMAIL_SUBJECT", "This is a test subject"));
-    }
+  private void assertConfiguredText(String text) {
+    assertEquals("Some message", text);
+  }
 
-    private void setSampleEmailText() {
-        HashMap<String, Setting> params = ps.getParameters();
-        params.put("PARAM_MESSAGETEXT",
-                new Setting("PARAM_MESSAGETEXT", "Some message"));
-    }
+  private void assertSampleText(String text) {
+    assertEquals(
+        "The sample instance '1' is currently being provisioned."
+            + " Current status: CREATION_STEP2.\n\n Some message",
+        text);
+  }
+
+  private void assertConfiguredSubject(String subject) {
+    assertEquals("This is a test subject", subject);
+  }
+
+  private void assertSampleSubject(String subject) {
+    assertEquals("Sample instance '1' is currently being provisioned.", subject);
+  }
+
+  private void assertNoPassword(String body) {
+    assertFalse(body.contains("PWD"));
+  }
+
+  private void assertHTMLConfirmationLink(String result) {
+    assertEquals(getHTMLConfirmationLink(), result);
+  }
+
+  private void assertConfirmationLink(String result) {
+    assertEquals(getConfirmationLink(), result);
+  }
+
+  private void assertHTMLType(Email e) {
+    assertTrue(e.getBody().contains("<html>"));
+    assertTrue(e.getBody().contains("meta content=\"text/html"));
+    assertEquals("text/html;charset=UTF-8", e.getContentType());
+
+  }
+
+  private void assertTextType(Email e) {
+    assertFalse(e.getBody().contains("<html>"));
+    assertFalse(e.getBody().contains("text/html"));
+    assertEquals("text/plain; charset=UTF-8", e.getContentType());
+  }
+
+  private void givenCSSIsUsed() {
+    HashMap<String, Setting> params = ps.getParameters();
+    params.put(Email.CSS_STYLE, new Setting(Email.CSS_STYLE,
+        "td, th, caption  { font: 15px arial;  }   caption  { font: bold 15px arial; background-color: #F2F2F2; margin:5px;}        .tcol       { width: 200px; }     .vcol       { width: 400px; }      .ckey        {  font: 15px arial; }      .cval        {  font: 15px arial; background-color: #F2F2F2; }  "));
+
+  }
+
+  private void setPassword() {
+    HashMap<String, Setting> params = ps.getParameters();
+    params.put("CUSTOMER_PWD", new Setting("CUSTOMER_PWD", "test123"));
+  }
+
+  private void givenCSSIsNotUsed() {
+    HashMap<String, Setting> params = ps.getParameters();
+    params.put(Email.CSS_STYLE, new Setting(Email.CSS_STYLE, ""));
+  }
+
+  private Email getEmail() {
+    Email e = Email.get(ps);
+    e.mainText = "Das ist eine Test Email";
+    System.out.println(e.getBody());
+    return e;
+  }
+
+  private String getConfirmationLink() {
+    return "https://fujitsu.com/global/notify?sid=1&controllerid=ess.sample&_resume=yes";
+  }
+
+  private String getHTMLConfirmationLink() {
+    return "<a href=https://fujitsu.com/global/notify?sid=1&controllerid=ess.sample&_resume=yes>";
+  }
+
+  private void setAppControllerID() {
+    HashMap<String, Setting> params = ps.getParameters();
+    params.put("APP_CONTROLLER_ID", new Setting("APP_CONTROLLER_ID", "ess.sample"));
+  }
+
+  private void setAppBaseUrl() {
+    HashMap<String, Setting> params = ps.getParameters();
+    params.put("APP_BASE_URL_FOR_NOTIFICATION", new Setting("APP_BASE_URL_FOR_NOTIFICATION", "https://fujitsu.com/global"));
+  }
+
+  private void setMailSubject() {
+    HashMap<String, Setting> params = ps.getParameters();
+    params.put("EMAIL_SUBJECT", new Setting("EMAIL_SUBJECT", "This is a test subject"));
+  }
+
+  private void setSampleEmailText() {
+    HashMap<String, Setting> params = ps.getParameters();
+    params.put("PARAM_MESSAGETEXT",
+        new Setting("PARAM_MESSAGETEXT", "Some message"));
+  }
 
 }

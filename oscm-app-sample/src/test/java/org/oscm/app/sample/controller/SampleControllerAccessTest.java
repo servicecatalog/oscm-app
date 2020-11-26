@@ -20,13 +20,17 @@ public class SampleControllerAccessTest {
 
   @Test
   public void testGetControllerId() {
+    // when
     String controllerId = ctrlAccess.getControllerId();
+    // then
     assertEquals(SampleController.ID, controllerId);
   }
 
   @Test
   public void testGetControllerParameterKeys() {
+    // when
     List<String> keys = ctrlAccess.getControllerParameterKeys();
+    // then
     assertTrue(keys.contains(PropertyHandler.TECPARAM_USER));
     assertTrue(keys.contains(PropertyHandler.TECPARAM_PWD));
     assertTrue(keys.contains(PropertyHandler.TECPARAM_EMAIL));
