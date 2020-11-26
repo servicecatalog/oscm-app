@@ -57,7 +57,6 @@ public class StateMachineTest {
   private PasswordAuthentication passwordAuthentication;
   private APPlatformService apPlatformService;
   private InputStream inputStream;
-  private Event mockEvent;
 
   static ProvisioningSettings ps;
   static HashMap<String, Setting> parameters;
@@ -100,7 +99,6 @@ public class StateMachineTest {
     passwordAuthentication = mock(PasswordAuthentication.class);
     apPlatformService = mock(APPlatformService.class);
     inputStream = mock(InputStream.class);
-    mockEvent = mock(Event.class);
 
     when(Thread.currentThread()).thenReturn(thread);
     when(thread.getContextClassLoader()).thenReturn(loader);
