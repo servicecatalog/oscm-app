@@ -9,35 +9,51 @@
  */
 package org.oscm.app.vmware.business;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
-import java.util.HashMap;
-
+import com.vmware.vim25.TaskInfo;
+import com.vmware.vim25.TaskInfoState;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscm.app.v2_0.data.ProvisioningSettings;
 import org.oscm.app.v2_0.data.Setting;
 import org.oscm.app.v2_0.exceptions.APPlatformException;
+import org.oscm.app.vmware.LoggerMocking;
+import org.oscm.app.vmware.business.model.Cluster;
+import org.oscm.app.vmware.business.model.VCenter;
 import org.oscm.app.vmware.i18n.Messages;
 import org.oscm.app.vmware.persistence.DataAccessService;
+import org.oscm.app.vmware.persistence.VMwareNetwork;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
+import org.slf4j.impl.SimpleLogger;
 
-/** @author Dirk Bernsau */
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
+
+@RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"javax.management.*", "javax.script.*", "jdk.internal.reflect.*"})
+@PrepareForTest({VMPropertyHandler.class})
 public class VMwarePropertyHandlerTest {
 
   private HashMap<String, Setting> parameters;
   private HashMap<String, Setting> configSettings;
   private ProvisioningSettings settings;
-  private VMPropertyHandler propertyHandler = new VMPropertyHandler(settings);
+  private VMPropertyHandler propertyHandler;
   private DataAccessService das;
+  private PortgroupIpSettings ipSettings;
+  private VMwareNetwork network;
+  private Cluster cluster;
+  private TaskInfo taskInfo;
+  private SimpleLogger mogger;
 
   @Before
   public void before() {
@@ -47,7 +63,13 @@ public class VMwarePropertyHandlerTest {
     propertyHandler = spy(new VMPropertyHandler(settings));
 
     das = mock(DataAccessService.class);
+    ipSettings = mock(PortgroupIpSettings.class);
+    network = mock(VMwareNetwork.class);
+    cluster = mock(Cluster.class);
+    taskInfo = mock(TaskInfo.class);
+    mogger = LoggerMocking.setDebugEnabledFor(VMPropertyHandler.class);
     doReturn(das).when(propertyHandler).getDataAccessService();
+    propertyHandler = PowerMockito.spy(new VMPropertyHandler(settings));
   }
 
   @Test
@@ -449,10 +471,10 @@ public class VMwarePropertyHandlerTest {
     doReturn("datacenter").when(propertyHandler).getTargetDatacenter();
     doReturn("cluster").when(propertyHandler).getTargetCluster();
     doReturn("vlan").when(propertyHandler).getVLAN(anyInt());
-
+    PowerMockito.whenNew(DataAccessService.class).withAnyArguments().thenReturn(das);
+    doNothing().when(das).releaseIPAddress(anyString(), anyString(), anyString(), anyString(), anyString());
     // when
     propertyHandler.releaseManuallyDefinedIPAddresses();
-
     // then
     verify(das, times(1))
         .releaseIPAddress(eq("site"), eq("datacenter"), eq("cluster"), eq("vlan"), eq("ipaddress"));
@@ -599,5 +621,261 @@ public class VMwarePropertyHandlerTest {
 
     // when
     propertyHandler.getIpAddress(5);
+  }
+
+  @Test
+  public void testGetNetworkSettingsFromDatabase() throws Exception {
+    // given
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC1_NETWORK_SETTINGS,
+            new Setting(VMPropertyHandler.TS_NIC1_NETWORK_SETTINGS, "DATABASE"));
+    settings
+        .getParameters()
+        .put(
+            VMPropertyHandler.TS_NIC2_NETWORK_SETTINGS,
+            new Setting(VMPropertyHandler.TS_NIC2_NETWORK_SETTINGS, "PORTGROUPIPPOOL"));
+    PowerMockito.when(propertyHandler.getServiceSetting(anyString())).thenReturn("2");
+    doNothing().when(propertyHandler).configureByDatabase(anyInt());
+    doNothing().when(propertyHandler).configureByPortgroupIPPool(anyInt());
+    // when
+    propertyHandler.getNetworkSettingsFromDatabase();
+    //then
+    verify(propertyHandler, times(1)).configureByDatabase(1);
+    verify(propertyHandler, times(1)).configureByPortgroupIPPool(2);
+  }
+
+  @Test
+  public void testConfigureByPortgroupIPPool() throws Exception {
+    // given
+    PowerMockito.whenNew(PortgroupIpSettings.class).withAnyArguments().thenReturn(ipSettings);
+    when(ipSettings.getIpAdressFromIpPool()).thenReturn("127.0.0.1");
+    // when
+    propertyHandler.configureByPortgroupIPPool(1);
+    //then
+    assertEquals("127.0.0.1", settings.getParameters().get(VMPropertyHandler.TS_NIC1_IP_ADDRESS).getValue());
+  }
+
+  @Test
+  public void testConfigureByDatabase_value_1() throws Exception {
+    // given
+    PowerMockito.when(propertyHandler.getDataAccessService()).thenReturn(das);
+    when(das.getVLANwithMostIPs(anyString(), anyString(), anyString())).thenReturn("vlan");
+    when(das.getNetworkSettings(anyString(), anyString(), anyString(), anyString())).thenReturn(network);
+    when(network.getDnsSuffix()).thenReturn("suf");
+    // when
+    propertyHandler.configureByDatabase(1);
+    //then
+    assertEquals("suf", settings.getParameters().get(VMPropertyHandler.TS_NIC1_DNS_SUFFIX).getValue());
+  }
+
+  @Test
+  public void testConfigureByDatabase_value_2() throws Exception {
+    // given
+    PowerMockito.when(propertyHandler.getDataAccessService()).thenReturn(das);
+    when(das.getVLANwithMostIPs(anyString(), anyString(), anyString())).thenReturn("vlan");
+    when(das.getNetworkSettings(anyString(), anyString(), anyString(), anyString())).thenReturn(network);
+    when(network.getDnsSuffix()).thenReturn("suf");
+    // when
+    propertyHandler.configureByDatabase(2);
+    //then
+    assertEquals("suf", settings.getParameters().get(VMPropertyHandler.TS_NIC2_DNS_SUFFIX).getValue());
+  }
+
+  @Test
+  public void testConfigureByDatabase_value_3() throws Exception {
+    // given
+    PowerMockito.when(propertyHandler.getDataAccessService()).thenReturn(das);
+    when(das.getVLANwithMostIPs(anyString(), anyString(), anyString())).thenReturn("vlan");
+    when(das.getNetworkSettings(anyString(), anyString(), anyString(), anyString())).thenReturn(network);
+    when(network.getDnsSuffix()).thenReturn("suf");
+    // when
+    propertyHandler.configureByDatabase(3);
+    //then
+    assertEquals("suf", settings.getParameters().get(VMPropertyHandler.TS_NIC3_DNS_SUFFIX).getValue());
+  }
+
+  @Test
+  public void testConfigureByDatabase_value_4() throws Exception {
+    // given
+    PowerMockito.when(propertyHandler.getDataAccessService()).thenReturn(das);
+    when(das.getVLANwithMostIPs(anyString(), anyString(), anyString())).thenReturn("vlan");
+    when(das.getNetworkSettings(anyString(), anyString(), anyString(), anyString())).thenReturn(network);
+    when(network.getDnsSuffix()).thenReturn("suf");
+    // when
+    propertyHandler.configureByDatabase(4);
+    //then
+    assertEquals("suf", settings.getParameters().get(VMPropertyHandler.TS_NIC4_DNS_SUFFIX).getValue());
+  }
+
+  @Test(expected = APPlatformException.class)
+  public void testConfigureByDatabase_ThrowException() throws Exception {
+    // given
+    PowerMockito.when(propertyHandler.getDataAccessService()).thenReturn(das);
+    // when
+    propertyHandler.configureByDatabase(4);
+  }
+
+  @Test
+  public void testGetDataDisksMB() {
+    // given
+    PowerMockito.when(propertyHandler.getServiceSetting(anyString())).thenReturn("1", "2", null);
+    // when
+    Double[] result = propertyHandler.getDataDisksMB();
+    //then
+    verify(propertyHandler, times(4)).getServiceSetting(anyString());
+    assertEquals(2, result.length);
+  }
+
+  @Test
+  public void testGetDataDiskKey() {
+    // given
+    settings.getParameters().put("DATA_DISK_KEY_2", new Setting("DATA_DISK_KEY_2", "140"));
+    // when
+    int result = propertyHandler.getDataDiskKey(2);
+    //then
+    assertEquals(140, result);
+  }
+
+  @Test
+  public void testSetDataDiskKey() {
+    // when
+    propertyHandler.setDataDiskKey(2, 140);
+    //then
+    assertEquals(140, propertyHandler.getDataDiskKey(2));
+  }
+
+  @Test
+  public void testGetVLANs() throws Exception {
+    //given
+    PowerMockito.when(propertyHandler.getDataAccessService()).thenReturn(das);
+    // when
+    propertyHandler.getVLANs(cluster);
+    //then
+    verify(das, times(1)).getVLANs(cluster);
+  }
+
+  @Test
+  public void testGetInstanceNameCustom() throws Exception {
+    //given
+    PowerMockito.when(propertyHandler.getDataAccessService()).thenReturn(das);
+    when(das.getVCenterIdentifier(anyString())).thenReturn("name");
+    PowerMockito.when(propertyHandler, "getDatacenterId").thenReturn("_datacenter");
+    when(das.getNextSequenceNumber(anyInt(), anyString())).thenReturn("_id");
+    // when
+    String result = Whitebox.invokeMethod(propertyHandler, "getInstanceNameCustom", "${VC}${DC}${ID3}${ID4}${ID5}${ID6}${ID7}${ID8}${ID10}${ID12}");
+    //then
+    verify(das, times(8)).getNextSequenceNumber(anyInt(), anyString());
+    assertEquals("name_datacenter_id_id_id_id_id_id_id_id", result);
+  }
+
+  @Test
+  public void testSetTask() throws Exception {
+    // when
+    propertyHandler.setTask(null);
+    //then
+    assertEquals("", settings.getParameters().get(VMPropertyHandler.TASK_KEY).getValue());
+    PowerMockito.verifyPrivate(propertyHandler, times(1)).invoke("logTaskInfo", null);
+  }
+
+  @Test
+  public void testLogTaskInfo() throws Exception {
+    //given
+    when(taskInfo.getState()).thenReturn(TaskInfoState.SUCCESS);
+    // when
+    Whitebox.invokeMethod(propertyHandler, "logTaskInfo", taskInfo);
+    //then
+    verify(mogger, times(1)).debug("Save task info key: null name: null target: null state: SUCCESS progress: 100% description:  queue-time:  start-time:  complete-time: ");
+  }
+
+  @Test
+  public void testGetHostLoadBalancerConfig() {
+    //given
+    PowerMockito.when(propertyHandler.getDataAccessService()).thenReturn(das);
+    when(das.getHostLoadBalancerConfig(anyString(), anyString(), anyString())).thenReturn("Test xml content");
+    // when
+    String result = propertyHandler.getHostLoadBalancerConfig();
+    //then
+    assertEquals("Test xml content", result);
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void testGetHostLoadBalancerConfigThrowException() {
+    //given
+    PowerMockito.when(propertyHandler.getDataAccessService()).thenReturn(das);
+    when(das.getHostLoadBalancerConfig(anyString(), anyString(), anyString())).thenReturn("");
+    // when
+    propertyHandler.getHostLoadBalancerConfig();
+  }
+
+  @Test
+  public void testGetDataDiskMountPointParameterKeys() {
+    //given
+    settings.getParameters().put("DATA_DISK_TARGET_18281", new Setting("DATA_DISK_KEY_1", "120"));
+    settings.getParameters().put("DATA_DISK_TARGET_14465", new Setting("DATA_DISK_KEY_2", "140"));
+    // when
+    List<String> result = propertyHandler.getDataDiskMountPointParameterKeys();
+    //then
+    assertEquals(2, result.size());
+    assertEquals("DATA_DISK_TARGET_14465", result.get(0));
+  }
+
+  @Test
+  public void testGetDataDiskSizeParameterKeys() {
+    //given
+    settings.getParameters().put("DATA_DISK_SIZE_18281", new Setting("DATA_DISK_KEY_1", "120"));
+    settings.getParameters().put("DATA_DISK_SIZE_14465", new Setting("DATA_DISK_KEY_2", "140"));
+    // when
+    List<String> result = propertyHandler.getDataDiskSizeParameterKeys();
+    //then
+    assertEquals(2, result.size());
+    assertEquals("DATA_DISK_SIZE_14465", result.get(0));
+  }
+
+  @Test
+  public void testGetDataDisksAsString() throws Exception {
+    //given
+    Double[] discMB = {1001.22, 2048.52};
+    when(propertyHandler.getDataDisksMB()).thenReturn(discMB);
+    // when
+    String result = propertyHandler.getDataDisksAsString();
+    //then
+    assertEquals("0 GB/1 GB/2 GB", result);
+  }
+
+  @Test
+  public void testGetResponsibleUserAsString() {
+    //given
+    when(propertyHandler.getServiceSetting(anyString())).thenReturn("USER");
+    // when
+    String result = propertyHandler.getResponsibleUserAsString("en");
+    //then
+    assertEquals("Responsible user: USER", result);
+  }
+
+  @Test
+  public void testGetResponsibleUserAsStringReturnNull() {
+    // when //then
+    assertNull(propertyHandler.getResponsibleUserAsString("en"));
+  }
+
+  @Test
+  public void testFormatMBasGB() {
+    // when
+    String result = propertyHandler.formatMBasGB(6254.2554);
+    //then
+    assertEquals("6.1 GB", result);
+  }
+
+  @Test
+  public void testGetTargetFolder() {
+    //given
+    settings.setOrganizationId("15000");
+    when(propertyHandler.getServiceSetting(anyString())).thenReturn("/oscm-app/folders/${ORGID}");
+    // when
+    String result = propertyHandler.getTargetFolder();
+    //then
+    assertEquals("/oscm-app/folders/15000", result);
   }
 }

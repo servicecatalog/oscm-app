@@ -9,19 +9,20 @@
  */
 package org.oscm.app.vmware.business;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import com.vmware.vim25.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.oscm.app.v2_0.data.ProvisioningSettings;
+import org.oscm.app.v2_0.exceptions.APPlatformException;
+import org.oscm.app.vmware.business.Script.OS;
+import org.oscm.app.vmware.remote.vmware.ManagedObjectAccessor;
+import org.oscm.app.vmware.remote.vmware.ServiceConnection;
+import org.oscm.app.vmware.remote.vmware.VMwareClient;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,33 +30,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.oscm.app.v2_0.data.ProvisioningSettings;
-import org.oscm.app.v2_0.exceptions.APPlatformException;
-import org.oscm.app.vmware.business.Script.OS;
-import org.oscm.app.vmware.remote.vmware.ManagedObjectAccessor;
-import org.oscm.app.vmware.remote.vmware.ServiceConnection;
-import org.oscm.app.vmware.remote.vmware.VMwareClient;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+import static org.powermock.api.mockito.PowerMockito.when;
 
-import com.vmware.vim25.CustomFieldDef;
-import com.vmware.vim25.GuestInfo;
-import com.vmware.vim25.GuestNicInfo;
-import com.vmware.vim25.ManagedObjectReference;
-import com.vmware.vim25.ServiceContent;
-import com.vmware.vim25.TaskInfo;
-import com.vmware.vim25.VimPortType;
-import com.vmware.vim25.VirtualDevice;
-import com.vmware.vim25.VirtualDisk;
-import com.vmware.vim25.VirtualHardware;
-import com.vmware.vim25.VirtualMachineConfigInfo;
-import com.vmware.vim25.VirtualMachinePowerState;
-import com.vmware.vim25.VirtualMachineRuntimeInfo;
-import com.vmware.vim25.VirtualMachineSnapshotInfo;
-import com.vmware.vim25.VirtualMachineSnapshotTree;
-import com.vmware.vim25.VirtualMachineSummary;
-
-/** @author worf */
+@RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"javax.management.*", "javax.script.*", "jdk.internal.reflect.*"})
+@PrepareForTest({VM.class, Script.class, VMScript.class})
 public class VMTest {
 
   private VM vm;
@@ -70,6 +52,8 @@ public class VMTest {
   private GuestInfo guestInfo;
   private VirtualMachineSummary virtualMachineSummary;
   private VirtualMachineSnapshotInfo virtualMachineSnapshotInfo;
+  private Script script;
+  private AboutInfo aboutInfo;
 
   private VimPortType service;
 
@@ -90,6 +74,10 @@ public class VMTest {
     service = mock(VimPortType.class);
     virtualMachineSummary = mock(VirtualMachineSummary.class);
     virtualMachineSnapshotInfo = mock(VirtualMachineSnapshotInfo.class);
+    script = mock(Script.class);
+    aboutInfo = mock(AboutInfo.class);
+    PowerMockito.mockStatic(Script.class);
+    PowerMockito.mockStatic(VMScript.class);
 
     init();
     vm = spy(new VM(vmc, "test"));
@@ -114,10 +102,10 @@ public class VMTest {
     // given
     Map<String, String> settings =
         Stream.of(
-                new String[][] {
-                  {"BACKUP", "true"},
-                  {"IP", "127.0.0.1"},
-                })
+            new String[][]{
+                {"BACKUP", "true"},
+                {"IP", "127.0.0.1"},
+            })
             .collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
     List<CustomFieldDef> fields = new ArrayList<CustomFieldDef>();
@@ -628,5 +616,52 @@ public class VMTest {
 
     // then
     assertEquals("true", "true");
+  }
+
+  @Test
+  public void testRunScript() throws Exception {
+    // given
+    when(ph.getServiceSetting(anyString())).thenReturn("https://company.com/script");
+    PowerMockito.when(Script.getInstance()).thenReturn(script);
+    when(configSpec.getGuestId()).thenReturn("windows");
+    // when
+    vm.runScript(ph);
+    // then
+    verify(script, times(1)).execute(any(), any());
+    verify(script, never()).setScriptExecuting(false);
+  }
+
+  @Test(expected = Exception.class)
+  public void testRunScriptThrowException() throws Exception {
+    // given
+    when(ph.getServiceSetting(anyString())).thenReturn("https://company.com/script");
+    // when
+    vm.runScript(ph);
+  }
+
+  @Test
+  public void testUpdateLinuxVMPassword() throws Exception {
+    // given
+    when(ph.getServiceSetting(anyString())).thenReturn("password");
+    PowerMockito.when(VMScript.updateLinuxVMRootPassword("password")).thenReturn("update");
+    PowerMockito.when(Script.getInstance()).thenReturn(script);
+    when(configSpec.getGuestId()).thenReturn("windows");
+    // when
+    vm.updateLinuxVMPassword(ph);
+    // then
+    verify(script, times(1)).execute(any(), any());
+  }
+
+  @Test
+  public void testCreateVmUrl() throws Exception {
+    //given
+    when(ph.getTargetVCenterServer()).thenReturn("oscm-app");
+    when(ph.getVsphereConsolePort()).thenReturn("8080");
+    when(vmInstance.getValue()).thenReturn("14000");
+    when(cont.getAbout()).thenReturn(aboutInfo);
+    // when
+    String result = vm.createVmUrl(ph);
+    // then
+    assertEquals("https://oscm-app:8080/vsphere-client/webconsole.html?vmId=14000&vmName=null&serverGuid=null&host=oscm-app:443&sessionTicket=cst-VCT", result);
   }
 }
