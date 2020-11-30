@@ -57,27 +57,29 @@ public class DynamicEquipartitionStorageBalancerTest {
 
   @Test
   public void testNext() throws APPlatformException {
+    //given
     when(properties.getServiceSetting(anyString())).thenReturn("TargetHost");
     when(inventory.getStorageByHost(anyString())).thenReturn(hosts);
     when(vMwareStorage.getFree()).thenReturn(1.0);
-
+    //when
     VMwareStorage result = desBalancer.next(properties);
-
+    //then
     verify(vMwareStorage, times(2)).getFree();
     assertEquals(vMwareStorage, result);
   }
 
   @Test(expected = APPlatformException.class)
   public void testNextNullTargetHost() throws APPlatformException {
-
+    //when
     desBalancer.next(properties);
   }
 
   @Test(expected = APPlatformException.class)
   public void testNextStorageFreeLessThanMaxSpace() throws APPlatformException {
+    //given
     when(properties.getServiceSetting(anyString())).thenReturn("TargetHost");
     when(inventory.getStorageByHost(anyString())).thenReturn(hosts);
-
+    //when
     desBalancer.next(properties);
   }
 }

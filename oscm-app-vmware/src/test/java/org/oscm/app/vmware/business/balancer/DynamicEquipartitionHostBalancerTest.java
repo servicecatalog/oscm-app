@@ -66,27 +66,29 @@ public class DynamicEquipartitionHostBalancerTest {
 
   @Test
   public void testNext() throws APPlatformException {
+    //given
     when(inventory.getHosts()).thenReturn(hosts);
-
+    //when
     VMwareHost result = dehBalancer.next(properties);
-
+    //then
     assertEquals(hosts.get(0), result);
   }
 
   @Test(expected = APPlatformException.class)
   public void testNextThrowsException() throws APPlatformException {
-
+    //when
     dehBalancer.next(properties);
   }
 
   @Test
   public void testSetConfiguration() {
+    //given
     when(node.getOwnerDocument()).thenReturn(document);
     when(document.getElementsByTagName(anyString())).thenReturn(nodeList);
     when(XMLHelper.getAttributeValue(any(), anyString(), anyString())).thenReturn("");
-
+    //when
     dehBalancer.setConfiguration(node);
-
+    //then
     verify(node, times(1)).getOwnerDocument();
   }
 }
