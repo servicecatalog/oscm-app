@@ -1,0 +1,54 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+<style> 
+td, th, caption 
+{ font: 15px arial; 
+} 
+caption { 
+  font: bold 15px arial; background-color: #FF9999; margin:5px;
+} .tcol { width: 200px; } .vcol { 
+  width: 400px; 
+} .ckey { font: 15px arial; } .cval { 
+   font: 15px arial; background-color: #F2F2F2; 
+} 
+</style>
+</head> 
+
+<body>
+<p/> 
+<p> Dear Approver,</p>
+<br/>
+<p> $(mail.body) </p> <hr/> 
+<table > 
+<caption>Subscription Technical Data</caption> 
+<colgroup> <col class="tcol"/> <col class="vcol" /> </colgroup> <tbody> 
+<tr > <td class="ckey">Service Name</td> <td class="cval">$(service.name)</td> </tr> 
+<tr > <td class="ckey">Technical Service ID</td> <td class="cval">$(service.technicalId)</td> </tr> 
+<tr > <td class="ckey">Organisation ID</td> <td class="cval">$(user.orgId)</td> </tr> 
+<tr > <td class="ckey">Price</td> <td class="cval">$(service.price.text)</td> </tr> 
+<tr > <td class="ckey">User Key</td> <td class="cval">$(user.key)</td> 
+</tr> </tbody> 
+</table > <hr/> 
+<table id="priceTable" > <caption>Price Model Details</caption> 
+<colgroup > <col class="tcol"/> <col class="vcol"/> </colgroup> <tbody> 
+<tr > <td class="ckey">Free period</td> <td class="cval">$(service.price.freePeriod)</td> </tr> 
+<tr > <td class="ckey">One time fee</td> <td class="cval">$(service.price.oneTimeFee) $(service.price.currency)</td> </tr> 
+<tr > <td class="ckey">Reoccuring price </td> <td class="cval">$(service.price.pricePerPeriod) $(service.price.currency)</td> </tr > 
+<tr > <td class="ckey">Price per user </td> <td class="cval">$(service.price.pricePerUser) $(service.price.currency)</td> </tr > 
+<tr > <td class="ckey">Price type </td> <td class="cval">$(service.price.type) </td> </tr >
+</tbody> </table >
+<hr/> 
+<table > <caption>User Data</caption> 
+<colgroup > <col class="tcol"/> <col class="vcol"/> </colgroup> <tbody> 
+<tr > <td class="ckey">First Name</td> <td class="cval">$(user.firstname)</td> </tr> 
+<tr > <td class="ckey">Name</td> <td class="cval">$(user.lastname)</td> </tr > 
+<tr > <td class="ckey">Email</td> <td class="cval">$(user.email)</td> </tr > 
+</tbody> </table > <hr/> <br/><br/>
+<script>
+if ('$(service.price.type)'=='FREE_OF_CHARGE') {
+	document.getElementById('priceTable').style.display = 'none';
+}
+</script>
+<p>Best regards,</p>
+<p>OSCM Approval Master<br/></p> </body> </html>
