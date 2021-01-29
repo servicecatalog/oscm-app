@@ -38,6 +38,16 @@
       <LocalizedDescription locale="de"/>
       <LocalizedDescription locale="ja"/>
     </ParameterDefinition>
+    <ParameterDefinition configurable="true" default="true" id="VSPHERE_ATTRIBUTE_BACKUP" mandatory="false" valueType="STRING">
+       <LocalizedDescription locale="en">The label to be used for backups of the VM</LocalizedDescription>
+       <LocalizedDescription locale="de"/>
+       <LocalizedDescription locale="ja"/>
+    </ParameterDefinition>
+    <ParameterDefinition configurable="true" default="true" id="VSPHERE_ATTRIBUTE_OWNER" mandatory="false" valueType="STRING">
+       <LocalizedDescription locale="en">Owner of the VM</LocalizedDescription>
+       <LocalizedDescription locale="de"/>
+       <LocalizedDescription locale="ja"/>
+    </ParameterDefinition>
     <ParameterDefinition configurable="false" default="ess.vmware" id="APP_CONTROLLER_ID" mandatory="true" valueType="STRING">
       <LocalizedDescription locale="en">The ID of the APP controller implementation.</LocalizedDescription>
       <LocalizedDescription locale="de"/>
