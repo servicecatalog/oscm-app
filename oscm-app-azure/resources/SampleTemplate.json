@@ -63,11 +63,12 @@
                 "2012-Datacenter",
                 "2012-R2-Datacenter",
 				"2016-Datacenter",
-				"7.3"
+				"7.3",
+				"18.04-LTS"
             ],
             "type": "String",
             "metadata": {
-                "description": "Image Sku for the VM. Allowed values: 2008-R2-SP1, 2012-Datacenter, 2012-R2-Datacenter, 2016-Datacenter, 7.3(For linux) ."
+                "description": "Image Sku for the VM. Allowed values: 2008-R2-SP1, 2012-Datacenter, 2012-R2-Datacenter, 2016-Datacenter, 7.3(For linux) 18.04-LTS."
             }
         }
     },
