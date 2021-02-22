@@ -672,34 +672,7 @@ public class AzureCommunication {
         if (!PowerState.RUNNING.equals(powerState)) {
           continue;
         }
-
-        List<NetworkInterfaceReference> nics = vm.getNetworkProfile().getNetworkInterfaces();
-        for (NetworkInterfaceReference nicReference : nics) {
-          NetworkInterface nic = getNic(nicReference);
-
-          logger.debug("NIC: {}, Is primary: {}", nic.getName(), nic.isPrimary());
-          if (nic.isPrimary() == Boolean.TRUE) {
-            // find public ip address
-            List<NetworkInterfaceIpConfiguration> ips = nic.getIpConfigurations();
-            for (NetworkInterfaceIpConfiguration ipConfiguration : ips) {
-              if (ipConfiguration.getPublicIpAddress() != null) {
-                String publicIp = getPublicIpAdressId(ipConfiguration);
-
-                accessPublicIPs.add(publicIp);
-                break;
-              } else {
-                logger.info("Public IP address not assigned ");
-              }
-              if (ipConfiguration.getPrivateIpAddress() != null) {
-                logger.debug("Private IP address: " + ipConfiguration.getPrivateIpAddress());
-                accessPrivateIPs.add(ipConfiguration.getPrivateIpAddress());
-              } else {
-                logger.info("Private IP address not assigned ");
-              }
-            }
-            break;
-          }
-        }
+        getNetworkInformationForVm(accessPublicIPs, accessPrivateIPs, vm);
       }
       accessStates.add(state);
 
@@ -715,7 +688,47 @@ public class AzureCommunication {
     return accessInfo;
   }
 
-  String getPublicIpAdressId(NetworkInterfaceIpConfiguration ipConfiguration)
+  protected List<NetworkInterfaceReference> getNetworkInformationForVm(
+      List<String> accessPublicIPs, List<String> accessPrivateIPs, VirtualMachine vm)
+      throws IOException, ServiceException {
+    List<NetworkInterfaceReference> nics = vm.getNetworkProfile().getNetworkInterfaces();
+    for (NetworkInterfaceReference nicReference : nics) {
+      NetworkInterface nic = getNic(nicReference);
+
+      logger.debug("NIC: {}, Is primary: {}", nic.getName(), nic.isPrimary());
+      if (nic.isPrimary() == Boolean.TRUE) {
+        // find public ip address
+        List<NetworkInterfaceIpConfiguration> ips = nic.getIpConfigurations();
+        setIpAdress(accessPublicIPs, accessPrivateIPs, ips);
+        break;
+      }
+    }
+    return nics;
+  }
+
+  protected void setIpAdress(
+      List<String> accessPublicIPs,
+      List<String> accessPrivateIPs,
+      List<NetworkInterfaceIpConfiguration> ips)
+      throws IOException, ServiceException {
+    for (NetworkInterfaceIpConfiguration ipConfiguration : ips) {
+      if (ipConfiguration.getPublicIpAddress() != null) {
+        String publicIp = getPublicIpAdressId(ipConfiguration);
+        accessPublicIPs.add(publicIp);
+        break;
+      } else {
+        logger.info("Public IP address not assigned ");
+      }
+      if (ipConfiguration.getPrivateIpAddress() != null) {
+        logger.debug("Private IP address: " + ipConfiguration.getPrivateIpAddress());
+        accessPrivateIPs.add(ipConfiguration.getPrivateIpAddress());
+      } else {
+        logger.info("Private IP address not assigned ");
+      }
+    }
+  }
+
+  protected String getPublicIpAdressId(NetworkInterfaceIpConfiguration ipConfiguration)
       throws IOException, ServiceException {
     String[] pipID = ipConfiguration.getPublicIpAddress().getId().split("/");
     PublicIpAddress pip =
@@ -756,33 +769,7 @@ public class AzureCommunication {
         if (!PowerState.RUNNING.equals(powerState)) {
           continue;
         }
-
-        List<NetworkInterfaceReference> nics = vm.getNetworkProfile().getNetworkInterfaces();
-        for (NetworkInterfaceReference nicReference : nics) {
-          NetworkInterface nic = getNic(nicReference);
-
-          logger.debug("NIC: {}, Is primary: {}", nic.getName(), nic.isPrimary());
-          if (nic.isPrimary() == Boolean.TRUE) {
-            // find public ip address
-            List<NetworkInterfaceIpConfiguration> ips = nic.getIpConfigurations();
-            for (NetworkInterfaceIpConfiguration ipConfiguration : ips) {
-              if (ipConfiguration.getPublicIpAddress() != null) {
-                String publicIp = getPublicIpAdressId(ipConfiguration);
-                accessPublicIPs.add(publicIp);
-                break;
-              } else {
-                logger.info("Public IP address not assigned ");
-              }
-              if (ipConfiguration.getPrivateIpAddress() != null) {
-                logger.debug("Private IP address: " + ipConfiguration.getPrivateIpAddress());
-                accessPrivateIPs.add(ipConfiguration.getPrivateIpAddress());
-              } else {
-                logger.info("Private IP address not assigned ");
-              }
-            }
-            break;
-          }
-        }
+        getNetworkInformationForVm(accessPublicIPs, accessPrivateIPs, vm);
       }
 
       server.setPrivateIP(accessPrivateIPs);
