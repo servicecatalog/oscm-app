@@ -764,7 +764,7 @@ public class AzureCommunication {
       for (VirtualMachine vm : vms) {
         logger.debug("VM: " + vm.getName());
         server.setName(vm.getName());
-        server.setType(vm.getHardwareProfile().getVirtualMachineSize());
+        server.setType(getVirtualMachineSize(vm));
         PowerState powerState = getPowerState(vm);
         server.setStatus(powerState.name().toString());
         if (!PowerState.RUNNING.equals(powerState)) {
@@ -779,6 +779,10 @@ public class AzureCommunication {
           "Getting VM name,Public IP and Private IP Address failed: " + e.getMessage(), e);
     }
     return server;
+  }
+
+  public String getVirtualMachineSize(VirtualMachine vm) {
+    return vm.getHardwareProfile().getVirtualMachineSize();
   }
 
   /**
