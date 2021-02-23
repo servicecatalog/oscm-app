@@ -764,6 +764,7 @@ public class AzureCommunication {
       for (VirtualMachine vm : vms) {
         logger.debug("VM: " + vm.getName());
         server.setName(vm.getName());
+        server.setType(vm.getHardwareProfile().getVirtualMachineSize());
         PowerState powerState = getPowerState(vm);
         server.setStatus(powerState.name().toString());
         if (!PowerState.RUNNING.equals(powerState)) {
@@ -771,7 +772,6 @@ public class AzureCommunication {
         }
         getNetworkInformationForVm(accessPublicIPs, accessPrivateIPs, vm);
       }
-
       server.setPrivateIP(accessPrivateIPs);
       server.setPublicIP(accessPublicIPs);
     } catch (IOException | ServiceException e) {
