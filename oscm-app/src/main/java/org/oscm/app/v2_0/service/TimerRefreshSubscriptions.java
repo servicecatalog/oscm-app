@@ -1,10 +1,12 @@
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
- *  Copyright FUJITSU LIMITED 2018
+ * <p>Copyright FUJITSU LIMITED 2018
  *
- *  Creation Date: 2017-05-05
+ * <p>Creation Date: 2017-05-05
  *
- *******************************************************************************/
+ * <p>*****************************************************************************
+ */
 package org.oscm.app.v2_0.service;
 
 import java.util.Collection;
@@ -34,74 +36,80 @@ import org.oscm.app.v2_0.intf.APPlatformController;
 /**
  * Created by BadziakP on 2017-05-04.
  *
- * This class is a timer which gets number of VMs from the cloud platform and
- * updates respective subscription parameters
+ * <p>This class is a timer which gets number of VMs from the cloud platform and updates respective
+ * subscription parameters
  */
-
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
 @Singleton
 @LocalBean
 @Startup
 public class TimerRefreshSubscriptions {
 
-	private static final String VM_TIMER_INFO = "abc2dac0-5f81-11e4-9803-0800200c9a66";
-	private static final long DEFAULT_TIMER_INTERVAL = 86400000;
+  private static final String VM_TIMER_INFO = "abc2dac0-5f81-11e4-9803-0800200c9a66";
+  private static final long DEFAULT_TIMER_INTERVAL = 86400000;
 
-	@Inject
-	protected ServiceInstanceServiceBean serviceInstanceService;
+  @Inject protected ServiceInstanceServiceBean serviceInstanceService;
 
-	@Resource
-	protected TimerService timerService;
+  @Resource protected TimerService timerService;
 
-	@EJB
-	protected APPConfigurationServiceBean configService;
+  @EJB protected APPConfigurationServiceBean configService;
 
-	@Inject
-	protected transient Logger logger;
+  @Inject protected transient Logger logger;
 
-	@PostConstruct
-	public void setTimer() {
-		Collection<Timer> timers = timerService.getTimers();
-		for (Timer timerVM : timers) {
-			if (VM_TIMER_INFO.equals(timerVM.getInfo())) {
-				timerVM.cancel();
-			}
-		}
-		logger.info("Timer for subscription VMs will be created.");
-		try {
-			String timerIntervalSetting = configService
-					.getProxyConfigurationSetting(PlatformConfigurationKey.APP_TIMER_REFRESH_SUBSCRIPTIONS);
-			long interval = Long.parseLong(timerIntervalSetting);
-			timerService.createTimer(0, interval, VM_TIMER_INFO);
-			// timerService.createIntervalTimer(new Date(), interval,
-			// new TimerConfig());
-		} catch (ConfigurationException e) {
-			timerService.createTimer(0, DEFAULT_TIMER_INTERVAL, VM_TIMER_INFO);
-			logger.info("Timer interval for refreshing subcription VMs not set, switch to default 10 min.");
-		}
-	}
+  @PostConstruct
+  public void setTimer() {
+    Collection<Timer> timers = timerService.getTimers();
+    for (Timer timerVM : timers) {
+      if (VM_TIMER_INFO.equals(timerVM.getInfo())) {
+        timerVM.cancel();
+      }
+    }
+    logger.info("Timer for subscription VMs will be created.");
+    try {
+      String timerIntervalSetting =
+          configService.getProxyConfigurationSetting(
+              PlatformConfigurationKey.APP_TIMER_REFRESH_SUBSCRIPTIONS);
+      long interval = Long.parseLong(timerIntervalSetting);
+      if (interval == -1L) {
+        logger.info(
+            String.format(
+                "Timer %s is disabled (interval is set to -1)",
+                PlatformConfigurationKey.APP_TIMER_REFRESH_SUBSCRIPTIONS.name()));
+        return;
+      }
+      timerService.createTimer(0, interval, VM_TIMER_INFO);
 
-	@Timeout
-	public void execute(Timer timer) {
-		if (!VM_TIMER_INFO.equals(timer.getInfo())) {
-			return;
-		}
-		List<ServiceInstance> instances = serviceInstanceService.getInstances();
-		for (ServiceInstance serviceInstance : instances) {
-			try {
-				final APPlatformController controller = APPlatformControllerFactory
-						.getInstance(serviceInstance.getControllerId());
+    } catch (ConfigurationException e) {
+      timerService.createTimer(0, DEFAULT_TIMER_INTERVAL, VM_TIMER_INFO);
+      logger.info(
+          "Timer interval for refreshing subcription VMs not set, switch to default 10 min.");
+    }
+  }
 
-				int vmsNumber = controller.getServersNumber(serviceInstance.getInstanceId(),
-						serviceInstance.getSubscriptionId(), serviceInstance.getOrganizationId());
+  @SuppressWarnings("boxing")
+  @Timeout
+  public void execute(Timer timer) {
+    if (!VM_TIMER_INFO.equals(timer.getInfo())) {
+      return;
+    }
+    List<ServiceInstance> instances = serviceInstanceService.getInstances();
+    for (ServiceInstance serviceInstance : instances) {
+      try {
+        final APPlatformController controller =
+            APPlatformControllerFactory.getInstance(serviceInstance.getControllerId());
 
-				ServiceInstance updatedServiceInstance = serviceInstanceService.updateVmsNumber(serviceInstance,
-						vmsNumber);
-				serviceInstanceService.notifySubscriptionAboutVmsNumber(updatedServiceInstance);
-			} catch (APPlatformException e) {
-				logger.error("Subscription cannot be notified about VMs number: ", e);
-			}
-		}
-	}
+        int vmsNumber =
+            controller.getServersNumber(
+                serviceInstance.getInstanceId(),
+                serviceInstance.getSubscriptionId(),
+                serviceInstance.getOrganizationId());
 
+        ServiceInstance updatedServiceInstance =
+            serviceInstanceService.updateVmsNumber(serviceInstance, vmsNumber);
+        serviceInstanceService.notifySubscriptionAboutVmsNumber(updatedServiceInstance);
+      } catch (APPlatformException e) {
+        logger.error("Subscription cannot be notified about VMs number: ", e);
+      }
+    }
+  }
 }
