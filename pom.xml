@@ -249,8 +249,8 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>29.0-jre</version>
-            </dependency>
+                <version>[30.0-jre,)</version>
+            </dependency>     
             <dependency>
                 <groupId>com.github.servicecatalog.oscm-interfaces</groupId>
                 <artifactId>oscm-app-extsvc</artifactId>
