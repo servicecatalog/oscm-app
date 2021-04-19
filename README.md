@@ -1,4 +1,4 @@
-[![Build status](https://travis-ci.org/servicecatalog/oscm-app.svg?branch=master)](https://travis-ci.org/servicecatalog/oscm-app)
+[![Build status](https://travis-ci.com/servicecatalog/oscm-app.svg?branch=master)](https://travis-ci.com/servicecatalog/oscm-app)
 [![codecov](https://codecov.io/gh/servicecatalog/oscm-app/branch/master/graph/badge.svg)](https://codecov.io/gh/servicecatalog/oscm-app)
 
 # What is it?
