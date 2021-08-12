@@ -1,4 +1,4 @@
-[![Build status](https://travis-ci.com/servicecatalog/oscm-app.svg?branch=master)](https://travis-ci.com/servicecatalog/oscm-app)
+[![Maven](https://github.com/servicecatalog/oscm-app/actions/workflows/maven.yml/badge.svg)](https://github.com/servicecatalog/oscm-app/actions)
 [![codecov](https://codecov.io/gh/servicecatalog/oscm-app/branch/master/graph/badge.svg)](https://codecov.io/gh/servicecatalog/oscm-app)
 
 # What is it?
