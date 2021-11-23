@@ -44,7 +44,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
           name: ${{ github.event.repository.name }}-coveragereport
-          path: ./**/target/site/jacoco/
+          path: ./**/oscm-app-coverage/target/site/jacoco-aggregate
     - name: Archive test results
       uses: actions/upload-artifact@v2
       with:
