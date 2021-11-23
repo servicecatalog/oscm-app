@@ -10,6 +10,17 @@
 
   <artifactId>oscm-app-approval</artifactId>
   <packaging>ejb</packaging>
+
+  <build>
+    <finalName>${project.artifactId}</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
   <dependencies>
     <dependency>
       <groupId>com.github.servicecatalog.oscm-interfaces</groupId>

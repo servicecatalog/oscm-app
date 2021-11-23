@@ -54,7 +54,7 @@ public class ConfigurationBeanTest {
     when(facesCtx.getExternalContext()).thenReturn(externalCtx);
     when(externalCtx.getSession(anyBoolean())).thenReturn(httpSession);
     when(facesCtx.getViewRoot()).thenReturn(viewRoot);
-    when(viewRoot.getLocale()).thenReturn(Locale.getDefault());
+    when(viewRoot.getLocale()).thenReturn(new Locale("en"));
   }
 
   @Test
