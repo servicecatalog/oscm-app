@@ -478,7 +478,7 @@ public class EC2CommunicationTest {
       assertTrue("Error message not as expected", ape.getMessage()
           .contains("cannot find the file")
           || ape.getMessage().contains("No such file")
-              || ape.getMessage().contains("Reading userdata failed"));;
+          || ape.getMessage().contains("Reading userdata failed"));
     } finally {
       myFile.delete();
     }
