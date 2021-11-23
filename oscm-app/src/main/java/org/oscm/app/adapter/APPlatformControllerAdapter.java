@@ -1,11 +1,3 @@
-/*******************************************************************************
- *
- *  Copyright FUJITSU LIMITED 2018
- *
- *  Creation Date: 29.10.15 10:01
- *
- ******************************************************************************/
-
 package org.oscm.app.adapter;
 
 import org.oscm.app.v2_0.data.*;
@@ -70,6 +62,7 @@ public class APPlatformControllerAdapter implements APPlatformController {
                 return delegate
                         .notifyInstance(instanceId, settings, properties);
         }
+
 
         @Override
         public InstanceStatus activateInstance(String instanceId,
