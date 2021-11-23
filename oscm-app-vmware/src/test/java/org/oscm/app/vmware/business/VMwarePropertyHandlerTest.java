@@ -865,7 +865,7 @@ public class VMwarePropertyHandlerTest {
     // when
     String result = propertyHandler.formatMBasGB(6254.2554);
     //then
-    assertEquals("6.1 GB", result);
+    assertTrue(" Expected 6.1 GB", result.matches("6.1 GB"));
   }
 
   @Test

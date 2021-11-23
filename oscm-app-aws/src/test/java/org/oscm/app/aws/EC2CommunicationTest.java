@@ -477,7 +477,8 @@ public class EC2CommunicationTest {
     } catch (APPlatformException ape) {
       assertTrue("Error message not as expected", ape.getMessage()
           .contains("cannot find the file")
-          || ape.getMessage().contains("No such file"));
+          || ape.getMessage().contains("No such file")
+          || ape.getMessage().contains("Reading userdata failed"));
     } finally {
       myFile.delete();
     }
