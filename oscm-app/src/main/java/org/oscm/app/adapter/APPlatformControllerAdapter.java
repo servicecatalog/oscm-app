@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.Properties;
 
 public class APPlatformControllerAdapter implements APPlatformController {
-
+  
+        
+        
 
         private APPlatformController delegate;
 
