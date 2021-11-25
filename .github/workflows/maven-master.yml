@@ -42,7 +42,7 @@ jobs:
         shell: bash
       - name: Build with Maven
         run: mvn clean install -f pom.xml
-      - name: Publish formatted code
+      - name: Publish Formatted Code
         run: ./scripts/repush_formatted_code.sh
         env:
           COMMIT: ${{ github.sha }}
