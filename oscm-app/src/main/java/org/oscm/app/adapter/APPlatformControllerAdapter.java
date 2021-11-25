@@ -16,6 +16,7 @@ public class APPlatformControllerAdapter implements APPlatformController {
         private APPlatformControllerAdapter() {
         }
 
+
         public APPlatformControllerAdapter(APPlatformController delegate) {
                 this.delegate = delegate;
         }
