@@ -1,4 +1,4 @@
-[![Maven](https://github.com/servicecatalog/oscm-app/actions/workflows/maven.yml/badge.svg)](https://github.com/servicecatalog/oscm-app/actions)
+[![Maven](https://github.com/servicecatalog/oscm-app/actions/workflows/maven-master.yml/badge.svg)](https://github.com/servicecatalog/oscm-app/actions)
 [![codecov](https://codecov.io/gh/servicecatalog/oscm-app/branch/master/graph/badge.svg)](https://codecov.io/gh/servicecatalog/oscm-app)
 
 # What is it?
